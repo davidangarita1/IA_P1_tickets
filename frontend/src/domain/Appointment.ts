@@ -1,7 +1,6 @@
 // ⚕️ HUMAN CHECK - Modelo de dominio sincronizado con backend TurnoEventPayload
-// Los tipos de estado y priority son uniones literales, no strings genéricos
+// Los tipos de estado son uniones literales, no strings genéricos
 export type AppointmentStatus = "espera" | "llamado" | "atendido";
-export type AppointmentPriority = "alta" | "media" | "baja";
 
 export interface Appointment {
     id: string;
@@ -10,5 +9,4 @@ export interface Appointment {
     consultorio: string | null;
     timestamp: number;
     estado: AppointmentStatus;
-    priority: AppointmentPriority;
 }

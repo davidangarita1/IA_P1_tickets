@@ -1,47 +1,66 @@
 # IA_P1 - Sistema de Turnos Médicos en Tiempo Real
 
-> Sistema de gestión de turnos médicos basado en **Microservicios**, **Event-Driven Architecture** y **WebSockets**.
+> Sistema de gestión de turnos médicos basado en **Microservicios**, **Event-Driven Architecture** y **WebSockets en tiempo real**.
 
-## 🚀 Arquitectura y Flujo
+## Arquitectura y Flujo
 
-El sistema desacopla la recepción de turnos de su procesamiento para garantizar alta disponibilidad y escalabilidad.
+El sistema desacopla la recepción de turnos de su procesamiento, garantizando alta disponibilidad, escalabilidad y actualizaciones en tiempo real.
 
 ```mermaid
 sequenceDiagram
-    participant C as Cliente (Frontend)
-    participant P as Producer (API + WS)
+    participant C as Cliente (Next.js :3001)
+    participant P as Producer (NestJS :3000)
     participant Q as RabbitMQ
-    participant W as Consumer (Worker)
+    participant W as Consumer (NestJS Worker)
     participant S as Scheduler (Consumer)
     participant D as MongoDB
 
     C->>P: 1. POST /turnos (HTTP)
-    P->>Q: 2. Publica 'crear_turno'
+    P->>Q: 2. Publica 'crear_turno' → turnos_queue
     P-->>C: 202 Accepted
     Q->>W: 3. Consume mensaje
-    W->>D: 4. Guarda turno (Estado: Espera)
-    
-    loop Cada 15s (Scheduler)
+    W->>D: 4. Guarda turno (estado: espera)
+
+    loop Cada 15s (configurable via SCHEDULER_INTERVAL)
         S->>D: 5. Busca turnos en espera
-        S->>D: 6. Asigna consultorio (Atomic Update)
-        S->>Q: 7. Publica 'turno_actualizado'
+        S->>D: 6. Asigna consultorio (findOneAndUpdate atómico)
+        S->>Q: 7. Publica 'turno_actualizado' → turnos_notifications
     end
 
-    Q->>P: 8. Consume evento 'turno_actualizado'
-    P->>C: 9. Emite evento WebSocket (Real-time)
+    Q->>P: 8. Consume evento de turnos_notifications
+    P->>C: 9. Emite via WebSocket (socket.io) en tiempo real
 ```
 
-## 🧩 Servicios
+## Stack Tecnológico
+
+| Capa | Tecnología | Versión mínima |
+|---|---|---|
+| Backend (microservicios) | **NestJS** | v10 |
+| Frontend | **Next.js** (App Router) | v14 |
+| Base de datos | **MongoDB** | v7 |
+| Message broker | **RabbitMQ** | v3 |
+| WebSockets | **socket.io** (`@nestjs/websockets`) | — |
+| Contenedores | **Docker + Docker Compose** | — |
+| Estilos frontend | **CSS Modules** | — |
+
+## Servicios
 
 | Servicio | Tecnología | Puerto | Responsabilidad |
 |---|---|---|---|
-| **Producer** | NestJS | `3000` | API Gateway, Validación de entrada, WebSocket Gateway,Swagger Documentation. |
-| **Consumer** | NestJS | — | Procesamiento asíncrono, Scheduler de asignación, Persistencia en DB. |
-| **Frontend** | Next.js | `3001` | Interfaz de usuario Reactiva, Cliente WebSocket, Diseño moderno. |
-| **RabbitMQ** | RabbitMQ 3 | `5672` | Broker de mensajería (Colas: `turnos_queue`, `turnos_notifications`). |
-| **MongoDB** | MongoDB 7 | `27017` | Base de datos NoSQL persistente. |
+| **Producer** | NestJS | `3000` | API Gateway, validación de entrada, WebSocket Gateway, Swagger docs |
+| **Consumer** | NestJS | — | Procesamiento asíncrono, Scheduler de asignación, persistencia en MongoDB |
+| **Frontend** | Next.js 16 | `3001` | UI reactiva, cliente WebSocket, registro de turnos, dashboard de atendidos |
+| **RabbitMQ** | RabbitMQ 3 | `5672` / `15672` | Broker de mensajería (`turnos_queue`, `turnos_notifications`) |
+| **MongoDB** | MongoDB 7 | `27017` | Base de datos NoSQL persistente |
 
-## 🛠️ Instalación y Ejecución
+## Colas RabbitMQ
+
+| Cola | Dirección | Contenido | Consumidor |
+|---|---|---|---|
+| `turnos_queue` | Producer → Consumer | `crear_turno` (payload del turno) | Consumer Worker |
+| `turnos_notifications` | Consumer → Producer | `turno_actualizado` (turno con consultorio) | Producer → WS Gateway |
+
+## Instalación y Ejecución
 
 ### Prerrequisitos
 - Docker Engine & Docker Compose
@@ -54,45 +73,63 @@ sequenceDiagram
    cd IA_P1
    ```
 
-2. **Iniciar la infraestructura**
+2. **Configurar entorno**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Iniciar la infraestructura**
    ```bash
    docker compose up -d --build
    ```
 
-3. **Acceder a la aplicación**
+4. **Acceder a la aplicación**
    - **Frontend:** [http://localhost:3001](http://localhost:3001)
    - **API Swagger:** [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
    - **RabbitMQ Admin:** [http://localhost:15672](http://localhost:15672) (user: `guest`, pass: `guest`)
 
-## ✨ Características Clave
+## Variables de Entorno
 
-- **Event-Driven**: Comunicación asíncrona entre servicios para mayor resiliencia.
-- **Real-Time**: Actualizaciones instantáneas en el frontend vía WebSockets (`socket.io`).
-- **Concurrency Safe**: Asignación de turnos atómica (`findOneAndUpdate`) para prevenir race conditions.
-- **Robustez**:
-  - Manejo de errores tipado (`TurnoEventPayload`).
-  - Validación de datos (DTOs + `class-validator`).
-  - Logs estructurados (`NestJS Logger`).
-- **Infraestructura como Código**: Entorno completamente dockerizado (`docker-compose.yml`).
+Todas las credenciales y configuraciones se manejan via `.env`. **Nunca commitear `.env` a Git.**
 
-## 📡 API Endpoints (Producer)
+```env
+# Producer
+PRODUCER_PORT=3000
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| `POST` | `/turnos` | Crear un nuevo turno (Async) |
-| `GET` | `/turnos` | Listar todos los turnos |
-| `GET` | `/turnos/:cedula` | Buscar turnos por cédula |
+# Frontend
+FRONTEND_PORT=3001
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_WS_URL=http://localhost:3000
 
-## 🧪 Pruebas Manuales (cURL)
+# RabbitMQ
+RABBITMQ_PORT=5672
+RABBITMQ_MGMT_PORT=15672
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
+RABBITMQ_QUEUE=turnos_queue
 
-**Crear un turno:**
+# MongoDB
+MONGODB_PORT=27017
+MONGO_USER=admin
+MONGO_PASS=admin123
+```
+
+## API Endpoints (Producer)
+
+| Método | Endpoint | Descripción | Respuesta |
+|---|---|---|---|
+| `POST` | `/turnos` | Crear un nuevo turno (async) | `202 Accepted` |
+| `GET` | `/turnos` | Listar todos los turnos | `200 OK` |
+| `GET` | `/turnos/:cedula` | Buscar turnos por cédula | `200 OK` |
+
+### Ejemplo cURL
+
 ```bash
 curl -X POST http://localhost:3000/turnos \
   -H "Content-Type: application/json" \
   -d '{"nombre": "Paciente Test", "cedula": 12345, "priority": "alta"}'
 ```
 
-**Ver respuesta:**
 ```json
 {
   "status": "accepted",
@@ -100,31 +137,103 @@ curl -X POST http://localhost:3000/turnos \
 }
 ```
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 IA_P1/
 ├── backend/
-│   ├── producer/        # API Gateway & WebSocket Server
-│   │   ├── src/events/  # Controladores de eventos (RabbitMQ -> WS)
-│   │   └── src/turnos/  # Lógica de negocio HTTP
-│   └── consumer/        # Worker Service
-│       ├── src/scheduler/ # Lógica de asignación automática
-│       └── src/turnos/    # Persistencia MongoDB
-├── frontend/            # Next.js App Router
-│   ├── src/hooks/       # Custom Hooks (useTurnosWebSocket)
-│   └── src/domain/      # Modelos compartidos
-├── docker-compose.yml   # Orquestación de contenedores
-└── README.md            # Documentación
+│   ├── producer/                  # API Gateway + WebSocket Server (puerto 3000)
+│   │   └── src/
+│   │       ├── turnos/            # Controladores HTTP, DTOs, lógica de negocio
+│   │       ├── events/            # RabbitMQ → WebSocket event handlers
+│   │       ├── dto/               # Data Transfer Objects
+│   │       ├── schemas/           # Mongoose schemas
+│   │       └── types/             # Tipos compartidos (TurnoEventPayload)
+│   └── consumer/                  # Worker Service (sin puerto expuesto)
+│       └── src/
+│           ├── turnos/            # Persistencia MongoDB
+│           ├── scheduler/         # Lógica de asignación automática (cron)
+│           ├── notifications/     # Publicación de eventos post-asignación
+│           ├── dto/               # Data Transfer Objects
+│           ├── schemas/           # Mongoose schemas
+│           └── types/             # Tipos compartidos
+├── frontend/                      # Next.js App Router (puerto 3001)
+│   └── src/
+│       ├── app/                   # Pages y routes (App Router)
+│       ├── components/            # Componentes UI reutilizables
+│       │   ├── AppointmentCard/
+│       │   ├── AppointmentList/
+│       │   └── AppointmentRegistrationForm/
+│       ├── hooks/                 # Custom hooks (WebSocket, audio, registro)
+│       ├── domain/                # Interfaces puras (Appointment, DTOs)
+│       ├── repositories/          # Repository pattern (puerto + adaptador HTTP)
+│       ├── lib/                   # httpClient + CircuitBreaker
+│       ├── services/              # AudioService (singleton)
+│       ├── config/                # Variables de entorno con validación
+│       ├── security/              # Sanitización de inputs
+│       ├── utils/                 # date-formatter, error-guard (type guards)
+│       ├── styles/                # CSS Modules (page, form, globals)
+│       └── __tests__/             # Tests automatizados (Jest + Testing Library)
+├── docker-compose.yml             # Orquestación de contenedores
+├── .env.example                   # Variables de entorno documentadas
+└── AI_WORKFLOW.md                 # Guía de arquitectura y principios SOLID
 ```
 
-## 📝 Notas de Auditoría (Fixes recientes)
+## Testing
 
-- **Type Safety**: Se eliminaron los tipos `any` mediante interfaces compartidas (`TurnoEventPayload`).
-- **Race Conditions**: Se corrigió la lógica del scheduler para garantizar asignaciones únicas.
-- **Frontend Sync**: Se ajustaron los tipos (`cedula: number`) para coincidir con el backend.
-- **Docker Networking**: Configuración corregida para que el cliente navegador use `localhost`.
-- **Scheduler configurable**: El intervalo del scheduler del consumer ahora se lee de `SCHEDULER_INTERVAL_MS` (default 15000 ms, alineado con la documentación).
-- **Validación en eventos**: El microservicio RMQ aplica `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform` para validar `CreateTurnoDto` en eventos.
-- **Ack/Nack explícitos**: El consumer confirma mensajes en éxito y diferencia `nack` sin requeue para errores de validación vs requeue en errores transitorios para evitar bloqueo con `prefetch=1`.
-- **Robustez**: Estas mejoras fortalecen el entorno de desarrollo; aún faltan políticas de reintentos, DLQ y hardening para un entorno productivo.
+### Backend — Producer
+
+```bash
+cd backend/producer
+npm test               # Ejecutar tests unitarios
+npm run test:watch     # Modo watch
+npm run test:cov       # Con cobertura
+```
+
+Tests de DTOs, controladores y servicios del Producer.
+
+### Frontend
+
+```bash
+cd frontend
+npm test               # Ejecutar 84 tests (11 suites)
+npm run test:watch     # Modo watch
+npm run test:coverage  # Con cobertura
+```
+
+| Tipo | Descripción | Suites |
+|------|-------------|--------|
+| **Unitarios (lógica pura)** | Type guards, formateo, sanitización, circuit breaker | 5 |
+| **Unitarios (componentes)** | Renderizado y comportamiento con Testing Library | 3 |
+| **Integración (repositorios)** | Adapter HTTP contra la interface (puerto) con mocks | 1 |
+| **Configuración** | Validación de variables de entorno al arranque | 1 |
+| **Servicios** | Ciclo de vida del AudioService (singleton, unlock, autoplay) | 1 |
+
+## Características Clave
+
+- **Event-Driven**: Comunicación asíncrona entre servicios via RabbitMQ
+- **Real-Time**: Actualizaciones instantáneas en el frontend via WebSocket (`socket.io`)
+- **Concurrency Safe**: Asignación de turnos atómica (`findOneAndUpdate`) sin race conditions
+- **Resiliente**: Circuit Breaker, retry con backoff, timeout configurable en el frontend
+- **Type-Safe**: Interfaces compartidas (`TurnoEventPayload`), zero `any` en TypeScript
+- **Validación**: DTOs con `class-validator`, `ValidationPipe` global con `whitelist` y `transform`
+- **Ack/Nack explícitos**: Diferenciación entre errores de validación (no requeue) y transitorios (requeue)
+- **Seguridad**: Sanitización de inputs, rate limiting, CSP headers, CORS configurado
+- **Infraestructura como Código**: Entorno completamente dockerizado
+- **Arquitectura Hexagonal** (en progreso): Puertos e interfaces en `domain/`, adaptadores en `repositories/`
+
+## Auditoría y Deuda Técnica
+
+| Documento | Contenido |
+|---|---|
+| `AI_WORKFLOW.md` | Guía de arquitectura, principios SOLID, reglas de generación de código |
+| `DEBT_REPORT.md` | Auditoría de deuda técnica del backend |
+| `DEBT_REPORT_FRONTEND.md` | Auditoría de deuda técnica del frontend (18/18 resueltas) |
+| `AUDIT_REPORT.md` | Reporte general de auditoría |
+
+## Roadmap
+
+- [x] **Week 0**: Infraestructura base, Producer, Consumer, Frontend, Docker Compose
+- [x] **Week 1**: Refactor hacia arquitectura hexagonal, tests automatizados, deuda técnica resuelta
+- [ ] **Week 2**: Adapters completos, Use Cases en backend
+- [ ] **Week 3–6**: DLQ, observabilidad, hardening para producción
