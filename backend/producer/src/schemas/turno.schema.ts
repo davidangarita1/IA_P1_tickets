@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { TurnoEstado, TurnoPriority } from '../types/turno-event';
+import { TurnoEstado, TurnoPriority } from '../domain/entities/turno.entity';
 
 export type TurnoDocument = HydratedDocument<Turno>;
 

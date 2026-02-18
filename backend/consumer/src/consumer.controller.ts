@@ -1,17 +1,16 @@
-import { BadRequestException, Controller, Inject, Logger } from '@nestjs/common';
-import { ClientProxy, Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { BadRequestException, Controller, Logger } from '@nestjs/common';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateTurnoDto } from './dto/create-turno.dto';
-import { TurnosService } from './turnos/turnos.service';
-import { NotificationsService } from './notifications/notifications.service';
+import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
 
 @Controller()
 export class ConsumerController {
     private readonly logger = new Logger(ConsumerController.name);
 
+    // ⚕️ HUMAN CHECK - SRP: Controller solo maneja transporte RabbitMQ (ack/nack),
+    // delega la lógica de negocio al Use Case
     constructor(
-        private readonly turnosService: TurnosService,
-        private readonly notificationsService: NotificationsService,
-        @Inject('TURNOS_NOTIFICATIONS') private readonly notificationsClient: ClientProxy,
+        private readonly createTurnoUseCase: CreateTurnoUseCase,
     ) { }
 
     @EventPattern('crear_turno')
@@ -19,44 +18,19 @@ export class ConsumerController {
         const channel = context.getChannelRef();
         const originalMsg = context.getMessage();
 
-        // ⚕️ HUMAN CHECK - Lógica de Procesamiento de Mensajes
-        // Verificar que los datos recibidos tengan la estructura esperada
         this.logger.log(`Recibido mensaje: ${JSON.stringify(data)}`);
 
         try {
-            // ⚕️ HUMAN CHECK - Validación explícita post-transform
-            if (typeof data.cedula !== 'number' || Number.isNaN(data.cedula)) {
-                throw new BadRequestException('cedula debe ser numérica');
-            }
-
-            // Persistir turno en MongoDB (estado: espera, sin consultorio)
-            const turno = await this.turnosService.crearTurno(data);
-            this.logger.log(
-                `Turno creado en espera para paciente ${turno.cedula} — ID: ${turno._id}`,
-            );
-
-            // Enviar notificación (log)
-            await this.notificationsService.sendNotification(String(turno.cedula), turno.consultorio);
-
-            // ⚕️ HUMAN CHECK - Emitir evento turno_creado al Producer
-            // El Producer recibirá este evento y hará broadcast por WebSocket
-            // Usa toEventPayload() para garantizar type safety
-            this.notificationsClient.emit(
-                'turno_creado',
-                this.turnosService.toEventPayload(turno),
-            );
+            // ⚕️ HUMAN CHECK - La validación de cedula la maneja ValidationPipe + @IsNumber() en CreateTurnoDto
+            await this.createTurnoUseCase.execute(data);
 
             // ⚕️ HUMAN CHECK - Confirmación Manual (Ack)
-            // Solo confirmar si el procesamiento fue exitoso para evitar bloqueo por prefetch=1
             channel.ack(originalMsg);
         } catch (error: unknown) {
-            // ⚕️ HUMAN CHECK - Error tipado (eliminado any implícito en catch)
             const message = error instanceof Error ? error.message : String(error);
             this.logger.error(`Error procesando mensaje: ${message}`);
 
             // ⚕️ HUMAN CHECK - Manejo de errores con nack controlado
-            // - Errores de validación: no requeue para evitar loops infinitos
-            // - Errores transitorios (otros): requeue=true para reintentar
             if (error instanceof BadRequestException) {
                 channel.nack(originalMsg, false, false);
             } else {

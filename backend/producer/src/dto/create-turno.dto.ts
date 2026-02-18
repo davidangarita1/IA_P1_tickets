@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber, IsOptional, IsIn, IsPositive, Max } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TurnoPriority } from '../types/turno-event';
+import { TurnoPriority } from '../domain/entities/turno.entity';
 
 export class CreateTurnoDto {
     // ⚕️ HUMAN CHECK - Validaciones del DTO

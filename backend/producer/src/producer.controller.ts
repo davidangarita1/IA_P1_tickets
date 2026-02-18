@@ -1,16 +1,19 @@
 import { Body, Controller, Get, HttpCode, Param, Post, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { ProducerService, CreateTurnoResponse } from './producer.service';
-import { TurnosService } from './turnos/turnos.service';
 import { CreateTurnoDto } from './dto/create-turno.dto';
-import { TurnoEventPayload } from './types/turno-event';
+import { TurnoEventPayload } from './domain/entities/turno.entity';
+import { CreateTurnoUseCase, CreateTurnoResult } from './application/use-cases/create-turno.use-case';
+import { GetAllTurnosUseCase } from './application/use-cases/get-all-turnos.use-case';
+import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-cedula.use-case';
 
 @ApiTags('Turnos')
 @Controller('turnos')
 export class ProducerController {
+    // ⚕️ HUMAN CHECK - SRP: Controller solo traduce HTTP → Use Case → HTTP, sin lógica de negocio
     constructor(
-        private readonly producerService: ProducerService,
-        private readonly turnosService: TurnosService,
+        private readonly createTurnoUseCase: CreateTurnoUseCase,
+        private readonly getAllTurnosUseCase: GetAllTurnosUseCase,
+        private readonly getTurnosByCedulaUseCase: GetTurnosByCedulaUseCase,
     ) { }
 
     @Post()
@@ -38,9 +41,9 @@ export class ProducerController {
         status: 400,
         description: 'Datos inválidos — campos faltantes, tipos incorrectos o propiedades no permitidas',
     })
-    // ⚕️ HUMAN CHECK - Tipo de retorno explícito (coincide con CreateTurnoResponse)
-    async createTurno(@Body() createTurnoDto: CreateTurnoDto): Promise<CreateTurnoResponse> {
-        return this.producerService.createTurno(createTurnoDto);
+    // ⚕️ HUMAN CHECK - Tipo de retorno explícito (coincide con CreateTurnoResult)
+    async createTurno(@Body() createTurnoDto: CreateTurnoDto): Promise<CreateTurnoResult> {
+        return this.createTurnoUseCase.execute(createTurnoDto);
     }
 
     // ⚕️ HUMAN CHECK - Endpoint GET /turnos
@@ -73,8 +76,7 @@ export class ProducerController {
     })
     // ⚕️ HUMAN CHECK - Tipo de retorno explícito (eliminada inferencia implícita)
     async getAllTurnos(): Promise<TurnoEventPayload[]> {
-        const turnos = await this.turnosService.findAll();
-        return turnos.map(t => this.turnosService.toEventPayload(t));
+        return this.getAllTurnosUseCase.execute();
     }
 
     @Get(':cedula')
@@ -100,6 +102,6 @@ export class ProducerController {
     // ⚕️ HUMAN CHECK - Validación de Parámetros
     // ParseIntPipe asegura que la cédula sea un número antes de llegar al handler
     async getTurnosByCedula(@Param('cedula', ParseIntPipe) cedula: number) {
-        return this.turnosService.findByCedula(cedula);
+        return this.getTurnosByCedulaUseCase.execute(cedula);
     }
 }

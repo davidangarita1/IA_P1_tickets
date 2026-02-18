@@ -1,38 +1,48 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ProducerController } from '../src/producer.controller';
-import { ProducerService } from '../src/producer.service';
-import { TurnosService } from '../src/turnos/turnos.service';
+import { CreateTurnoUseCase } from '../src/application/use-cases/create-turno.use-case';
+import { GetAllTurnosUseCase } from '../src/application/use-cases/get-all-turnos.use-case';
+import { GetTurnosByCedulaUseCase } from '../src/application/use-cases/get-turnos-by-cedula.use-case';
 import * as request from 'supertest';
 
 describe('ProducerController (Integration Tests)', () => {
     let app: INestApplication;
-    let producerService: jest.Mocked<ProducerService>;
-    let turnosService: jest.Mocked<TurnosService>;
+    let createTurnoUseCase: jest.Mocked<CreateTurnoUseCase>;
+    let getAllTurnosUseCase: jest.Mocked<GetAllTurnosUseCase>;
+    let getTurnosByCedulaUseCase: jest.Mocked<GetTurnosByCedulaUseCase>;
 
     beforeEach(async () => {
         /**
-         * Mock de los servicios
-         * Simulamos ProducerService y TurnosService
+         * Mock de los Use Cases
+         * ⚕️ HUMAN CHECK - Los tests mockean Use Cases, no servicios de infraestructura
          */
-        const mockProducerService = {
-            createTurno: jest.fn(),
+        const mockCreateTurnoUseCase = {
+            execute: jest.fn(),
         };
 
-        const mockTurnosService = {
-            findByCedula: jest.fn(),
+        const mockGetAllTurnosUseCase = {
+            execute: jest.fn(),
+        };
+
+        const mockGetTurnosByCedulaUseCase = {
+            execute: jest.fn(),
         };
 
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ProducerController],
             providers: [
                 {
-                    provide: ProducerService,
-                    useValue: mockProducerService,
+                    provide: CreateTurnoUseCase,
+                    useValue: mockCreateTurnoUseCase,
                 },
                 {
-                    provide: TurnosService,
-                    useValue: mockTurnosService,
+                    provide: GetAllTurnosUseCase,
+                    useValue: mockGetAllTurnosUseCase,
+                },
+                {
+                    provide: GetTurnosByCedulaUseCase,
+                    useValue: mockGetTurnosByCedulaUseCase,
                 },
             ],
         }).compile();
@@ -47,8 +57,9 @@ describe('ProducerController (Integration Tests)', () => {
             }),
         );
 
-        producerService = module.get(ProducerService) as jest.Mocked<ProducerService>;
-        turnosService = module.get(TurnosService) as jest.Mocked<TurnosService>;
+        createTurnoUseCase = module.get(CreateTurnoUseCase) as jest.Mocked<CreateTurnoUseCase>;
+        getAllTurnosUseCase = module.get(GetAllTurnosUseCase) as jest.Mocked<GetAllTurnosUseCase>;
+        getTurnosByCedulaUseCase = module.get(GetTurnosByCedulaUseCase) as jest.Mocked<GetTurnosByCedulaUseCase>;
 
         await app.init();
     });
@@ -69,7 +80,7 @@ describe('ProducerController (Integration Tests)', () => {
                 nombre: 'Juan Pérez',
             };
 
-            producerService.createTurno.mockResolvedValue({
+            createTurnoUseCase.execute.mockReturnValue({
                 status: 'accepted',
                 message: 'Turno en proceso de asignación',
             });
@@ -83,7 +94,7 @@ describe('ProducerController (Integration Tests)', () => {
                 status: 'accepted',
                 message: 'Turno en proceso de asignación',
             });
-            expect(producerService.createTurno).toHaveBeenCalledWith(createTurnoDto);
+            expect(createTurnoUseCase.execute).toHaveBeenCalledWith(createTurnoDto);
         });
 
         /**
@@ -194,7 +205,7 @@ describe('ProducerController (Integration Tests)', () => {
             const turno1 = { cedula: 111111111, nombre: 'Ana García' };
             const turno2 = { cedula: 222222222, nombre: 'Carlos López' };
 
-            producerService.createTurno.mockResolvedValue({
+            createTurnoUseCase.execute.mockReturnValue({
                 status: 'accepted',
                 message: 'Turno en proceso de asignación',
             });
@@ -209,7 +220,7 @@ describe('ProducerController (Integration Tests)', () => {
                 .send(turno2)
                 .expect(202);
 
-            expect(producerService.createTurno).toHaveBeenCalledTimes(2);
+            expect(createTurnoUseCase.execute).toHaveBeenCalledTimes(2);
         });
 
         /**
@@ -222,7 +233,7 @@ describe('ProducerController (Integration Tests)', () => {
                 nombre: 'María José O\'Connor-García',
             };
 
-            producerService.createTurno.mockResolvedValue({
+            createTurnoUseCase.execute.mockReturnValue({
                 status: 'accepted',
                 message: 'Turno en proceso de asignación',
             });
@@ -232,7 +243,7 @@ describe('ProducerController (Integration Tests)', () => {
                 .send(createTurnoDto)
                 .expect(202);
 
-            expect(producerService.createTurno).toHaveBeenCalledWith(createTurnoDto);
+            expect(createTurnoUseCase.execute).toHaveBeenCalledWith(createTurnoDto);
         });
 
         /**
@@ -262,7 +273,7 @@ describe('ProducerController (Integration Tests)', () => {
                 nombre: 'Juan Pérez',
             };
 
-            producerService.createTurno.mockResolvedValue({
+            createTurnoUseCase.execute.mockReturnValue({
                 status: 'accepted',
                 message: 'Turno en proceso de asignación',
             });
@@ -286,38 +297,38 @@ describe('ProducerController (Integration Tests)', () => {
                 {
                     cedula: 123456789,
                     nombre: 'Juan Pérez',
-                    consultorio: 3,
+                    consultorio: '3',
                     estado: 'asignado',
-                    createdAt: '2026-02-11T01:55:42.679Z',
+                    timestamp: 1710000000,
                 },
             ];
 
-            turnosService.findByCedula.mockResolvedValue(expectedTurnos as unknown as any);
+            getTurnosByCedulaUseCase.execute.mockResolvedValue(expectedTurnos as any);
 
             const response = await request(app.getHttpServer())
                 .get(`/turnos/${cedula}`)
                 .expect(200);
 
             expect(response.body).toEqual(expectedTurnos);
-            expect(turnosService.findByCedula).toHaveBeenCalledWith(cedula);
+            expect(getTurnosByCedulaUseCase.execute).toHaveBeenCalledWith(cedula);
         });
 
         /**
          * PRUEBA 12: No encontrar turnos
-         * Verifica que retorna 404 si no hay turnos
+         * Verifica que retorna 500 si el use case lanza error
          */
-        it('Debe retornar 404 si no hay turnos para la cédula', async () => {
+        it('Debe retornar 500 si el use case lanza error', async () => {
             const cedula = 999999999;
 
-            turnosService.findByCedula.mockRejectedValue(
+            getTurnosByCedulaUseCase.execute.mockRejectedValue(
                 new Error('No se encontraron turnos para la cédula 999999999'),
             );
 
             await request(app.getHttpServer())
                 .get(`/turnos/${cedula}`)
-                .expect(500); // O ajustar según el handler de errores
+                .expect(500);
 
-            expect(turnosService.findByCedula).toHaveBeenCalledWith(cedula);
+            expect(getTurnosByCedulaUseCase.execute).toHaveBeenCalledWith(cedula);
         });
 
         /**
@@ -334,13 +345,13 @@ describe('ProducerController (Integration Tests)', () => {
 
         /**
          * PRUEBA 14: Cédula con valor 0
-         * ParseIntPipe acepta 0 (validación de rango es responsabilidad del servicio)
+         * ParseIntPipe acepta 0 (validación de rango es responsabilidad del use case)
          */
         it('Debe retornar 200 si la cédula es 0 (ParseIntPipe permite)', async () => {
             const cedula = 0;
-            const expectedTurnos = [];
+            const expectedTurnos: unknown[] = [];
 
-            turnosService.findByCedula.mockResolvedValue(expectedTurnos as unknown as any);
+            getTurnosByCedulaUseCase.execute.mockResolvedValue(expectedTurnos as any);
 
             const response = await request(app.getHttpServer())
                 .get(`/turnos/${cedula}`)
@@ -351,19 +362,19 @@ describe('ProducerController (Integration Tests)', () => {
 
         /**
          * PRUEBA 15: Cédula negativa
-         * ParseIntPipe acepta negativos (validación de rango es responsabilidad del servicio)
+         * ParseIntPipe acepta negativos (validación de rango es responsabilidad del use case)
          */
         it('Debe retornar 200 si la cédula es negativa (ParseIntPipe permite)', async () => {
             const cedula = -123456789;
-            const expectedTurnos = [];
+            const expectedTurnos: unknown[] = [];
 
-            turnosService.findByCedula.mockResolvedValue(expectedTurnos as unknown as any);
+            getTurnosByCedulaUseCase.execute.mockResolvedValue(expectedTurnos as any);
 
             const response = await request(app.getHttpServer())
                 .get(`/turnos/${cedula}`)
                 .expect(200);
 
-            expect(turnosService.findByCedula).toHaveBeenCalledWith(cedula);
+            expect(getTurnosByCedulaUseCase.execute).toHaveBeenCalledWith(cedula);
         });
 
         /**
@@ -376,20 +387,20 @@ describe('ProducerController (Integration Tests)', () => {
                 {
                     cedula: 123456789,
                     nombre: 'Juan Pérez',
-                    consultorio: 3,
+                    consultorio: '3',
                     estado: 'asignado',
-                    createdAt: '2026-02-11T01:55:42.679Z',
+                    timestamp: 1710000000,
                 },
                 {
                     cedula: 123456789,
                     nombre: 'Juan Pérez',
-                    consultorio: 5,
-                    estado: 'confirmado',
-                    createdAt: '2026-02-10T10:00:00.000Z',
+                    consultorio: '5',
+                    estado: 'atendido',
+                    timestamp: 1709900000,
                 },
             ];
 
-            turnosService.findByCedula.mockResolvedValue(expectedTurnos as unknown as any);
+            getTurnosByCedulaUseCase.execute.mockResolvedValue(expectedTurnos as any);
 
             const response = await request(app.getHttpServer())
                 .get(`/turnos/${cedula}`)
