@@ -59,11 +59,11 @@
 }
 
 .success {
+    color: #065f46;
     font-size: 14px;
-    color: #6b7280;
 }
 
 .error {
+    color: #991b1b;
     font-size: 14px;
-    color: #9b1c1c;
 }
