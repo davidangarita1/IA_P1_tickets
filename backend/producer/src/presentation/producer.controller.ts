@@ -1,10 +1,10 @@
 import { Body, Controller, Get, HttpCode, Param, Post, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { CreateTurnoDto } from './dto/create-turno.dto';
-import { TurnoEventPayload } from './domain/entities/turno.entity';
-import { CreateTurnoUseCase, CreateTurnoResult } from './application/use-cases/create-turno.use-case';
-import { GetAllTurnosUseCase } from './application/use-cases/get-all-turnos.use-case';
-import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-cedula.use-case';
+import { TurnoEventPayload } from '../domain/entities/turno.entity';
+import { CreateTurnoUseCase, CreateTurnoResult } from '../application/use-cases/create-turno.use-case';
+import { GetAllTurnosUseCase } from '../application/use-cases/get-all-turnos.use-case';
+import { GetTurnosByCedulaUseCase } from '../application/use-cases/get-turnos-by-cedula.use-case';
 
 @ApiTags('Turnos')
 @Controller('turnos')

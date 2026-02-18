@@ -1,5 +1,5 @@
 import { HttpAppointmentRepository } from "@/repositories/HttpAppointmentRepository";
-import { AppointmentRepository } from "@/repositories/AppointmentRepository";
+import { AppointmentRepository } from "@/domain/AppointmentRepository";
 
 // Mock httpClient module
 jest.mock("@/lib/httpClient", () => ({

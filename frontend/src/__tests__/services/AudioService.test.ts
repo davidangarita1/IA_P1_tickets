@@ -24,7 +24,7 @@ describe("AudioService", () => {
         mockAddEventListener.mockClear();
 
         // Fresh import each time (singleton reset)
-        const mod = require("@/services/AudioService");
+        const mod = require("@/infrastructure/AudioService");
         audioService = mod.audioService;
     });
 

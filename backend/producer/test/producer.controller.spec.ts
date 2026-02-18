@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ProducerController } from '../src/producer.controller';
+import { ProducerController } from '../src/presentation/producer.controller';
 import { CreateTurnoUseCase } from '../src/application/use-cases/create-turno.use-case';
 import { GetAllTurnosUseCase } from '../src/application/use-cases/get-all-turnos.use-case';
 import { GetTurnosByCedulaUseCase } from '../src/application/use-cases/get-turnos-by-cedula.use-case';

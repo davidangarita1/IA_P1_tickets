@@ -1,7 +1,7 @@
 import { BadRequestException, Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateTurnoDto } from './dto/create-turno.dto';
-import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
+import { CreateTurnoUseCase } from '../application/use-cases/create-turno.use-case';
 
 @Controller()
 export class ConsumerController {

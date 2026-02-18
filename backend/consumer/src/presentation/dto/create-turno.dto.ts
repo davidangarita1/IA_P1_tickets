@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber, IsOptional, IsIn } from 'class-validator';
-import { TurnoPriority } from '../domain/entities/turno.entity';
+import { TurnoPriority } from '../../domain/entities/turno.entity';
 
 export class CreateTurnoDto {
     // ⚕️ HUMAN CHECK - Tipo de Dato y Renombrado

@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Turno as TurnoSchema, TurnoDocument } from '../../schemas/turno.schema';
+import { Turno as TurnoSchema, TurnoDocument } from '../schemas/turno.schema';
 import { ITurnoRepository, CreateTurnoData } from '../../domain/ports/ITurnoRepository';
 import { Turno } from '../../domain/entities/turno.entity';
 import { IPrioritySortingStrategy } from '../../domain/ports/IPrioritySortingStrategy';

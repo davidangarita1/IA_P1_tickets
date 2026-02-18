@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { audioService } from "@/services/AudioService";
+import { audioService } from "@/infrastructure/AudioService";
 
 /**
  * Hook that encapsulates audio initialization and unlock logic.

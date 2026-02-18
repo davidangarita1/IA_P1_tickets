@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Turno as TurnoSchema, TurnoDocument } from '../../schemas/turno.schema';
+import { Turno as TurnoSchema, TurnoDocument } from '../schemas/turno.schema';
 import { ITurnoRepository } from '../../domain/ports/ITurnoRepository';
 import { Turno } from '../../domain/entities/turno.entity';
 
