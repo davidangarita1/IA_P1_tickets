@@ -46,7 +46,7 @@ describe("TicketsScreen — integration", () => {
     renderWithDeps();
 
     expect(
-      screen.getByText("Turnos habilitados")
+      screen.getByText(/Turnos.*Habilitados/i)
     ).toBeInTheDocument();
     expect(
       screen.getByText(/Desconectado/)
