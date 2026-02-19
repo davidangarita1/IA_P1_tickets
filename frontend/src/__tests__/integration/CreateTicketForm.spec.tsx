@@ -24,6 +24,11 @@ jest.mock("@/providers/DependencyProvider", () => {
   };
 });
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => "/register",
+}));
+
 import CreateTicketForm from "@/components/CreateTicketForm/CreateTicketForm";
 
 function renderWithDeps(overrides: Partial<Dependencies> = {}) {
