@@ -49,7 +49,8 @@ src/
 │   └── useAudioNotification.ts
 │
 ├── components/              ← UI components
-│   └── CreateTicketForm/
+│   ├── CreateTicketForm/
+│   └── Navbar/
 │
 ├── app/                     ← Pages (App Router)
 │   ├── layout.tsx
@@ -58,7 +59,7 @@ src/
 │   └── register/page.tsx    ← Registration form
 │
 ├── config/env.ts            ← Environment variables
-├── middleware.ts             ← Rate limiting + Security headers
+├── proxy.ts                 ← Security headers middleware
 └── styles/                  ← CSS Modules
 ```
 
@@ -97,7 +98,7 @@ npm run dev
 
 ## Testing
 
-Comprehensive test suite with **93 tests** (87.38% coverage) using Jest + React Testing Library.
+Comprehensive test suite with **100 tests** across 14 suites using Jest + React Testing Library.
 
 ### Test Commands
 
@@ -114,8 +115,8 @@ npm run test:coverage
 
 ### Test Structure
 
-- **11 Unit Tests:** CircuitBreaker, ticketMapper, HtmlSanitizer, httpClient, hooks, adapters
-- **2 Integration Tests:** DependencyProvider, CreateTicketForm, TicketsScreen, ServedDashboard
+- **10 Unit Suites:** CircuitBreaker, ticketMapper, HtmlSanitizer, httpClient, BrowserAudioAdapter, HttpTicketAdapter, SocketIOAdapter, useCreateTicket, useTicketsWebSocket, useAudioNotification
+- **4 Integration Suites:** DependencyProvider, CreateTicketForm, TicketsScreen, ServedDashboard
 - **Mock Factories:** Zero external dependencies (HTTP, WebSocket, File System, Audio APIs)
 
 All tests use fully isolated mock objects via `src/__tests__/mocks/factories.ts` — no real network calls, no real server required.
