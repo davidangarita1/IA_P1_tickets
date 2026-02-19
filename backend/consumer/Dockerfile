@@ -12,9 +12,15 @@ WORKDIR /workspace
 
 # Copiar shared primero (dependencia local del consumer)
 COPY shared/ ./shared/
+WORKDIR /workspace/shared
+RUN npm run build
+
+# Volver a /workspace antes de copiar consumer
+WORKDIR /workspace
 
 # Instalar dependencias del consumer
-COPY consumer/package*.json ./consumer/
+COPY consumer/package.json ./consumer/
+COPY consumer/package-lock.json ./consumer/
 WORKDIR /workspace/consumer
 RUN npm install
 
@@ -29,7 +35,14 @@ FROM node:20-slim AS build
 WORKDIR /workspace
 
 COPY shared/ ./shared/
-COPY consumer/package*.json ./consumer/
+WORKDIR /workspace/shared
+RUN npm run build
+
+# Volver a /workspace antes de copiar consumer
+WORKDIR /workspace
+
+COPY consumer/package.json ./consumer/
+COPY consumer/package-lock.json ./consumer/
 WORKDIR /workspace/consumer
 RUN npm install
 
@@ -41,9 +54,16 @@ FROM node:20-slim AS production
 
 WORKDIR /workspace
 
-# ⚕️ HUMAN CHECK - En producción, shared se copia para resolver el symlink file:../shared
+# ⚕️ HUMAN CHECK - Compilar shared primero, luego copiar dist compilado
 COPY shared/ ./shared/
-COPY consumer/package*.json ./consumer/
+WORKDIR /workspace/shared
+RUN npm run build
+
+# Volver a /workspace antes de copiar consumer
+WORKDIR /workspace
+
+COPY consumer/package.json ./consumer/
+COPY consumer/package-lock.json ./consumer/
 WORKDIR /workspace/consumer
 RUN npm install --only=production
 
