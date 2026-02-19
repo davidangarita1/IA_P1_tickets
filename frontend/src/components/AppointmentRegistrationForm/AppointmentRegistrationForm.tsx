@@ -1,34 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { useAppointmentRegistration } from "@/hooks/useAppointmentRegistration";
+import { useCreateTicket } from "@/hooks/useCreateTicket";
+import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/AppointmentRegistrationForm.module.css";
-import { sanitizeText } from "@/security/sanitize";
-
-/**
- * 🛡️ HUMAN CHECK:
- * HTTP logic is separated from the component.
- * The component only handles UI + sanitization.
- * Follows Single Responsibility Principle.
- */
 
 export default function AppointmentRegistrationForm() {
+    const { ticketWriter, sanitizer } = useDeps();
+    const { submit, loading, success, error } = useCreateTicket(ticketWriter);
+
     const [name, setName] = useState("");
     const [idCard, setIdCard] = useState("");
-
-    const { register, loading, success, error } = useAppointmentRegistration();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const safeName = sanitizeText(name);
-        const safeIdCard = sanitizeText(idCard);
+        const safeName = sanitizer.sanitize(name);
+        const safeIdCard = sanitizer.sanitize(idCard);
 
         const validIdCard = parseInt(safeIdCard, 10);
         if (!safeName || isNaN(validIdCard)) return;
 
-        // Keep Spanish keys for backend compatibility
-        await register({ nombre: safeName, cedula: validIdCard });
+        await submit({ name: safeName, documentId: validIdCard });
     };
 
     return (
