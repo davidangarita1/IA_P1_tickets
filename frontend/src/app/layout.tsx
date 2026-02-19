@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { DependencyProvider } from "@/providers/DependencyProvider";
+import Navbar from "@/components/Navbar/Navbar";
 import "@/styles/globals.css";
 
 const inter = Inter({
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <DependencyProvider>{children}</DependencyProvider>
+        <DependencyProvider>
+          <Navbar />
+          {children}
+        </DependencyProvider>
       </body>
     </html>
   );
