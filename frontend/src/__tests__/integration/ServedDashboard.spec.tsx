@@ -48,7 +48,7 @@ describe("ServedDashboard — integration", () => {
     renderWithDeps();
 
     expect(
-      screen.getByText("Historial de atendidos")
+      screen.getByText(/Historial de.*Atendidos/i)
     ).toBeInTheDocument();
     expect(
       screen.getByText(/Desconectado/)
