@@ -3,6 +3,7 @@
 export interface CreateAppointmentDTO {
     nombre: string;
     cedula: number;
+    priority?: "alta" | "media" | "baja";
 }
 
 // ⚕️ HUMAN CHECK - Respuesta sincronizada con backend (ProducerService)

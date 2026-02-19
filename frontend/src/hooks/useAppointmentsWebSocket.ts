@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { Appointment } from "@/domain/Appointment";
 import { env } from "@/config/env";
-import { SocketError, getSocketErrorMessage } from "@/utils/error-guard";
 
 /**
  * Real-time hook using WebSocket (Socket.IO).
@@ -16,7 +15,7 @@ import { SocketError, getSocketErrorMessage } from "@/utils/error-guard";
  * - Cleanup on unmount (no memory leaks)
  * - Connection status indicator
  *
- * ⚕️ HUMAN CHECK - Primary real-time hook (replaces deprecated polling approach)
+ * ⚕️ HUMAN CHECK - Replaces polling hook useAppointmentsRealtime
  */
 export function useAppointmentsWebSocket() {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -66,9 +65,8 @@ export function useAppointmentsWebSocket() {
             setConnected(false);
         });
 
-        // ⚕️ HUMAN CHECK - Replaced `Error | any` with typed SocketError
-        socket.on("connect_error", (err: SocketError) => {
-            console.error("[WS] Connection error:", getSocketErrorMessage(err));
+        socket.on("connect_error", (err: Error | any) => {
+            console.error("[WS] Connection error:", err?.message || err);
             setError("Connection error with the server");
             setConnected(false);
         });

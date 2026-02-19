@@ -1,6 +1,6 @@
 import { Appointment } from "@/domain/Appointment";
 import { env } from "@/config/env";
-import { AppointmentRepository } from "@/domain/AppointmentRepository";
+import { AppointmentRepository } from "./AppointmentRepository";
 import { CreateAppointmentDTO, CreateAppointmentResponse } from "@/domain/CreateAppointment";
 import { httpGet, httpPost } from "@/lib/httpClient";
 

@@ -1,9 +1,3 @@
-/**
- * MOCK ENDPOINT — Used for frontend testing without backend.
- * ⚕️ HUMAN CHECK - Not for production use (FRONT-A5).
- * This endpoint simulates the Producer API for local development.
- * Remove or disable behind a flag before deploying.
- */
 import { NextResponse } from "next/server";
 
 export async function GET() {

@@ -1,20 +1,74 @@
 /**
  * 🛡️ HUMAN CHECK:
- * Resilient HTTP client — production grade.
+ * Cliente HTTP resiliente nivel producción.
  *
- * Features:
- * - Automatic retry with exponential backoff
- * - Timeout via AbortController
- * - Circuit Breaker (extracted to circuit-breaker.ts)
- * - Fail-Fast when backend is down
- * - Request storm protection
- * - Typed errors (zero `any`)
+ * Características:
+ * - Retry automático con backoff exponencial
+ * - Timeout con AbortController
+ * - Circuit Breaker (Closed → Open → Half-Open)
+ * - Fail-Fast cuando backend está caído
+ * - Protección contra tormentas de requests
+ * - Errores tipificados
  */
 
-import { getCircuit } from "./circuit-breaker";
-import { isError } from "@/utils/error-guard";
+type CircuitState = "CLOSED" | "OPEN" | "HALF_OPEN";
 
-function sleep(ms: number): Promise<void> {
+class CircuitBreaker {
+    private state: CircuitState = "CLOSED";
+    private failures = 0;
+    private nextTry = 0;
+
+    constructor(
+        private failureThreshold = 5,
+        private cooldownTime = 10_000 // ms
+    ) { }
+
+    canRequest() {
+        if (this.state === "OPEN") {
+            if (Date.now() > this.nextTry) {
+                this.state = "HALF_OPEN";
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    success() {
+        this.failures = 0;
+        this.state = "CLOSED";
+    }
+
+    fail() {
+        this.failures++;
+
+        if (this.failures >= this.failureThreshold) {
+            this.state = "OPEN";
+            this.nextTry = Date.now() + this.cooldownTime;
+        }
+    }
+
+    getState() {
+        return this.state;
+    }
+}
+
+/**
+ * Circuit global por host (evita tumbar backend)
+ */
+const circuits = new Map<string, CircuitBreaker>();
+
+function getCircuit(url: string) {
+    const host = new URL(url, "http://dummy").host;
+
+    if (!circuits.has(host)) {
+        circuits.set(host, new CircuitBreaker());
+    }
+
+    return circuits.get(host)!;
+}
+
+function sleep(ms: number) {
     return new Promise((r) => setTimeout(r, ms));
 }
 
@@ -52,16 +106,13 @@ async function request<T>(
 
             circuit.success();
             return data;
-        } catch (err: unknown) {
+        } catch (err: any) {
             clearTimeout(id);
-
-            // ⚕️ HUMAN CHECK - Replaced `any` with `unknown` + type guards
-            const error = isError(err) ? err : new Error(String(err));
 
             /**
              * TIMEOUT → retry
              */
-            if (error.name === "AbortError") {
+            if (err.name === "AbortError") {
                 if (attempt === retries) {
                     circuit.fail();
                     throw new Error("TIMEOUT");
@@ -71,27 +122,27 @@ async function request<T>(
             /**
              * SERVER ERROR → retry + breaker
              */
-            else if (error.message === "SERVER_ERROR") {
+            else if (err.message === "SERVER_ERROR") {
                 if (attempt === retries) {
                     circuit.fail();
-                    throw error;
+                    throw err;
                 }
             }
 
             /**
-             * RATE LIMIT → no aggressive retry
+             * RATE LIMIT → no retry agresivo
              */
-            else if (error.message === "RATE_LIMIT") {
-                throw error;
+            else if (err.message === "RATE_LIMIT") {
+                throw err;
             }
 
             /**
-             * Other errors
+             * Otros errores
              */
             else {
                 if (attempt === retries) {
                     circuit.fail();
-                    throw error;
+                    throw err;
                 }
             }
 
@@ -107,14 +158,14 @@ async function request<T>(
 }
 
 /**
- * Public API
+ * API pública
  */
 
-export function httpGet<T>(url: string): Promise<T> {
+export function httpGet<T>(url: string) {
     return request<T>(url, { method: "GET", cache: "no-store" });
 }
 
-export function httpPost<T>(url: string, body: unknown): Promise<T> {
+export function httpPost<T>(url: string, body: unknown) {
     return request<T>(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

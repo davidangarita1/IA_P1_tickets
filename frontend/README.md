@@ -161,62 +161,13 @@ El proyecto está diseñado para evolucionar hacia:
 * Código documentado
 * Separación de responsabilidades
 
-## Testing
-
-El proyecto cuenta con **84 tests automatizados** distribuidos en **11 suites**, cubriendo todas las capas de la arquitectura frontend.
-
-### Tipos de tests
-
-| Tipo | Descripción | Suites |
-|------|-------------|--------|
-| **Unitarios (lógica pura)** | Funciones sin dependencias de framework — type guards, formateo, sanitización, circuit breaker | 5 |
-| **Unitarios (componentes)** | Renderizado y comportamiento de componentes React con Testing Library | 3 |
-| **Integración (repositorios)** | Verificación del adapter HTTP contra el puerto (interface) con mocks | 1 |
-| **Configuración** | Validación de variables de entorno y fallos controlados al arranque | 1 |
-| **Servicios** | Ciclo de vida del AudioService (singleton, unlock, autoplay policy) | 1 |
-
-### Cobertura por módulo
-
-| Módulo | Archivo de test | Tests |
-|--------|----------------|-------|
-| `utils/date-formatter` | `__tests__/utils/date-formatter.test.ts` | 4 |
-| `utils/error-guard` | `__tests__/utils/error-guard.test.ts` | 11 |
-| `lib/circuit-breaker` | `__tests__/lib/circuit-breaker.test.ts` | 11 |
-| `security/sanitize` | `__tests__/security/sanitize.test.ts` | 8 |
-| `config/env` | `__tests__/config/env.test.ts` | 4 |
-| `services/AudioService` | `__tests__/services/AudioService.test.ts` | 6 |
-| `domain/*` | `__tests__/domain/domain-types.test.ts` | 6 |
-| `repositories/HttpAppointmentRepository` | `__tests__/repositories/HttpAppointmentRepository.test.ts` | 5 |
-| `components/AppointmentCard` | `__tests__/components/AppointmentCard.test.tsx` | 6 |
-| `components/AppointmentList` | `__tests__/components/AppointmentList.test.tsx` | 7 |
-| `components/AppointmentRegistrationForm` | `__tests__/components/AppointmentRegistrationForm.test.tsx` | 6 |
-
-### Herramientas
-
-- **Jest** — Test runner
-- **ts-jest** — Transformación TypeScript
-- **@testing-library/react** — Renderizado y queries de componentes
-- **@testing-library/jest-dom** — Matchers extendidos para DOM
-- **@testing-library/user-event** — Simulación de interacciones de usuario
-
-### Ejecutar tests
-
-```bash
-npm test              # Ejecutar todos los tests
-npm run test:watch    # Modo watch (re-ejecuta al guardar)
-npm run test:coverage # Ejecutar con reporte de cobertura
-```
-
 ## Scripts
 
 ```bash
-npm run dev            # Desarrollo
-npm run build          # Build producción
-npm start              # Ejecutar build
-npm run lint           # Lint
-npm test               # Tests
-npm run test:watch     # Tests en modo watch
-npm run test:coverage  # Tests con cobertura
+npm run dev      # Desarrollo
+npm run build    # Build producción
+npm start        # Ejecutar build
+npm run lint     # Lint
 ```
 
 ## Requisitos
@@ -226,4 +177,4 @@ npm run test:coverage  # Tests con cobertura
 
 ## Estado del Proyecto
 
-**MVP funcional — estable — con tests automatizados — preparado para evolución.**
+**MVP funcional — estable — preparado para evolución.**
