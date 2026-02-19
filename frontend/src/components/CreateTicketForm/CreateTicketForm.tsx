@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useDeps } from "@/providers/DependencyProvider";
-import styles from "./CreateTicketForm.module.css";
+import styles from "@/styles/CreateTicketForm.module.css";
 
 export default function CreateTicketForm() {
   const { ticketWriter, sanitizer } = useDeps();

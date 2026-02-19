@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAppointmentRegistration } from "@/hooks/useAppointmentRegistration";
-import styles from "./AppointmentRegistrationForm.module.css";
+import styles from "@/styles/AppointmentRegistrationForm.module.css";
 import { sanitizeText } from "@/security/sanitize";
 
 /**
