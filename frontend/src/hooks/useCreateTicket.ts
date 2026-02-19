@@ -35,8 +35,8 @@ export function useCreateTicket(writer: TicketWriter) {
     if (isMountedRef.current) setter(value);
   };
 
-  const submit = async (data: CreateTicketDTO) => {
-    if (inFlightRef.current) return;
+  const submit = async (data: CreateTicketDTO): Promise<boolean> => {
+    if (inFlightRef.current) return false;
     inFlightRef.current = true;
 
     safeSet(setLoading, true);
@@ -46,8 +46,10 @@ export function useCreateTicket(writer: TicketWriter) {
     try {
       const res = await writer.createTicket(data);
       safeSet(setSuccess, res.message ?? "Turno registrado correctamente");
+      return true;
     } catch (err: unknown) {
       safeSet(setError, mapError(err));
+      return false;
     } finally {
       safeSet(setLoading, false);
       inFlightRef.current = false;

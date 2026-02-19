@@ -20,16 +20,20 @@ export default function ServedDashboard() {
     useAudioNotification(audio);
 
   const lastCountRef = useRef<number | null>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     const servedCount = tickets.filter((t) => t.status === "served").length;
 
-    if (lastCountRef.current === null) {
+    if (!initializedRef.current) {
       lastCountRef.current = servedCount;
+      if (servedCount > 0) {
+        initializedRef.current = true;
+      }
       return;
     }
 
-    if (servedCount > lastCountRef.current) {
+    if (servedCount > (lastCountRef.current ?? 0)) {
       notify("✅ Turno completado");
     }
 
