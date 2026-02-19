@@ -1,0 +1,47 @@
+"use client";
+
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import type { TicketWriter } from "@/domain/ports/TicketWriter";
+import type { TicketReader } from "@/domain/ports/TicketReader";
+import type { RealTimeProvider } from "@/domain/ports/RealTimeProvider";
+import type { AudioNotifier } from "@/domain/ports/AudioNotifier";
+import type { InputSanitizer } from "@/domain/ports/InputSanitizer";
+import { HttpTicketAdapter } from "@/infrastructure/adapters/HttpTicketAdapter";
+import { SocketIOAdapter } from "@/infrastructure/adapters/SocketIOAdapter";
+import { BrowserAudioAdapter } from "@/infrastructure/adapters/BrowserAudioAdapter";
+import { HtmlSanitizer } from "@/infrastructure/adapters/HtmlSanitizer";
+
+export interface Dependencies {
+  ticketWriter: TicketWriter;
+  ticketReader: TicketReader;
+  realTime: RealTimeProvider;
+  audio: AudioNotifier;
+  sanitizer: InputSanitizer;
+}
+
+const DependencyContext = createContext<Dependencies | null>(null);
+
+export function useDeps(): Dependencies {
+  const deps = useContext(DependencyContext);
+  if (!deps) throw new Error("DependencyProvider is required");
+  return deps;
+}
+
+export function DependencyProvider({ children }: { children: ReactNode }) {
+  const deps = useMemo<Dependencies>(() => {
+    const ticketAdapter = new HttpTicketAdapter();
+    return {
+      ticketWriter: ticketAdapter,
+      ticketReader: ticketAdapter,
+      realTime: new SocketIOAdapter(),
+      audio: new BrowserAudioAdapter(),
+      sanitizer: new HtmlSanitizer(),
+    };
+  }, []);
+
+  return (
+    <DependencyContext.Provider value={deps}>
+      {children}
+    </DependencyContext.Provider>
+  );
+}
