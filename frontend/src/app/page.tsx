@@ -13,14 +13,18 @@ export default function TicketsScreen() {
     useAudioNotification(audio);
 
   const lastCountRef = useRef<number | null>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (lastCountRef.current === null) {
+    if (!initializedRef.current) {
       lastCountRef.current = tickets.length;
+      if (tickets.length > 0) {
+        initializedRef.current = true;
+      }
       return;
     }
 
-    if (tickets.length > lastCountRef.current) {
+    if (tickets.length > (lastCountRef.current ?? 0)) {
       notify("🔔 Nuevo turno llamado");
     }
 
