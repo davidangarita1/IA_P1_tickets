@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
     WebSocketGateway,
     WebSocketServer,
@@ -6,8 +6,9 @@ import {
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { TurnosService } from '../turnos/turnos.service';
-import { TurnoEventPayload } from '../types/turno-event';
+import { ITurnoRepository } from '../domain/ports/ITurnoRepository';
+import { TURNO_REPOSITORY_TOKEN } from '../domain/ports/tokens';
+import { TurnoEventPayload } from '../domain/entities/turno.entity';
 
 // ⚕️ HUMAN CHECK - WebSocket Gateway
 // cors: true permite conexiones de cualquier origen (solo para desarrollo)
@@ -24,7 +25,10 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly turnosService: TurnosService) { }
+    // ⚕️ HUMAN CHECK - DIP: inyecta ITurnoRepository (puerto), no TurnosService (concreto)
+    constructor(
+        @Inject(TURNO_REPOSITORY_TOKEN) private readonly turnoRepository: ITurnoRepository,
+    ) { }
 
     // ⚕️ HUMAN CHECK - Conexión de cliente
     // Al conectarse, envía un snapshot de todos los turnos actuales
@@ -32,12 +36,9 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(`Cliente conectado: ${client.id}`);
 
         try {
-            const turnos = await this.turnosService.findAll();
+            const turnos = await this.turnoRepository.findAll();
 
-            // ⚕️ HUMAN CHECK - Usa toEventPayload() para mapeo consistente
-            const snapshot: TurnoEventPayload[] = turnos.map(t =>
-                this.turnosService.toEventPayload(t),
-            );
+            const snapshot: TurnoEventPayload[] = turnos.map(t => t.toEventPayload());
 
             client.emit('TURNOS_SNAPSHOT', {
                 type: 'TURNOS_SNAPSHOT',
@@ -46,7 +47,6 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             this.logger.log(`Snapshot enviado a ${client.id} — ${snapshot.length} turnos`);
         } catch (error: unknown) {
-            // ⚕️ HUMAN CHECK - Error tipado (eliminado any implícito)
             const message = error instanceof Error ? error.message : String(error);
             this.logger.error(`Error enviando snapshot a ${client.id}: ${message}`);
         }
@@ -58,7 +58,6 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // ⚕️ HUMAN CHECK - Broadcast de actualización
     // Se llama desde el EventsController cuando llega un evento de RabbitMQ
-    // ⚕️ HUMAN CHECK - Usa TurnoEventPayload en vez de inline object type
     broadcastTurnoActualizado(turno: TurnoEventPayload): void {
         this.server.emit('TURNO_ACTUALIZADO', {
             type: 'TURNO_ACTUALIZADO',

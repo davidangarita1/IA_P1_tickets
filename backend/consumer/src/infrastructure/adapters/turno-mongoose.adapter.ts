@@ -1,0 +1,130 @@
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Turno as TurnoSchema, TurnoDocument } from '../schemas/turno.schema';
+import { ITurnoRepository, CreateTurnoData } from '../../domain/ports/ITurnoRepository';
+import { Turno } from '../../domain/entities/turno.entity';
+import { IPrioritySortingStrategy } from '../../domain/ports/IPrioritySortingStrategy';
+import { PRIORITY_SORTING_STRATEGY_TOKEN } from '../../domain/ports/tokens';
+
+/**
+ * Adapter: implementa ITurnoRepository usando Mongoose/MongoDB.
+ * Contiene todas las operaciones de persistencia del Consumer.
+ *
+ * ⚕️ HUMAN CHECK - replace direct model injection with ITurnoRepository token
+ * El @InjectModel queda aislado en esta capa de infraestructura.
+ */
+@Injectable()
+export class TurnoMongooseAdapter implements ITurnoRepository {
+    private readonly logger = new Logger(TurnoMongooseAdapter.name);
+
+    constructor(
+        @InjectModel(TurnoSchema.name) private readonly turnoModel: Model<TurnoDocument>,
+        @Inject(PRIORITY_SORTING_STRATEGY_TOKEN) private readonly prioritySorting: IPrioritySortingStrategy,
+    ) {}
+
+    async save(data: CreateTurnoData): Promise<Turno> {
+        const doc = new this.turnoModel({
+            cedula: data.cedula,
+            nombre: data.nombre,
+            consultorio: null,
+            estado: 'espera',
+            priority: data.priority ?? 'media',
+            timestamp: Date.now(),
+        });
+
+        const saved = await doc.save();
+        this.logger.log(`Turno creado en espera para paciente ${saved.cedula} — ID: ${saved._id}`);
+        return this.toDomain(saved);
+    }
+
+    async findPacientesEnEspera(): Promise<Turno[]> {
+        const docs = await this.turnoModel
+            .find({ estado: 'espera' })
+            .exec();
+
+        const turnos = docs.map(doc => this.toDomain(doc));
+
+        // ⚕️ HUMAN CHECK - OCP: el ordenamiento se delega a IPrioritySortingStrategy (Strategy pattern)
+        return this.prioritySorting.sort(turnos);
+    }
+
+    async getConsultoriosOcupados(): Promise<string[]> {
+        const docs = await this.turnoModel
+            .find({ estado: 'llamado', consultorio: { $ne: null } })
+            .select('consultorio')
+            .lean()
+            .exec();
+
+        return docs
+            .map(t => t.consultorio)
+            .filter((c): c is string => c !== null && c !== undefined);
+    }
+
+    // ⚕️ HUMAN CHECK - Asignación atómica de consultorio
+    // Usa filtro por estado 'espera' para evitar race condition
+    async asignarConsultorio(turnoId: string, consultorio: string): Promise<Turno | null> {
+        const duracionSegundos = Math.floor(Math.random() * (15 - 8 + 1)) + 8;
+        const finAtencionAt = Date.now() + duracionSegundos * 1000;
+
+        const doc = await this.turnoModel.findOneAndUpdate(
+            { _id: turnoId, estado: 'espera' },
+            {
+                consultorio,
+                estado: 'llamado',
+                finAtencionAt,
+            },
+            { new: true },
+        ).exec();
+
+        if (doc) {
+            this.logger.log(`Turno ${turnoId} asignado al consultorio ${consultorio} (duración: ${duracionSegundos}s)`);
+            return this.toDomain(doc);
+        }
+
+        return null;
+    }
+
+    // ⚕️ HUMAN CHECK - Transición automática a 'atendido' por tiempo
+    async finalizarTurnosLlamados(): Promise<Turno[]> {
+        const ahora = Date.now();
+        const expirados = await this.turnoModel.find({
+            estado: 'llamado',
+            finAtencionAt: { $lte: ahora },
+        }).exec();
+
+        if (expirados.length === 0) return [];
+
+        await this.turnoModel.updateMany(
+            {
+                estado: 'llamado',
+                finAtencionAt: { $lte: ahora },
+            },
+            { estado: 'atendido' },
+        ).exec();
+
+        this.logger.log(`Finalizados ${expirados.length} turnos cuyo tiempo de atención expiró`);
+
+        // Retornamos los documentos con estado actualizado para emitir eventos
+        return expirados.map(doc => {
+            doc.estado = 'atendido';
+            return this.toDomain(doc);
+        });
+    }
+
+    /**
+     * Mapea un documento de Mongoose a la entidad de dominio pura.
+     */
+    private toDomain(doc: TurnoDocument): Turno {
+        return new Turno({
+            id: String(doc._id),
+            nombre: doc.nombre,
+            cedula: doc.cedula,
+            consultorio: doc.consultorio,
+            estado: doc.estado,
+            priority: doc.priority,
+            timestamp: doc.timestamp,
+            finAtencionAt: doc.finAtencionAt,
+        });
+    }
+}

@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreateTurnoDto } from '../src/dto/create-turno.dto';
+import { CreateTurnoDto } from '../src/presentation/dto/create-turno.dto';
 
 describe('CreateTurnoDto - Validación', () => {
     /**

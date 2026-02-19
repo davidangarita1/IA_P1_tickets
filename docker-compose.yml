@@ -4,8 +4,8 @@ services:
   producer:
     container_name: backend-producer
     build:
-      context: ./backend/producer
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: producer/Dockerfile
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
@@ -18,9 +18,10 @@ services:
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
     volumes:
-      - ./backend/producer:/app
-      - /app/node_modules
-      - /app/dist
+      - ./backend/producer:/workspace/producer
+      - ./backend/shared:/workspace/shared
+      - /workspace/producer/node_modules
+      - /workspace/producer/dist
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -42,8 +43,8 @@ services:
   consumer:
     container_name: backend-consumer
     build:
-      context: ./backend/consumer
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: consumer/Dockerfile
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
@@ -52,9 +53,10 @@ services:
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
     volumes:
-      - ./backend/consumer:/app
-      - /app/node_modules
-      - /app/dist
+      - ./backend/consumer:/workspace/consumer
+      - ./backend/shared:/workspace/shared
+      - /workspace/consumer/node_modules
+      - /workspace/consumer/dist
     environment:
       - NODE_ENV=development
       # ⚕️ HUMAN CHECK - Credenciales de conexión RabbitMQ
@@ -64,7 +66,7 @@ services:
       # ⚕️ HUMAN CHECK - Cola de notificaciones (WebSocket bridge)
       - RABBITMQ_NOTIFICATIONS_QUEUE=${RABBITMQ_NOTIFICATIONS_QUEUE:-turnos_notifications}
       # ⚕️ HUMAN CHECK - Configuración del Scheduler
-      - SCHEDULER_INTERVAL=1000
+      - SCHEDULER_INTERVAL_MS=${SCHEDULER_INTERVAL_MS:-15000}
       - CONSULTORIOS_TOTAL=5
       # ⚕️ HUMAN CHECK - Credenciales de conexión MongoDB
       # No usar credenciales por defecto en producción.

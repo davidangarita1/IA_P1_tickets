@@ -42,8 +42,10 @@ async function bootstrap(): Promise<void> {
     // ⚕️ HUMAN CHECK - Hybrid App: HTTP + Microservice (RabbitMQ listener)
     // El Producer escucha eventos del Consumer (turno_creado, turno_actualizado)
     // para reenviarlos por WebSocket a los clientes conectados
-    const rabbitUrl = configService.get<string>('RABBITMQ_URL') ?? 'amqp://guest:guest@localhost:5672';
-    const notificationsQueue = configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE') ?? 'turnos_notifications';
+    // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+    const rabbitUrl = configService.get<string>('RABBITMQ_URL');
+    if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
+    const notificationsQueue = configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE', 'turnos_notifications');
 
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.RMQ,
