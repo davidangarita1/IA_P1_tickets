@@ -1,13 +1,14 @@
 import { io, Socket } from "socket.io-client";
-import { env } from "@/config/env";
 import type { RealTimeProvider, RealTimeCallbacks } from "@/domain/ports/RealTimeProvider";
 import { toDomainTicket } from "@/infrastructure/mappers/ticketMapper";
 
 export class SocketIOAdapter implements RealTimeProvider {
   private socket: Socket | null = null;
 
+  constructor(private readonly wsUrl: string) {}
+
   connect(callbacks: RealTimeCallbacks): void {
-    this.socket = io(`${env.WS_URL}/ws/turnos`, {
+    this.socket = io(`${this.wsUrl}/ws/turnos`, {
       transports: ["websocket"],
       reconnection: true,
       reconnectionDelay: 1000,

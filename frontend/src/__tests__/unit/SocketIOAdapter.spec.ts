@@ -29,7 +29,7 @@ describe("SocketIOAdapter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    adapter = new SocketIOAdapter();
+    adapter = new SocketIOAdapter("http://localhost:3000");
     callbacks = {
       onSnapshot: jest.fn(),
       onTicketUpdate: jest.fn(),

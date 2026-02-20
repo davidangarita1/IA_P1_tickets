@@ -29,7 +29,7 @@ describe("HttpTicketAdapter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    adapter = new HttpTicketAdapter();
+    adapter = new HttpTicketAdapter("http://localhost:3000");
   });
 
   describe("getTickets()", () => {

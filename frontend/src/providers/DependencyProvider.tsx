@@ -10,6 +10,7 @@ import { HttpTicketAdapter } from "@/infrastructure/adapters/HttpTicketAdapter";
 import { SocketIOAdapter } from "@/infrastructure/adapters/SocketIOAdapter";
 import { BrowserAudioAdapter } from "@/infrastructure/adapters/BrowserAudioAdapter";
 import { HtmlSanitizer } from "@/infrastructure/adapters/HtmlSanitizer";
+import { env } from "@/config/env";
 
 export interface Dependencies {
   ticketWriter: TicketWriter;
@@ -27,17 +28,23 @@ export function useDeps(): Dependencies {
   return deps;
 }
 
-export function DependencyProvider({ children }: { children: ReactNode }) {
+interface DependencyProviderProps {
+  children: ReactNode;
+  overrides?: Partial<Dependencies>;
+}
+
+export function DependencyProvider({ children, overrides }: DependencyProviderProps) {
   const deps = useMemo<Dependencies>(() => {
-    const ticketAdapter = new HttpTicketAdapter();
+    const ticketAdapter = new HttpTicketAdapter(env.API_BASE_URL);
     return {
       ticketWriter: ticketAdapter,
       ticketReader: ticketAdapter,
-      realTime: new SocketIOAdapter(),
+      realTime: new SocketIOAdapter(env.WS_URL),
       audio: new BrowserAudioAdapter(),
       sanitizer: new HtmlSanitizer(),
+      ...overrides,
     };
-  }, []);
+  }, [overrides]);
 
   return (
     <DependencyContext.Provider value={deps}>
