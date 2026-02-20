@@ -1,5 +1,13 @@
 import { CircuitBreaker } from "./CircuitBreaker";
 
+export interface RequestConfig {
+  retries?: number;
+  timeout?: number;
+}
+
+const DEFAULT_RETRIES = 2;
+const DEFAULT_TIMEOUT = 4000;
+
 const circuits = new Map<string, CircuitBreaker>();
 
 function getCircuit(url: string): CircuitBreaker {
@@ -15,9 +23,10 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function request<T>(
   url: string,
   options: RequestInit,
-  retries = 2,
-  timeout = 4000
+  config: RequestConfig = {}
 ): Promise<T> {
+  const retries = config.retries ?? DEFAULT_RETRIES;
+  const timeout = config.timeout ?? DEFAULT_TIMEOUT;
   const circuit = getCircuit(url);
 
   if (!circuit.canRequest()) {
@@ -78,14 +87,14 @@ async function request<T>(
   throw new Error("UNEXPECTED_HTTP_ERROR");
 }
 
-export function httpGet<T>(url: string): Promise<T> {
-  return request<T>(url, { method: "GET", cache: "no-store" });
+export function httpGet<T>(url: string, config?: RequestConfig): Promise<T> {
+  return request<T>(url, { method: "GET", cache: "no-store" }, config);
 }
 
-export function httpPost<T>(url: string, body: unknown): Promise<T> {
+export function httpPost<T>(url: string, body: unknown, config?: RequestConfig): Promise<T> {
   return request<T>(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-  });
+  }, config);
 }
