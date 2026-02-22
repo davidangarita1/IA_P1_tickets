@@ -9,7 +9,4 @@ module.exports = {
   coverageDirectory: './coverage',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  moduleNameMapper: {
-    '^@turnos/shared(.*)$': '<rootDir>/../shared/src$1',
-  },
 };
