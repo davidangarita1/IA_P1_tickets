@@ -22,10 +22,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install shared dependencies
-        working-directory: backend/shared
-        run: npm install
-
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
@@ -40,15 +36,15 @@ jobs:
 
       - name: Test frontend
         working-directory: frontend
-        run: npm test -- --passWithNoTests
+        run: npm test
 
       - name: Test producer
         working-directory: backend/producer
-        run: npm test -- --passWithNoTests
+        run: npm test
 
       - name: Test consumer
         working-directory: backend/consumer
-        run: npm test -- --passWithNoTests
+        run: npm test
 
       - name: Typecheck frontend
         working-directory: frontend

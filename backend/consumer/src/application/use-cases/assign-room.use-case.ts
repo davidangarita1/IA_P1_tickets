@@ -66,4 +66,23 @@ export class AssignRoomUseCase {
 
         return turnoActualizado;
     }
+
+    /**
+     * Asigna turnos hasta agotar consultorios libres o pacientes en espera.
+     */
+    async executeAll(totalConsultorios: number): Promise<Turno[]> {
+        const asignados: Turno[] = [];
+
+        while (true) {
+            const turno = await this.execute(totalConsultorios);
+            if (!turno) break;
+            asignados.push(turno);
+        }
+
+        if (asignados.length > 0) {
+            this.logger.log(`Asignación en lote completada: ${asignados.length} turnos`);
+        }
+
+        return asignados;
+    }
 }

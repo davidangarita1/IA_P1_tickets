@@ -8,5 +8,5 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.(t|j)s'],
   coverageDirectory: './coverage',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/test'],
 };

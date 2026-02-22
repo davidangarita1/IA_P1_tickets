@@ -10,6 +10,7 @@ import { RabbitMQEventPublisher } from './infrastructure/adapters/rabbitmq-event
 import { NotificationsService } from './notifications/notifications.service';
 import { EVENT_PUBLISHER_TOKEN, NOTIFICATION_GATEWAY_TOKEN } from './domain/ports/tokens';
 import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
+import { AssignRoomUseCase } from './application/use-cases/assign-room.use-case';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-cas
     // ⚕️ HUMAN CHECK - DIP: ConsumerController usa CreateTurnoUseCase, puertos registrados con tokens
     providers: [
         CreateTurnoUseCase,
+        AssignRoomUseCase,
         {
             provide: EVENT_PUBLISHER_TOKEN,
             useClass: RabbitMQEventPublisher,

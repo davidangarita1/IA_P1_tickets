@@ -46,7 +46,7 @@ export class SchedulerService implements OnModuleDestroy {
     async handleSchedulerTick(): Promise<void> {
         try {
             await this.finalizeTurnosUseCase.execute();
-            await this.assignRoomUseCase.execute(this.totalConsultorios);
+            await this.assignRoomUseCase.executeAll(this.totalConsultorios);
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : String(error);
             this.logger.error(`Error en scheduler de asignación: ${message}`);

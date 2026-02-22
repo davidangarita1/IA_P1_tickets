@@ -1,8 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Turno, TurnoEventPayload } from '../../domain/entities/turno.entity';
 import { ITurnoRepository, CreateTurnoData } from '../../domain/ports/ITurnoRepository';
 import { IEventPublisher } from '../../domain/ports/IEventPublisher';
 import { INotificationGateway } from '../../domain/ports/INotificationGateway';
+import { AssignRoomUseCase } from './assign-room.use-case';
 import {
     TURNO_REPOSITORY_TOKEN,
     EVENT_PUBLISHER_TOKEN,
@@ -27,12 +29,17 @@ export interface CreateTurnoResult {
 @Injectable()
 export class CreateTurnoUseCase {
     private readonly logger = new Logger(CreateTurnoUseCase.name);
+    private readonly totalConsultorios: number;
 
     constructor(
         @Inject(TURNO_REPOSITORY_TOKEN) private readonly turnoRepository: ITurnoRepository,
         @Inject(EVENT_PUBLISHER_TOKEN) private readonly eventPublisher: IEventPublisher,
         @Inject(NOTIFICATION_GATEWAY_TOKEN) private readonly notificationGateway: INotificationGateway,
-    ) {}
+        private readonly assignRoomUseCase: AssignRoomUseCase,
+        private readonly configService: ConfigService,
+    ) {
+        this.totalConsultorios = Number(this.configService.get('CONSULTORIOS_TOTAL')) || 5;
+    }
 
     async execute(data: CreateTurnoData): Promise<CreateTurnoResult> {
         // 1. Persistir turno en estado 'espera'
@@ -48,6 +55,9 @@ export class CreateTurnoUseCase {
         // 3. Publicar evento para broadcast WebSocket
         const eventPayload = turno.toEventPayload();
         this.eventPublisher.publish('turno_creado', eventPayload);
+
+        // 4. Asignación inmediata: si hay consultorios libres, se llenan en el momento
+        await this.assignRoomUseCase.executeAll(this.totalConsultorios);
 
         return { turno, eventPayload };
     }
