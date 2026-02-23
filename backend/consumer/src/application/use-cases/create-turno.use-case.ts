@@ -56,8 +56,16 @@ export class CreateTurnoUseCase {
         const eventPayload = turno.toEventPayload();
         this.eventPublisher.publish('turno_creado', eventPayload);
 
-        // 4. Asignación inmediata: si hay consultorios libres, se llenan en el momento
-        await this.assignRoomUseCase.executeAll(this.totalConsultorios);
+        // 4. Asignación inmediata: si hay consultorios libres, se llenan en el momento.
+        //    Esta operación es best-effort: en caso de error, el scheduler reintentará.
+        try {
+            await this.assignRoomUseCase.executeAll(this.totalConsultorios);
+        } catch (error) {
+            this.logger.error(
+                `Error al asignar consultorios después de crear el turno ${turno.id}`,
+                (error as Error).stack,
+            );
+        }
 
         return { turno, eventPayload };
     }
