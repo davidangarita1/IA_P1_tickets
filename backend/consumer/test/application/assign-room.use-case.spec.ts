@@ -92,4 +92,25 @@ describe('AssignRoomUseCase', () => {
         expect(repository.asignarConsultorio).not.toHaveBeenCalled();
         expect(eventPublisher.publish).not.toHaveBeenCalled();
     });
+
+    it('retorna vacío cuando totalConsultorios es inválido', async () => {
+        const repository: jest.Mocked<ITurnoRepository> = {
+            save: jest.fn(),
+            findPacientesEnEspera: jest.fn(),
+            getConsultoriosOcupados: jest.fn(),
+            asignarConsultorio: jest.fn(),
+            finalizarTurnosLlamados: jest.fn(),
+        };
+        const eventPublisher: jest.Mocked<IEventPublisher> = {
+            publish: jest.fn(),
+        };
+        const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+        const asignados = await useCase.executeAll(0);
+
+        expect(asignados).toEqual([]);
+        expect(repository.getConsultoriosOcupados).not.toHaveBeenCalled();
+        expect(repository.findPacientesEnEspera).not.toHaveBeenCalled();
+        expect(repository.asignarConsultorio).not.toHaveBeenCalled();
+    });
 });
