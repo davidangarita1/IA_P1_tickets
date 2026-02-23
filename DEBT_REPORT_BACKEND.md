@@ -320,18 +320,17 @@
 
 ### [CROSS-E1] ✅ TurnoEventPayload duplicated across microservices — RESOLVED
 - **Files:** 
-  - `backend/shared/src/domain/entities/turno.entity.ts` (canonical source)
-  - `backend/producer/src/domain/entities/turno.entity.ts` (re-export)
-  - `backend/consumer/src/domain/entities/turno.entity.ts` (re-export)
+  - `backend/producer/src/domain/entities/turno.entity.ts`
+  - `backend/consumer/src/domain/entities/turno.entity.ts`
 - **Rule:** E2 — DRY principle, avoid type duplication
 - **Problem:** Same entity class and types were defined in both microservices.
-- **Resolution:** Created `@turnos/shared` package at `backend/shared/` with canonical `Turno`, `TurnoEstado`, `TurnoPriority`, and `TurnoEventPayload`. Both services reference via `"file:../shared"` dependency. Local entity files re-export from `@turnos/shared` to preserve existing import paths. Dockerfiles and docker-compose.yml updated to support shared package in containerized builds.
+- **Resolution:** Se eliminaron las referencias al paquete compartido eliminado. Cada microservicio mantiene sus tipos de dominio localmente y sin dependencia local entre servicios.
 
 ### [CROSS-E2] ✅ Domain types scattered, no shared domain package — RESOLVED
-- **Files:** `backend/shared/src/domain/entities/turno.entity.ts` (single source of truth)
+- **Files:** `backend/producer/src/domain/entities/turno.entity.ts`, `backend/consumer/src/domain/entities/turno.entity.ts`
 - **Rule:** Hexagonal Architecture — Domain should be centralized
 - **Problem:** Domain types (`TurnoEstado`, `TurnoPriority`, `TurnoEventPayload`, `Turno`) were duplicated.
-- **Resolution:** Same as CROSS-E1. All domain types now live in `@turnos/shared`. Both services consume via `file:../shared` npm dependency + tsconfig path aliases.
+- **Resolution:** Same as CROSS-E1. La carpeta compartida fue removida y ya no existen dependencias locales hacia ese paquete.
 
 ### [CROSS-A1] 🔜 No separation between read and write models — DEFERRED (recommended, not required)
 - **Status:** DEFERRED — CQRS is recommended for future scale but not required for Week 1 acceptance criteria.
@@ -345,7 +344,7 @@ All 19 steps from the original fix order have been executed. Here is the executi
 | Step | Action | Microservice | Status |
 |---|---|---|---|
 | 1 | Remove hardcoded credentials from fallbacks | Both | ✅ Done — fail-fast pattern in all files |
-| 2 | Create shared types package (`@turnos/shared`) | Both | ✅ Done — `backend/shared/` with `file:../shared` dependency |
+| 2 | Remove references to deleted `shared` package | Both | ✅ Done — sin dependencia local compartida |
 | 3 | Create domain entity `turno.entity.ts` | Both | ✅ Done |
 | 4 | Create `ITurnoRepository` port | Both | ✅ Done |
 | 5 | Create `IEventPublisher` port | Both | ✅ Done |
