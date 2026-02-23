@@ -66,4 +66,30 @@ export class AssignRoomUseCase {
 
         return turnoActualizado;
     }
+
+    /**
+     * Asigna turnos hasta agotar consultorios libres o pacientes en espera.
+     */
+    async executeAll(totalConsultorios: number): Promise<Turno[]> {
+        const asignados: Turno[] = [];
+
+        if (!Number.isInteger(totalConsultorios) || totalConsultorios <= 0) {
+            this.logger.warn(
+                `executeAll llamado con totalConsultorios inválido: ${totalConsultorios}`,
+            );
+            return asignados;
+        }
+
+        for (let iteracion = 0; iteracion < totalConsultorios; iteracion++) {
+            const turno = await this.execute(totalConsultorios);
+            if (!turno) break;
+            asignados.push(turno);
+        }
+
+        if (asignados.length > 0) {
+            this.logger.log(`Asignación en lote completada: ${asignados.length} turnos`);
+        }
+
+        return asignados;
+    }
 }

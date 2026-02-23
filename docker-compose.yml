@@ -18,10 +18,8 @@ services:
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
     volumes:
-      - ./backend/producer:/workspace/producer
-      - ./backend/shared:/workspace/shared
-      - /workspace/producer/node_modules
-      - /workspace/producer/dist
+      - ./backend/producer:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -53,10 +51,8 @@ services:
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
     volumes:
-      - ./backend/consumer:/workspace/consumer
-      - ./backend/shared:/workspace/shared
-      - /workspace/consumer/node_modules
-      - /workspace/consumer/dist
+      - ./backend/consumer:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       # ⚕️ HUMAN CHECK - Credenciales de conexión RabbitMQ

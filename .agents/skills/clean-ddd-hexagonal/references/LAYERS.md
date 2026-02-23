@@ -55,7 +55,7 @@ domain/
 
 ```typescript
 // domain/order/order.ts
-import { AggregateRoot } from '../shared/aggregate_root';
+import { AggregateRoot } from '../core/aggregate_root';
 import { OrderItem } from './order_item';
 import { Money } from './value_objects';
 import { OrderPlaced, OrderShipped } from './events';

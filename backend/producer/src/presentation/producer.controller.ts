@@ -22,8 +22,9 @@ export class ProducerController {
         summary: 'Crear un nuevo turno',
         description:
             'Recibe los datos del paciente, valida el payload y envía el mensaje a la cola de RabbitMQ ' +
-            'para procesamiento asíncrono. El Consumer crea el turno en estado "espera" y el scheduler ' +
-            'asigna un consultorio cada 15 segundos. Los cambios se emiten por WebSocket.',
+            'para procesamiento asíncrono. El Consumer crea el turno, intenta asignación inmediata si hay ' +
+            'consultorios libres, y el scheduler sigue reasignando cuando se liberan consultorios. ' +
+            'Los cambios se emiten por WebSocket.',
     })
     @ApiBody({ type: CreateTurnoDto })
     @ApiResponse({

@@ -1,9 +1,57 @@
-// ⚕️ HUMAN CHECK - DRY: fuente canónica en @turnos/shared
-// Este archivo re-exporta para mantener los import paths existentes del servicio.
-// Cualquier cambio en la entidad Turno debe hacerse en backend/shared/src/domain/entities/turno.entity.ts
-export {
-    Turno,
-    TurnoEstado,
-    TurnoPriority,
-    TurnoEventPayload,
-} from '@turnos/shared';
+export type TurnoEstado = 'espera' | 'llamado' | 'atendido';
+export type TurnoPriority = 'alta' | 'media' | 'baja';
+
+export class Turno {
+    readonly id: string;
+    readonly nombre: string;
+    readonly cedula: number;
+    readonly consultorio: string | null;
+    readonly estado: TurnoEstado;
+    readonly priority: TurnoPriority;
+    readonly timestamp: number;
+    readonly finAtencionAt: number | null;
+
+    constructor(props: {
+        id: string;
+        nombre: string;
+        cedula: number;
+        consultorio: string | null;
+        estado: TurnoEstado;
+        priority: TurnoPriority;
+        timestamp: number;
+        finAtencionAt?: number | null;
+    }) {
+        this.id = props.id;
+        this.nombre = props.nombre;
+        this.cedula = props.cedula;
+        this.consultorio = props.consultorio;
+        this.estado = props.estado;
+        this.priority = props.priority;
+        this.timestamp = props.timestamp;
+        this.finAtencionAt = props.finAtencionAt ?? null;
+    }
+
+    toEventPayload(): TurnoEventPayload {
+        return {
+            id: this.id,
+            nombre: this.nombre,
+            cedula: this.cedula,
+            consultorio: this.consultorio,
+            estado: this.estado,
+            priority: this.priority,
+            timestamp: this.timestamp,
+            ...(this.finAtencionAt != null && { finAtencionAt: this.finAtencionAt }),
+        };
+    }
+}
+
+export interface TurnoEventPayload {
+    id: string;
+    nombre: string;
+    cedula: number;
+    consultorio: string | null;
+    estado: TurnoEstado;
+    priority: TurnoPriority;
+    timestamp: number;
+    finAtencionAt?: number;
+}
