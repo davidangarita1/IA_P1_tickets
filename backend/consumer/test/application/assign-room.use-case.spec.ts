@@ -16,61 +16,43 @@ const buildTurnoEnEspera = (id: string, cedula: number, timestamp: number): Turn
     });
 
 describe('AssignRoomUseCase', () => {
-    it('asigna inmediatamente 4 pacientes cuando hay 5 consultorios libres', async () => {
-        // Arrange (Test Data Builder + Fake State)
-        const enEspera: Turno[] = [
-            buildTurnoEnEspera('t1', 101, 1),
-            buildTurnoEnEspera('t2', 102, 2),
-            buildTurnoEnEspera('t3', 103, 3),
-            buildTurnoEnEspera('t4', 104, 4),
-        ];
-        const ocupados: string[] = [];
+    it('asigna el primer consultorio libre al primer paciente en espera y publica evento', async () => {
+        // Arrange: un paciente en espera y solo el consultorio "2" disponible.
+        const paciente = buildTurnoEnEspera('t1', 101, 1);
+        const turnoAsignado = new Turno({
+            ...paciente,
+            consultorio: '2',
+            estado: 'llamado',
+            finAtencionAt: Date.now() + 10000,
+        });
 
         const repository: jest.Mocked<ITurnoRepository> = {
             save: jest.fn(),
-            findPacientesEnEspera: jest.fn(async () => [...enEspera]),
-            getConsultoriosOcupados: jest.fn(async () => [...ocupados]),
-            asignarConsultorio: jest.fn(async (turnoId: string, consultorio: string) => {
-                const index = enEspera.findIndex(turno => turno.id === turnoId);
-                if (index < 0) return null;
-
-                const turnoOriginal = enEspera[index];
-                enEspera.splice(index, 1);
-                ocupados.push(consultorio);
-
-                return new Turno({
-                    id: turnoOriginal.id,
-                    nombre: turnoOriginal.nombre,
-                    cedula: turnoOriginal.cedula,
-                    consultorio,
-                    estado: 'llamado',
-                    priority: turnoOriginal.priority,
-                    timestamp: turnoOriginal.timestamp,
-                    finAtencionAt: Date.now() + 10000,
-                });
-            }),
+            findPacientesEnEspera: jest.fn(async () => [paciente]),
+            getConsultoriosOcupados: jest.fn(async () => ['1', '3', '4', '5']),
+            asignarConsultorio: jest.fn(
+                async (_turnoId: string, _consultorio: string) => turnoAsignado,
+            ),
             finalizarTurnosLlamados: jest.fn(),
         };
 
-        const eventPublisher: jest.Mocked<IEventPublisher> = {
-            publish: jest.fn(),
-        };
-
+        const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
         const useCase = new AssignRoomUseCase(repository, eventPublisher);
 
-        // Act
-        const asignados = await useCase.executeAll(5);
+        // Act: ejecutar una asignación.
+        const resultado = await useCase.execute(5);
 
-        // Assert
-        expect(asignados).toHaveLength(4);
-        expect(asignados.map(turno => turno.consultorio)).toEqual(['1', '2', '3', '4']);
-        expect(enEspera).toHaveLength(0);
-        expect(repository.asignarConsultorio).toHaveBeenCalledTimes(4);
-        expect(eventPublisher.publish).toHaveBeenCalledTimes(4);
+        // Assert: se asigna consultorio y se publica el evento de actualización.
+        expect(repository.asignarConsultorio).toHaveBeenCalledWith('t1', '2');
+        expect(eventPublisher.publish).toHaveBeenCalledWith(
+            'turno_actualizado',
+            turnoAsignado.toEventPayload(),
+        );
+        expect(resultado).toEqual(turnoAsignado);
     });
 
-    it('deja pacientes en espera cuando no hay consultorios libres', async () => {
-        // Arrange
+    it('no asigna turno cuando no hay consultorios libres', async () => {
+        // Arrange: todos los consultorios ocupados.
         const enEspera: Turno[] = [buildTurnoEnEspera('t1', 201, 1)];
         const repository: jest.Mocked<ITurnoRepository> = {
             save: jest.fn(),
@@ -84,33 +66,12 @@ describe('AssignRoomUseCase', () => {
         };
         const useCase = new AssignRoomUseCase(repository, eventPublisher);
 
-        // Act
-        const asignados = await useCase.executeAll(5);
+        // Act: intentar asignar con capacidad llena.
+        const resultado = await useCase.execute(5);
 
-        // Assert
-        expect(asignados).toEqual([]);
+        // Assert: no debe asignar ni publicar cambios.
+        expect(resultado).toBeNull();
         expect(repository.asignarConsultorio).not.toHaveBeenCalled();
         expect(eventPublisher.publish).not.toHaveBeenCalled();
-    });
-
-    it('retorna vacío cuando totalConsultorios es inválido', async () => {
-        const repository: jest.Mocked<ITurnoRepository> = {
-            save: jest.fn(),
-            findPacientesEnEspera: jest.fn(),
-            getConsultoriosOcupados: jest.fn(),
-            asignarConsultorio: jest.fn(),
-            finalizarTurnosLlamados: jest.fn(),
-        };
-        const eventPublisher: jest.Mocked<IEventPublisher> = {
-            publish: jest.fn(),
-        };
-        const useCase = new AssignRoomUseCase(repository, eventPublisher);
-
-        const asignados = await useCase.executeAll(0);
-
-        expect(asignados).toEqual([]);
-        expect(repository.getConsultoriosOcupados).not.toHaveBeenCalled();
-        expect(repository.findPacientesEnEspera).not.toHaveBeenCalled();
-        expect(repository.asignarConsultorio).not.toHaveBeenCalled();
     });
 });

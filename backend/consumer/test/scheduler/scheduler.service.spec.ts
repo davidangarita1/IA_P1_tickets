@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { SchedulerService } from '../../src/scheduler/scheduler.service';
@@ -7,23 +6,20 @@ import { AssignRoomUseCase } from '../../src/application/use-cases/assign-room.u
 
 describe('SchedulerService', () => {
     let service: SchedulerService;
-    let finalizeTurnosUseCase: jest.Mocked<FinalizeTurnosUseCase>;
-    let assignRoomUseCase: jest.Mocked<AssignRoomUseCase>;
-
-    const mockFinalizeTurnosUseCase = {
+    const finalizeTurnosUseCase: Pick<FinalizeTurnosUseCase, 'execute'> = {
         execute: jest.fn(),
     };
 
-    const mockAssignRoomUseCase = {
+    const assignRoomUseCase: Pick<AssignRoomUseCase, 'executeAll'> = {
         executeAll: jest.fn(),
     };
 
-    const mockSchedulerRegistry = {
+    const schedulerRegistry: Pick<SchedulerRegistry, 'addInterval' | 'deleteInterval'> = {
         addInterval: jest.fn(),
         deleteInterval: jest.fn(),
     };
 
-    const mockConfigService = {
+    const configService: Pick<ConfigService, 'get'> = {
         get: jest.fn((key: string) => {
             if (key === 'SCHEDULER_INTERVAL_MS') return 15000;
             if (key === 'CONSULTORIOS_TOTAL') return 5;
@@ -31,22 +27,14 @@ describe('SchedulerService', () => {
         }),
     };
 
-    beforeEach(async () => {
+    beforeEach(() => {
         jest.useFakeTimers();
-
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                SchedulerService,
-                { provide: FinalizeTurnosUseCase, useValue: mockFinalizeTurnosUseCase },
-                { provide: AssignRoomUseCase, useValue: mockAssignRoomUseCase },
-                { provide: ConfigService, useValue: mockConfigService },
-                { provide: SchedulerRegistry, useValue: mockSchedulerRegistry },
-            ],
-        }).compile();
-
-        service = module.get<SchedulerService>(SchedulerService);
-        finalizeTurnosUseCase = module.get(FinalizeTurnosUseCase);
-        assignRoomUseCase = module.get(AssignRoomUseCase);
+        service = new SchedulerService(
+            finalizeTurnosUseCase as FinalizeTurnosUseCase,
+            assignRoomUseCase as AssignRoomUseCase,
+            configService as ConfigService,
+            schedulerRegistry as SchedulerRegistry,
+        );
     });
 
     afterEach(() => {
@@ -58,33 +46,43 @@ describe('SchedulerService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should register an interval on construction', () => {
-        expect(mockSchedulerRegistry.addInterval).toHaveBeenCalledWith(
+    it('registra el intervalo al inicializarse', () => {
+        // Verifica que el scheduler quede conectado al registro de Nest.
+        expect(schedulerRegistry.addInterval).toHaveBeenCalledWith(
             'scheduler-asignacion-turnos',
             expect.any(Object),
         );
     });
 
-    it('should delegate finalization and batch assignment to use cases', async () => {
-        mockFinalizeTurnosUseCase.execute.mockResolvedValue([]);
-        mockAssignRoomUseCase.executeAll.mockResolvedValue([]);
+    it('delegates finalization and batch assignment to use cases', async () => {
+        // Arrange: los casos de uso responden correctamente.
+        (finalizeTurnosUseCase.execute as jest.Mock).mockResolvedValue([]);
+        (assignRoomUseCase.executeAll as jest.Mock).mockResolvedValue([]);
 
+        // Act: ejecutar un tick manual del scheduler.
         await service.handleSchedulerTick();
 
+        // Assert: se orquesta en el orden esperado.
         expect(finalizeTurnosUseCase.execute).toHaveBeenCalledTimes(1);
         expect(assignRoomUseCase.executeAll).toHaveBeenCalledWith(5);
     });
 
-    it('should not throw when use cases fail', async () => {
-        mockFinalizeTurnosUseCase.execute.mockRejectedValue(new Error('DB connection failed'));
+    it('no propaga error cuando falla un caso de uso', async () => {
+        // Arrange: falla de infraestructura simulada.
+        (finalizeTurnosUseCase.execute as jest.Mock).mockRejectedValue(
+            new Error('DB connection failed'),
+        );
 
+        // Act + Assert: el scheduler captura el error y no rompe el proceso.
         await expect(service.handleSchedulerTick()).resolves.not.toThrow();
     });
 
-    it('should delete the interval on destroy', () => {
+    it('elimina el intervalo en onModuleDestroy', () => {
+        // Act: simular apagado ordenado del módulo.
         service.onModuleDestroy();
 
-        expect(mockSchedulerRegistry.deleteInterval).toHaveBeenCalledWith(
+        // Assert: el intervalo debe quedar removido.
+        expect(schedulerRegistry.deleteInterval).toHaveBeenCalledWith(
             'scheduler-asignacion-turnos',
         );
     });
