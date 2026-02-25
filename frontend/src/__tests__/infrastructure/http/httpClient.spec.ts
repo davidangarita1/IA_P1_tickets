@@ -129,5 +129,24 @@ describe("httpClient", () => {
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(mockSuccess).toHaveBeenCalled();
     });
+
+    it("throws TIMEOUT when request is aborted at last retry", async () => {
+      const abortError = Object.assign(new Error("Aborted"), {
+        name: "AbortError",
+      });
+      mockFetch.mockRejectedValueOnce(abortError);
+
+      await expect(
+        httpGet("http://localhost:3000/test", { retries: 0 })
+      ).rejects.toThrow("TIMEOUT");
+    });
+
+    it("throws original error when non-Error rejection exhausts retries", async () => {
+      mockFetch.mockRejectedValueOnce("plain string error");
+
+      await expect(
+        httpGet("http://localhost:3000/test", { retries: 0 })
+      ).rejects.toBe("plain string error");
+    });
   });
 });
