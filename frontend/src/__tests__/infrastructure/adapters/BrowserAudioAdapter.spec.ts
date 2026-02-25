@@ -87,4 +87,24 @@ describe("BrowserAudioAdapter", () => {
 
     expect(adapter.isEnabled()).toBe(false);
   });
+
+  it("does not unlock again when already enabled", async () => {
+    adapter.init("/sounds/ding.mp3");
+    await adapter.unlock();
+    mockPlay.mockClear();
+
+    await adapter.unlock();
+
+    expect(mockPlay).not.toHaveBeenCalled();
+  });
+
+  it("plays without catching when play() returns undefined (old browser compat)", async () => {
+    adapter.init("/sounds/ding.mp3");
+    listeners["canplaythrough"]?.();
+    await adapter.unlock();
+    mockPlay.mockClear();
+    mockPlay.mockReturnValueOnce(undefined);
+
+    expect(() => adapter.play()).not.toThrow();
+  });
 });

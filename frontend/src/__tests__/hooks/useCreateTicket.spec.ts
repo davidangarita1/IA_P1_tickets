@@ -153,4 +153,57 @@ describe("useCreateTicket", () => {
     expect(result.current.error).toBeNull();
     expect(result.current.success).toBe("OK");
   });
+
+  it("uses fallback success message when response.message is absent", async () => {
+    const writer = mockTicketWriter();
+    writer.createTicket.mockResolvedValueOnce({
+      status: "accepted",
+      message: undefined as unknown as string,
+    });
+
+    const { result } = renderHook(() => useCreateTicket(writer));
+
+    await act(async () => {
+      await result.current.submit(dto);
+    });
+
+    expect(result.current.success).toBe("Turno registrado correctamente");
+  });
+
+  it("produces generic error message when thrown value is not an Error instance", async () => {
+    const writer = mockTicketWriter();
+    writer.createTicket.mockRejectedValueOnce("plain string rejection");
+
+    const { result } = renderHook(() => useCreateTicket(writer));
+
+    await act(async () => {
+      await result.current.submit(dto);
+    });
+
+    expect(result.current.error).toBe("No se pudo registrar el turno.");
+  });
+
+  it("does not update state after component unmounts during in-flight request", async () => {
+    let resolvePromise!: (v: CreateTicketResponse) => void;
+    const writer = mockTicketWriter();
+    writer.createTicket.mockReturnValueOnce(
+      new Promise<CreateTicketResponse>((resolve) => {
+        resolvePromise = resolve;
+      })
+    );
+
+    const { result, unmount } = renderHook(() => useCreateTicket(writer));
+
+    act(() => {
+      result.current.submit(dto);
+    });
+
+    unmount();
+
+    await act(async () => {
+      resolvePromise({ status: "accepted", message: "OK" });
+    });
+
+    expect(result.current.success).toBeNull();
+  });
 });

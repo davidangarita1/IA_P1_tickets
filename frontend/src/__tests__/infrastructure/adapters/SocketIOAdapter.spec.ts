@@ -165,4 +165,8 @@ describe("SocketIOAdapter", () => {
   it("isConnected() returns false before connect()", () => {
     expect(adapter.isConnected()).toBe(false);
   });
+
+  it("disconnect() is safe to call before connect() when socket is null", () => {
+    expect(() => adapter.disconnect()).not.toThrow();
+  });
 });
