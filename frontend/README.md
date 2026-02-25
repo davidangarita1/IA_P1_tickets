@@ -49,6 +49,7 @@ src/
 │   └── useAudioNotification.ts
 │
 ├── components/              ← UI components
+│   ├── AppointmentRegistrationForm/
 │   ├── CreateTicketForm/
 │   └── Navbar/
 │
@@ -98,7 +99,9 @@ npm run dev
 
 ## Testing
 
-Comprehensive test suite with **100 tests** across 14 suites using Jest + React Testing Library.
+Comprehensive test suite with **136 tests** across 17 suites using Jest + React Testing Library.
+
+**Coverage:** 99.18% statements · 99.42% lines · 95.83% branches
 
 ### Test Commands
 
@@ -115,14 +118,20 @@ npm run test:coverage
 
 ### Test Structure
 
-- **10 Unit Suites:** CircuitBreaker, ticketMapper, HtmlSanitizer, httpClient, BrowserAudioAdapter, HttpTicketAdapter, SocketIOAdapter, useCreateTicket, useTicketsWebSocket, useAudioNotification
-- **4 Integration Suites:** DependencyProvider, CreateTicketForm, TicketsScreen, ServedDashboard
-- **Mock Factories:** Zero external dependencies (HTTP, WebSocket, File System, Audio APIs)
+Tests mirror the hexagonal architecture of `src/` exactly:
+
+```
+src/__tests__/
+├── infrastructure/
+│   ├── adapters/    ← BrowserAudioAdapter, HtmlSanitizer, HttpTicketAdapter, SocketIOAdapter
+│   ├── http/        ← CircuitBreaker, httpClient
+│   └── mappers/     ← ticketMapper
+├── hooks/           ← useCreateTicket, useTicketsWebSocket, useAudioNotification
+├── providers/       ← DependencyProvider
+├── components/      ← AppointmentRegistrationForm, CreateTicketForm, Navbar
+├── app/             ← page (TicketsScreen), dashboard/page (ServedDashboard), register/page
+└── mocks/           ← factories.ts (shared mock builders)
+```
 
 All tests use fully isolated mock objects via `src/__tests__/mocks/factories.ts` — no real network calls, no real server required.
 
-See [TEST_STRATEGY.md](./TEST_STRATEGY.md) for detailed testing documentation.
-
-## Additional Documentation
-
-See [docs/EXPLAIN_FRONT.md](../docs/EXPLAIN_FRONT.md) for detailed design pattern documentation.
