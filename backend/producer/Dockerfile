@@ -1,13 +1,26 @@
 # ⚕️ HUMAN CHECK - Dockerfile del Producer
 # Asegurarse de usar una versión LTS de Node.js
 
+# --- Build-time knobs for npm ---
+ARG NPM_FETCH_TIMEOUT=600000
+ARG NPM_FETCH_RETRIES=5
+ARG NPM_FETCH_RETRY_FACTOR=10
+
 # --- Stage: development ---
 FROM node:20-slim AS development
+ARG NPM_FETCH_TIMEOUT
+ARG NPM_FETCH_RETRIES
+ARG NPM_FETCH_RETRY_FACTOR
+ENV NPM_CONFIG_FETCH_TIMEOUT=${NPM_FETCH_TIMEOUT}
+ENV NPM_CONFIG_FETCH_RETRIES=${NPM_FETCH_RETRIES}
+ENV NPM_CONFIG_FETCH_RETRY_FACTOR=${NPM_FETCH_RETRY_FACTOR}
 
 WORKDIR /app
 
 COPY producer/package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps \
+    --fetch-retries=${NPM_FETCH_RETRIES} \
+    --fetch-timeout=${NPM_FETCH_TIMEOUT}
 
 # Copiar código fuente (en dev, volumes sobreescriben esto)
 COPY producer/ .
@@ -18,22 +31,38 @@ CMD ["npm", "run", "start:dev"]
 
 # --- Stage: build ---
 FROM node:20-slim AS build
+ARG NPM_FETCH_TIMEOUT
+ARG NPM_FETCH_RETRIES
+ARG NPM_FETCH_RETRY_FACTOR
+ENV NPM_CONFIG_FETCH_TIMEOUT=${NPM_FETCH_TIMEOUT}
+ENV NPM_CONFIG_FETCH_RETRIES=${NPM_FETCH_RETRIES}
+ENV NPM_CONFIG_FETCH_RETRY_FACTOR=${NPM_FETCH_RETRY_FACTOR}
 
 WORKDIR /app
 
 COPY producer/package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps \
+    --fetch-retries=${NPM_FETCH_RETRIES} \
+    --fetch-timeout=${NPM_FETCH_TIMEOUT}
 
 COPY producer/ .
 RUN npm run build
 
 # --- Stage: production ---
 FROM node:20-slim AS production
+ARG NPM_FETCH_TIMEOUT
+ARG NPM_FETCH_RETRIES
+ARG NPM_FETCH_RETRY_FACTOR
+ENV NPM_CONFIG_FETCH_TIMEOUT=${NPM_FETCH_TIMEOUT}
+ENV NPM_CONFIG_FETCH_RETRIES=${NPM_FETCH_RETRIES}
+ENV NPM_CONFIG_FETCH_RETRY_FACTOR=${NPM_FETCH_RETRY_FACTOR}
 
 WORKDIR /app
 
 COPY producer/package*.json ./
-RUN npm install --omit=dev --legacy-peer-deps
+RUN npm install --omit=dev --legacy-peer-deps \
+    --fetch-retries=${NPM_FETCH_RETRIES} \
+    --fetch-timeout=${NPM_FETCH_TIMEOUT}
 
 COPY --from=build /app/dist ./dist
 
