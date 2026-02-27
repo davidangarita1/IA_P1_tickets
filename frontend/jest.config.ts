@@ -22,6 +22,7 @@ const config: Config = {
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
+    "!src/__tests__/**",
     "!src/app/layout.tsx",
     "!src/styles/**",
     "!src/config/env.ts",

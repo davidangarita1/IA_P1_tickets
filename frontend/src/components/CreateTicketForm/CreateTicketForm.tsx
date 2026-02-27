@@ -1,31 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/CreateTicketForm.module.css";
 
+function isNumericOnly(value: string): boolean {
+  return /^\d+$/.test(value);
+}
+
 export default function CreateTicketForm() {
-  const router = useRouter();
   const { ticketWriter, sanitizer } = useDeps();
   const { submit, loading, success, error } = useCreateTicket(ticketWriter);
 
   const [name, setName] = useState("");
   const [documentId, setDocumentId] = useState("");
 
+  const sanitizedName = sanitizer.sanitize(name);
+  const sanitizedDocId = sanitizer.sanitize(documentId);
+
+  const docIdTouched = documentId.length > 0;
+  const docIdError = docIdTouched && !isNumericOnly(sanitizedDocId)
+    ? "La cédula solo puede contener números"
+    : null;
+
+  const isFormValid = sanitizedName.length > 0 && sanitizedDocId.length > 0 && isNumericOnly(sanitizedDocId);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
 
-    const sanitizedName = sanitizer.sanitize(name);
-    const sanitizedDocId = sanitizer.sanitize(documentId);
     const validDocId = parseInt(sanitizedDocId, 10);
-
-    if (!sanitizedName || isNaN(validDocId)) return;
-
     const result = await submit({ name: sanitizedName, documentId: validDocId });
     if (result) {
-      router.push("/");
+      setName("");
+      setDocumentId("");
     }
   };
 
@@ -47,9 +56,15 @@ export default function CreateTicketForm() {
         value={documentId}
         onChange={(e) => setDocumentId(e.target.value)}
         className={styles.input}
+        aria-describedby={docIdError ? "docId-error" : undefined}
       />
+      {docIdError && (
+        <p id="docId-error" className={styles.error} role="alert">
+          {docIdError}
+        </p>
+      )}
 
-      <button disabled={loading} className={styles.button}>
+      <button disabled={loading || !isFormValid} className={styles.button}>
         {loading ? "Enviando..." : "Registrar turno"}
       </button>
 

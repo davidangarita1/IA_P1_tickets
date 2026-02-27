@@ -5,6 +5,9 @@ import type { AudioNotifier } from "@/domain/ports/AudioNotifier";
 import type { InputSanitizer } from "@/domain/ports/InputSanitizer";
 import type { Ticket } from "@/domain/Ticket";
 import type { CreateTicketResponse } from "@/domain/CreateTicket";
+import type { User, UserRole } from "@/domain/User";
+import type { AuthResult } from "@/domain/AuthCredentials";
+import type { AuthService } from "@/domain/ports/AuthService";
 
 let idCounter = 0;
 
@@ -88,6 +91,32 @@ export function mockAudioNotifier(): jest.Mocked<AudioNotifier> {
 
 export function mockSanitizer(): jest.Mocked<InputSanitizer> {
   return {
+    // istanbul ignore next
     sanitize: jest.fn((input: string) => input.trim()),
+  };
+}
+
+let userIdCounter = 0;
+
+export function buildUser(overrides: Partial<User> = {}): User {
+  userIdCounter++;
+  return {
+    id: `user-${userIdCounter}`,
+    email: `user${userIdCounter}@example.com`,
+    name: `User ${userIdCounter}`,
+    role: "employee" as UserRole,
+    ...overrides,
+  };
+}
+
+export function mockAuthService(
+  signInResult: AuthResult = { success: true, message: "OK", user: undefined, token: "jwt-token" },
+  signUpResult: AuthResult = { success: true, message: "Created", user: undefined, token: "jwt-token" }
+): jest.Mocked<AuthService> {
+  return {
+    signIn: jest.fn().mockResolvedValue(signInResult),
+    signUp: jest.fn().mockResolvedValue(signUpResult),
+    signOut: jest.fn().mockResolvedValue(undefined),
+    getSession: jest.fn().mockResolvedValue(null),
   };
 }

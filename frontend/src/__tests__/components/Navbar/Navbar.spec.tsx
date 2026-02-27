@@ -4,6 +4,11 @@ import Navbar from "@/components/Navbar/Navbar";
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
+jest.mock("@/providers/AuthProvider", () => ({
+  useAuth: jest.fn(),
 }));
 
 jest.mock("@/styles/Navbar.module.css", () => ({
@@ -15,10 +20,30 @@ jest.mock("@/styles/Navbar.module.css", () => ({
 }));
 
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+
+function setupAuth(isAuthenticated: boolean) {
+  mockUseAuth.mockReturnValue({
+    user: isAuthenticated ? { id: "1", email: "u@u.com", name: "User", role: "employee" } : null,
+    loading: false,
+    error: null,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn(),
+    isAuthenticated,
+    hasRole: jest.fn().mockReturnValue(false),
+  });
+}
 
 describe("Navbar", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setupAuth(true);
+  });
+
   it("renders all navigation items", () => {
     mockUsePathname.mockReturnValue("/");
 
@@ -35,6 +60,15 @@ describe("Navbar", () => {
     render(<Navbar />);
 
     expect(screen.getByText(/Sistema de/i)).toBeInTheDocument();
+  });
+
+  it("logo is a link that navigates to /", () => {
+    mockUsePathname.mockReturnValue("/dashboard");
+
+    render(<Navbar />);
+
+    const logoLink = screen.getByRole("link", { name: /sistema de turnos/i });
+    expect(logoLink).toHaveAttribute("href", "/");
   });
 
   it("renders correct href for each nav item", () => {
@@ -65,5 +99,65 @@ describe("Navbar", () => {
 
     const turnosLink = screen.getByRole("link", { name: "Turnos" });
     expect(turnosLink.className).toBe("link");
+  });
+
+  it("does not render navigation links when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("link", { name: "Turnos" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Registro" })).not.toBeInTheDocument();
+  });
+
+  it("renders navigation links when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.getByRole("link", { name: "Turnos" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Registro" })).toBeInTheDocument();
+  });
+
+  it("renders SignOutButton when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.getByRole("button", { name: /cerrar sesión|sign out|logout/i })).toBeInTheDocument();
+  });
+
+  it("does not render SignOutButton when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("button", { name: /cerrar sesión|sign out|logout/i })).not.toBeInTheDocument();
+  });
+
+  it("renders Iniciar sesión link when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    const link = screen.getByRole("link", { name: /iniciar sesión/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", "/signin");
+  });
+
+  it("does not render Iniciar sesión link when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("link", { name: /iniciar sesión/i })).not.toBeInTheDocument();
   });
 });

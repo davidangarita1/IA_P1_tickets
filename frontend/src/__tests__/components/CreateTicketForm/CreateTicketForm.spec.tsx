@@ -1,7 +1,6 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { mockAuthService, mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
 import CreateTicketForm from "@/components/CreateTicketForm/CreateTicketForm";
-import { mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 
@@ -17,8 +16,8 @@ jest.mock("@/hooks/useCreateTicket", () => ({
   useCreateTicket: jest.fn(),
 }));
 
-import { useDeps } from "@/providers/DependencyProvider";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
+import { useDeps } from "@/providers/DependencyProvider";
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseCreateTicket = useCreateTicket as jest.MockedFunction<
@@ -49,6 +48,7 @@ function setupMocks(overrides: {
       isEnabled: jest.fn(),
     },
     sanitizer,
+    authService: mockAuthService(),
   });
 
   mockUseCreateTicket.mockReturnValue({
@@ -139,7 +139,7 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("navigates to home on successful submission", async () => {
+  it("clears the form on successful submission", async () => {
     const submit = jest.fn().mockResolvedValue(true);
     setupMocks({ submit });
 
@@ -156,11 +156,12 @@ describe("CreateTicketForm", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/");
+      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("");
+      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("");
     });
   });
 
-  it("does not navigate when submission fails", async () => {
+  it("does not clear the form when submission fails", async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
@@ -177,8 +178,42 @@ describe("CreateTicketForm", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("Maria");
+      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("12345678");
     });
+  });
+
+  it("shows inline error when documentId is not purely numeric", async () => {
+    setupMocks({});
+    render(<CreateTicketForm />);
+
+    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
+      target: { value: "abc" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("La cédula solo puede contener números")
+      ).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
+      target: { value: "12ab34" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("La cédula solo puede contener números")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("submit button is disabled when form is incomplete", () => {
+    setupMocks({});
+    render(<CreateTicketForm />);
+
+    const button = screen.getByRole("button", { name: "Registrar turno" });
+    expect(button).toBeDisabled();
   });
 
   it("shows loading text on button when loading", () => {
