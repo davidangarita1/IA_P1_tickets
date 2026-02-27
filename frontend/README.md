@@ -55,9 +55,9 @@ src/
 ├── hooks/                   ← Use cases
 │   ├── useCreateTicket.ts
 │   ├── useTicketsWebSocket.ts
-│   ├── useAudioNotification.ts
-│   └── useAuth.ts           ← Consumes AuthContext
+│   └── useAudioNotification.ts
 │
+├── components/              ← UI components
 ├── components/              ← UI components
 │   ├── AppointmentRegistrationForm/
 │   ├── CreateTicketForm/
