@@ -101,6 +101,8 @@ Navbar   →  SignOutButton  →  useAuth().signOut()
 
 New users created via `/signup` are always registered as `employee`. The `admin` role can only be granted at the database level.
 
+> **Alcance de esta HU:** La ruta `/signup` permanece **pública** (sin autenticación requerida) para permitir el auto-registro de empleados. En un ciclo posterior se evaluará restringir el acceso al formulario de registro (por ejemplo, exigiendo un token de invitación o limitando el registro a administradores).
+
 ### Route Protection
 
 - **`AuthGuard` component** — wraps `dashboard` and `register` pages; redirects to `/signin` if not authenticated.
