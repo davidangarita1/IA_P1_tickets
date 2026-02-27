@@ -1,7 +1,6 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { mockAuthService, mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
 import CreateTicketForm from "@/components/CreateTicketForm/CreateTicketForm";
-import { mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 
@@ -17,8 +16,8 @@ jest.mock("@/hooks/useCreateTicket", () => ({
   useCreateTicket: jest.fn(),
 }));
 
-import { useDeps } from "@/providers/DependencyProvider";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
+import { useDeps } from "@/providers/DependencyProvider";
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseCreateTicket = useCreateTicket as jest.MockedFunction<
@@ -49,6 +48,7 @@ function setupMocks(overrides: {
       isEnabled: jest.fn(),
     },
     sanitizer,
+    authService: mockAuthService(),
   });
 
   mockUseCreateTicket.mockReturnValue({
