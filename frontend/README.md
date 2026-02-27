@@ -106,7 +106,7 @@ New users created via `/signup` are always registered as `employee`. The `admin`
 ### Route Protection
 
 - **`AuthGuard` component** — wraps `dashboard` and `register` pages; redirects to `/signin` if not authenticated.
-- **`proxy.ts` middleware** — edge-level check; validates the presence of the session cookie on every request to protected routes before the page renders.
+- **`proxy.ts` middleware` (current)** — applies security headers and HTTP method filtering only; it does **not** yet perform auth cookie validation or redirects. Edge-level auth checks are planned for a future iteration.
 
 ### Current Adapter
 
