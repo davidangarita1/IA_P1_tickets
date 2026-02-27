@@ -18,7 +18,19 @@ describe("AuthProvider", () => {
     consoleError.mockRestore();
   });
 
-  it("starts with user null, loading false and isAuthenticated false", async () => {
+  it("starts with loading true before getSession resolves", async () => {
+    const service = mockAuthService();
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {});
+
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("initializes with user null and isAuthenticated false when no session exists", async () => {
     const service = mockAuthService();
     const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
 
@@ -175,10 +187,12 @@ describe("AuthProvider", () => {
     expect(result.current.hasRole("employee")).toBe(false);
   });
 
-  it("hasRole: returns false when there is no authenticated user", () => {
+  it("hasRole: returns false when there is no authenticated user", async () => {
     const service = mockAuthService();
 
     const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    await act(async () => {});
 
     expect(result.current.hasRole("admin")).toBe(false);
     expect(result.current.hasRole("employee")).toBe(false);
