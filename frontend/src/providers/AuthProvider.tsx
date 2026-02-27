@@ -18,6 +18,11 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+function mapError(err: unknown): string {
+  const message = err instanceof Error ? err.message : "";
+  return message || "Ocurrió un error inesperado. Intente nuevamente.";
+}
+
 export function useAuth(): AuthState {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("AuthProvider is required");
@@ -54,6 +59,9 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
         }
         setError(result.message);
         return false;
+      } catch (err: unknown) {
+        setError(mapError(err));
+        return false;
       } finally {
         setLoading(false);
       }
@@ -72,6 +80,9 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
           return true;
         }
         setError(result.message);
+        return false;
+      } catch (err: unknown) {
+        setError(mapError(err));
         return false;
       } finally {
         setLoading(false);

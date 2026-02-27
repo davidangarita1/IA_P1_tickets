@@ -197,6 +197,70 @@ describe("AuthProvider", () => {
     expect(result.current.isAuthenticated).toBe(true);
   });
 
+  it("signIn: sets error and returns false when authService throws an Error", async () => {
+    const service = mockAuthService();
+    service.signIn.mockRejectedValueOnce(new Error("Network error"));
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    let returned: boolean | undefined;
+    await act(async () => {
+      returned = await result.current.signIn({ email: "a@a.com", password: "pass" });
+    });
+
+    expect(returned).toBe(false);
+    expect(result.current.error).toBe("Network error");
+    expect(result.current.user).toBeNull();
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("signIn: sets fallback error message when authService throws a non-Error", async () => {
+    const service = mockAuthService();
+    service.signIn.mockRejectedValueOnce("unexpected");
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    let returned: boolean | undefined;
+    await act(async () => {
+      returned = await result.current.signIn({ email: "a@a.com", password: "pass" });
+    });
+
+    expect(returned).toBe(false);
+    expect(result.current.error).toBe("Ocurrió un error inesperado. Intente nuevamente.");
+  });
+
+  it("signUp: sets error and returns false when authService throws an Error", async () => {
+    const service = mockAuthService();
+    service.signUp.mockRejectedValueOnce(new Error("Connection refused"));
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    let returned: boolean | undefined;
+    await act(async () => {
+      returned = await result.current.signUp({ name: "Ana", email: "ana@test.com", password: "pass", role: "employee" });
+    });
+
+    expect(returned).toBe(false);
+    expect(result.current.error).toBe("Connection refused");
+    expect(result.current.user).toBeNull();
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("signUp: sets fallback error message when authService throws a non-Error", async () => {
+    const service = mockAuthService();
+    service.signUp.mockRejectedValueOnce(null);
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
+
+    let returned: boolean | undefined;
+    await act(async () => {
+      returned = await result.current.signUp({ name: "Ana", email: "ana@test.com", password: "pass", role: "employee" });
+    });
+
+    expect(returned).toBe(false);
+    expect(result.current.error).toBe("Ocurrió un error inesperado. Intente nuevamente.");
+  });
+
   it("clears previous error on new signIn attempt", async () => {
     const user = buildUser();
     const service = mockAuthService({ success: false, message: "Error" });
