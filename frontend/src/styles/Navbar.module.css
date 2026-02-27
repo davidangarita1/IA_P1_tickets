@@ -53,6 +53,24 @@
   color: #ffffff;
 }
 
+.signOutBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #991b1b;
+  background: transparent;
+  border: 1px solid #fecaca;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.signOutBtn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #7f1d1d;
+}
+
 @media (prefers-color-scheme: dark) {
   .navbar {
     background: #1a1a1a;
@@ -62,5 +80,16 @@
   .link:hover {
     background: #2a2a2a;
     color: var(--foreground);
+  }
+
+  .signOutBtn {
+    color: #fca5a5;
+    border-color: #7f1d1d;
+  }
+
+  .signOutBtn:hover {
+    background: #451a1a;
+    border-color: #991b1b;
+    color: #fecaca;
   }
 }

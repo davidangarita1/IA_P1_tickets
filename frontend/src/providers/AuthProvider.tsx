@@ -45,13 +45,18 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
   const signIn = useCallback(
     async (credentials: AuthCredentials): Promise<boolean> => {
       setError(null);
-      const result = await authService.signIn(credentials);
-      if (result.success && result.user) {
-        setUser(result.user);
-        return true;
+      setLoading(true);
+      try {
+        const result = await authService.signIn(credentials);
+        if (result.success && result.user) {
+          setUser(result.user);
+          return true;
+        }
+        setError(result.message);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      setError(result.message);
-      return false;
     },
     [authService]
   );
@@ -59,13 +64,18 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
   const signUp = useCallback(
     async (data: SignUpData): Promise<boolean> => {
       setError(null);
-      const result = await authService.signUp(data);
-      if (result.success && result.user) {
-        setUser(result.user);
-        return true;
+      setLoading(true);
+      try {
+        const result = await authService.signUp(data);
+        if (result.success && result.user) {
+          setUser(result.user);
+          return true;
+        }
+        setError(result.message);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      setError(result.message);
-      return false;
     },
     [authService]
   );

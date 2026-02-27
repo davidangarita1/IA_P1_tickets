@@ -60,4 +60,10 @@ describe("SignInPage", () => {
 
     expect(screen.getByRole("button", { name: /iniciar sesión|sign in/i })).toBeInTheDocument();
   });
+
+  it("renders the form heading", () => {
+    render(<SignInPage />);
+
+    expect(screen.getByRole("heading", { name: /iniciar sesión/i })).toBeInTheDocument();
+  });
 });

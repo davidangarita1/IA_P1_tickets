@@ -63,4 +63,10 @@ describe("SignUpPage", () => {
 
     expect(screen.getByRole("button", { name: /registrarse|sign up/i })).toBeInTheDocument();
   });
+
+  it("renders the form heading", () => {
+    render(<SignUpPage />);
+
+    expect(screen.getByRole("heading", { name: /crear cuenta/i })).toBeInTheDocument();
+  });
 });

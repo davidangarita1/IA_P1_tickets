@@ -18,6 +18,7 @@ function getCircuit(url: string): CircuitBreaker {
   return circuits.get(host)!;
 }
 
+/* istanbul ignore next */
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function request<T>(
@@ -84,6 +85,7 @@ async function request<T>(
     }
   }
 
+  /* istanbul ignore next */
   throw new Error("UNEXPECTED_HTTP_ERROR");
 }
 

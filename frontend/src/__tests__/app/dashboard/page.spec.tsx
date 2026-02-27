@@ -10,6 +10,16 @@ import {
   mockSanitizer,
 } from "@/__tests__/mocks/factories";
 
+const mockPush = jest.fn();
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
+jest.mock("@/providers/AuthProvider", () => ({
+  useAuth: jest.fn(),
+}));
+
 jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
 }));
@@ -25,6 +35,7 @@ jest.mock("@/hooks/useAudioNotification", () => ({
 import { useDeps } from "@/providers/DependencyProvider";
 import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
 import { useAudioNotification } from "@/hooks/useAudioNotification";
+import { useAuth } from "@/providers/AuthProvider";
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseTicketsWebSocket = useTicketsWebSocket as jest.MockedFunction<
@@ -33,6 +44,7 @@ const mockUseTicketsWebSocket = useTicketsWebSocket as jest.MockedFunction<
 const mockUseAudioNotification = useAudioNotification as jest.MockedFunction<
   typeof useAudioNotification
 >;
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 function setupMocks(options: {
   tickets?: ReturnType<typeof buildTicket>[];
@@ -67,6 +79,16 @@ function setupMocks(options: {
 describe("ServedDashboard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAuth.mockReturnValue({
+      user: { id: "1", email: "a@a.com", name: "Test", role: "admin" },
+      loading: false,
+      error: null,
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      isAuthenticated: true,
+      hasRole: jest.fn(() => true),
+    });
     setupMocks({});
   });
 
@@ -166,6 +188,40 @@ describe("ServedDashboard", () => {
     render(<ServedDashboard />);
 
     expect(screen.getByText("✅ Turno completado")).toBeInTheDocument();
+  });
+
+  it("redirects to /signin when user is not authenticated", () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      error: null,
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      isAuthenticated: false,
+      hasRole: jest.fn(() => false),
+    });
+
+    render(<ServedDashboard />);
+
+    expect(mockPush).toHaveBeenCalledWith("/signin");
+  });
+
+  it("does not render content when not authenticated", () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      error: null,
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      isAuthenticated: false,
+      hasRole: jest.fn(() => false),
+    });
+
+    render(<ServedDashboard />);
+
+    expect(screen.queryByText("Historial de Turnos Atendidos")).not.toBeInTheDocument();
   });
 
   it("calls notify when served ticket count increases after initialization", () => {

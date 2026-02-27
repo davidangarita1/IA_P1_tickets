@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import type { UserRole } from "@/domain/User";
+import styles from "@/styles/SignUpForm.module.css";
 
 export default function SignUpForm() {
   const [name, setName] = useState("");
@@ -24,33 +26,46 @@ export default function SignUpForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <p role="alert">{error}</p>}
-      <input
-        type="text"
-        placeholder="Nombre"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <select value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
-        <option value="admin">Admin</option>
-        <option value="employee">Employee</option>
-      </select>
-      <button type="submit" disabled={loading}>
-        Registrarse
-      </button>
-    </form>
+    <div className={styles.wrapper}>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <h2>Crear cuenta</h2>
+        {error && <p role="alert" className={styles.error}>{error}</p>}
+        <input
+          type="text"
+          placeholder="Nombre"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={styles.input}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className={styles.input}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={styles.input}
+        />
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value as UserRole)}
+          className={styles.select}
+        >
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" disabled={loading} className={styles.button}>
+          {loading ? "Registrando..." : "Registrarse"}
+        </button>
+        <p className={styles.footer}>
+          ¿Ya tienes cuenta? <Link href="/signin">Inicia sesión</Link>
+        </p>
+      </form>
+    </div>
   );
 }

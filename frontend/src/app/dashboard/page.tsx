@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
 import { useAudioNotification } from "@/hooks/useAudioNotification";
 import { useDeps } from "@/providers/DependencyProvider";
+import AuthGuard from "@/components/AuthGuard/AuthGuard";
 import styles from "@/styles/page.module.css";
 
 const formatTime = (timestamp: number): string =>
@@ -14,6 +15,14 @@ const formatTime = (timestamp: number): string =>
   });
 
 export default function ServedDashboard() {
+  return (
+    <AuthGuard>
+      <ServedDashboardContent />
+    </AuthGuard>
+  );
+}
+
+function ServedDashboardContent() {
   const { realTime, audio } = useDeps();
   const { tickets, error, connected } = useTicketsWebSocket(realTime);
   const { audioEnabled, showToast, toastMessage, notify } =
