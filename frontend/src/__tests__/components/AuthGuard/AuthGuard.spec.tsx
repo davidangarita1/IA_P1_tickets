@@ -78,6 +78,7 @@ describe("AuthGuard", () => {
     );
 
     expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it("renders children when user has an allowed role", () => {
