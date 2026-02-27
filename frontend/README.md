@@ -166,8 +166,8 @@ El botón **Registrar turno** permanece deshabilitado hasta que el formulario se
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
 NEXT_PUBLIC_WS_URL=http://localhost:3001
-AUTH_COOKIE_NAME=auth_token          # name of the session cookie
-AUTH_COOKIE_MAX_AGE=86400            # cookie lifetime in seconds (24h)
+NEXT_PUBLIC_AUTH_COOKIE_NAME=auth_token          # name of the session cookie (client-accessible)
+NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE=86400            # cookie lifetime in seconds (24h, client-accessible)
 ```
 
 ## Run

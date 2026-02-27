@@ -18,6 +18,19 @@ describe("cookieUtils", () => {
 
       expect(getAuthCookie()).toBe("token-two");
     });
+
+    it("sets Max-Age on the cookie string", () => {
+      const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+      if (!cookieDescriptor) return;
+      const setSpy = jest.fn();
+      Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor.get, configurable: true });
+
+      setAuthCookie("token-with-expiry");
+
+      expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age="));
+
+      Object.defineProperty(document, "cookie", cookieDescriptor);
+    });
   });
 
   describe("getAuthCookie", () => {
