@@ -36,10 +36,10 @@
 ## 2. Arquitectura
 
 ### Descripción de la arquitectura propuesta
-Se extiende la **arquitectura hexagonal** ya establecida en el proyecto. La capa de dominio define los tipos (`User`, `AuthCredentials`, `SignUpData`) y los puertos (`AuthProvider`). La capa de infraestructura implementa el adaptador concreto (`HttpAuthAdapter`). La capa de presentación consume los hooks (`useAuth`) que operan contra los puertos, y los componentes de UI delegan toda la lógica en esos hooks. Un `AuthProvider` (contexto React) centraliza el estado de sesión y lo inyecta vía `DependencyProvider` existente.
+Se extiende la **arquitectura hexagonal** ya establecida en el proyecto. La capa de dominio define los tipos (`User`, `AuthCredentials`, `SignUpData`) y los puertos (`AuthService`). La capa de infraestructura implementa el adaptador concreto (`HttpAuthAdapter`). La capa de presentación consume los hooks (`useAuth`) que operan contra los puertos, y los componentes de UI delegan toda la lógica en esos hooks. Un `AuthProvider` (contexto React) centraliza el estado de sesión y lo inyecta vía `DependencyProvider` existente.
 
 ### Justificación
-- **Inversión de dependencias (DIP)**: los hooks y componentes dependen del puerto `AuthProvider`, no de la implementación HTTP concreta. Esto permite cambiar el backend de autenticación sin tocar la UI.
+- **Inversión de dependencias (DIP)**: los hooks y componentes dependen del puerto `AuthService`, no de la implementación HTTP concreta. Esto permite cambiar el backend de autenticación sin tocar la UI.
 - **Principio abierto/cerrado (OCP)**: se añaden nuevos puertos, adaptadores, hooks y páginas sin modificar el código existente.
 - **Separación de responsabilidades (SRP)**: cada capa tiene una única razón de cambio — dominio (reglas de negocio), infraestructura (comunicación), presentación (UI).
 - **Coherencia**: se reutilizan los mismos patrones ya presentes (`DependencyProvider`, `httpClient` con `CircuitBreaker`, `InputSanitizer`, factorías de mocks).
