@@ -12,6 +12,20 @@ export interface ITokenService {
   generateToken(payload: Record<string, unknown>): string;
 }
 
+// Datos del usuario en la respuesta (español, para el ACL del front).
+export interface UsuarioResponse {
+  id: string;
+  email: string;
+  nombre: string;
+  rol: string;
+}
+
+// Resultado del login: token + datos de usuario para el frontend.
+export interface LoginResult {
+  token: string;
+  usuario: UsuarioResponse;
+}
+
 // Dependencias necesarias para ejecutar el flujo de login.
 export interface LoginDependencies {
   userRepository: IUserRepository;
@@ -23,8 +37,8 @@ export interface LoginDependencies {
 export class LoginUseCase {
   constructor(private readonly deps: LoginDependencies) {}
 
-  // Ejecuta el flujo de login, usando los adapters inyectados.
-  async execute(credentials: LoginCredentials): Promise<string> {
+  // Ejecuta el flujo de login, retorna token + usuario completo.
+  async execute(credentials: LoginCredentials): Promise<LoginResult> {
     const user = await this.deps.userRepository.findByEmail(credentials.email);
 
     if (!user) {
@@ -37,6 +51,12 @@ export class LoginUseCase {
       throw new Error('Invalid credentials');
     }
 
-    return this.deps.tokenService.generateToken({ sub: user.id, email: user.email });
+    const tokenPayload = { sub: user.id, email: user.email, nombre: user.nombre, rol: user.rol };
+    const token = this.deps.tokenService.generateToken(tokenPayload);
+
+    return {
+      token,
+      usuario: { id: user.id, email: user.email, nombre: user.nombre, rol: user.rol },
+    };
   }
 }

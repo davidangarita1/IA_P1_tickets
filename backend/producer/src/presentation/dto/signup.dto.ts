@@ -1,6 +1,7 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsString, MinLength } from 'class-validator';
 
-// DTO mínimo para solicitudes de registro de usuario.
+// DTO para solicitudes de registro — alineado con front SignUpData { email, password, name, role }.
+// El front envía campos en español (nombre, rol) a través del mapper ACL.
 export class SignupDto {
   @IsEmail()
   email: string;
@@ -8,4 +9,12 @@ export class SignupDto {
   @IsString()
   @MinLength(4)
   password: string;
+
+  @IsString()
+  @MinLength(1)
+  nombre: string;
+
+  @IsString()
+  @IsIn(['admin', 'empleado'])
+  rol: string;
 }

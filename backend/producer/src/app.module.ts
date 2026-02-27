@@ -100,9 +100,9 @@ import { AuthGuard } from './presentation/auth.guard';
         },
         {
             provide: SignupUseCase,
-            useFactory: (userRepository, passwordHasher) =>
-                new SignupUseCase({ userRepository, passwordHasher }),
-            inject: [USER_REPOSITORY_TOKEN, PASSWORD_HASHER_TOKEN],
+            useFactory: (userRepository, passwordHasher, tokenService) =>
+                new SignupUseCase({ userRepository, passwordHasher, tokenService }),
+            inject: [USER_REPOSITORY_TOKEN, PASSWORD_HASHER_TOKEN, TOKEN_SERVICE_TOKEN],
         },
         AuthGuard,
     ],

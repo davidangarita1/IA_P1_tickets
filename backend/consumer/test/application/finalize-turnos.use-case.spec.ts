@@ -16,6 +16,7 @@ describe('FinalizeTurnosUseCase (Application)', () => {
     });
 
     const turnoRepository: jest.Mocked<ITurnoRepository> = {
+        findActivoPorCedula: jest.fn(),
         save: jest.fn(),
         findPacientesEnEspera: jest.fn(),
         getConsultoriosOcupados: jest.fn(),

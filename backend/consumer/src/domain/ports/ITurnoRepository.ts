@@ -17,6 +17,7 @@ export interface CreateTurnoData {
  * ⚕️ HUMAN CHECK - ISP: puerto enfocado en las operaciones que el Consumer consume
  */
 export interface ITurnoRepository {
+    findActivoPorCedula(cedula: number): Promise<Turno | null>;
     save(data: CreateTurnoData): Promise<Turno>;
     findPacientesEnEspera(): Promise<Turno[]>;
     getConsultoriosOcupados(): Promise<string[]>;

@@ -27,30 +27,48 @@ describe('AuthController (Presentation)', () => {
     );
   });
 
-  it('delegates signup and returns user id', async () => {
+  it('delegates signUp and returns success with usuario', async () => {
     // Arrange
-    (signupUseCase.execute as jest.Mock).mockResolvedValue('user-1');
-    const request = { email: 'admin@eps.com', password: 'secret' };
+    const signupResult = {
+      token: 'new-token',
+      usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+    };
+    (signupUseCase.execute as jest.Mock).mockResolvedValue(signupResult);
+    const request = { email: 'admin@eps.com', password: 'secret', nombre: 'Admin', rol: 'admin' };
 
     // Act
-    const result = await controller.signup(request);
+    const result = await controller.signUp(request);
 
     // Assert
     expect(signupUseCase.execute).toHaveBeenCalledWith(request);
-    expect(result).toEqual({ userId: 'user-1' });
+    expect(result).toEqual({
+      success: true,
+      message: 'Registro exitoso',
+      token: 'new-token',
+      usuario: signupResult.usuario,
+    });
   });
 
-  it('delegates login and returns access token', async () => {
+  it('delegates signIn and returns success with token + usuario', async () => {
     // Arrange
-    (loginUseCase.execute as jest.Mock).mockResolvedValue('signed-token');
+    const loginResult = {
+      token: 'signed-token',
+      usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+    };
+    (loginUseCase.execute as jest.Mock).mockResolvedValue(loginResult);
     const request = { email: 'admin@eps.com', password: 'secret' };
 
     // Act
-    const result = await controller.login(request);
+    const result = await controller.signIn(request);
 
     // Assert
     expect(loginUseCase.execute).toHaveBeenCalledWith(request);
-    expect(result).toEqual({ accessToken: 'signed-token' });
+    expect(result).toEqual({
+      success: true,
+      message: 'Login exitoso',
+      token: 'signed-token',
+      usuario: loginResult.usuario,
+    });
   });
 
   it('returns dashboard history from use case when already authenticated', async () => {

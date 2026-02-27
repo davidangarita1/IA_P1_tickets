@@ -11,7 +11,7 @@ import { HttpTicketAdapter } from "@/infrastructure/adapters/HttpTicketAdapter";
 import { SocketIOAdapter } from "@/infrastructure/adapters/SocketIOAdapter";
 import { BrowserAudioAdapter } from "@/infrastructure/adapters/BrowserAudioAdapter";
 import { HtmlSanitizer } from "@/infrastructure/adapters/HtmlSanitizer";
-import { NoopAuthAdapter } from "@/infrastructure/adapters/NoopAuthAdapter";
+import { HttpAuthAdapter } from "@/infrastructure/adapters/HttpAuthAdapter";
 import { env } from "@/config/env";
 
 export interface Dependencies {
@@ -45,7 +45,7 @@ export function DependencyProvider({ children, overrides }: DependencyProviderPr
       realTime: new SocketIOAdapter(env.WS_URL),
       audio: new BrowserAudioAdapter(),
       sanitizer: new HtmlSanitizer(),
-      authService: new NoopAuthAdapter(),
+      authService: new HttpAuthAdapter(env.API_BASE_URL),
       ...overrides,
     };
   }, [overrides]);

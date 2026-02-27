@@ -9,11 +9,13 @@ export class InMemoryUserRepository implements IUserRepository {
     return this.usersByEmail.get(email) ?? null;
   }
 
-  async create(params: { email: string; passwordHash: string }): Promise<IUserRecord> {
+  async create(params: { email: string; passwordHash: string; nombre: string; rol: string }): Promise<IUserRecord> {
     const user: IUserRecord = {
       id: String(this.sequence++),
       email: params.email,
       passwordHash: params.passwordHash,
+      nombre: params.nombre,
+      rol: params.rol,
       isActive: true,
     };
 

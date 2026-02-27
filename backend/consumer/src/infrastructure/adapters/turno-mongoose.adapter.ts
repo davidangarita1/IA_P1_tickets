@@ -23,6 +23,14 @@ export class TurnoMongooseAdapter implements ITurnoRepository {
         @Inject(PRIORITY_SORTING_STRATEGY_TOKEN) private readonly prioritySorting: IPrioritySortingStrategy,
     ) {}
 
+    async findActivoPorCedula(cedula: number): Promise<Turno | null> {
+        const doc = await this.turnoModel
+            .findOne({ cedula, estado: { $in: ['espera', 'llamado'] } })
+            .exec();
+
+        return doc ? this.toDomain(doc) : null;
+    }
+
     async save(data: CreateTurnoData): Promise<Turno> {
         const doc = new this.turnoModel({
             cedula: data.cedula,
