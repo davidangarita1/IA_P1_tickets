@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/SignUpForm.module.css";
 
 export default function SignUpForm() {
@@ -11,13 +12,17 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signUp, loading, error } = useAuth();
+  const { sanitizer } = useDeps();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password) return;
+    const sanitizedName = sanitizer.sanitize(name);
+    const sanitizedEmail = sanitizer.sanitize(email);
+    const trimmedPassword = password.trim();
+    if (!sanitizedName || !sanitizedEmail || !trimmedPassword) return;
 
-    const success = await signUp({ name, email, password, role: "employee" });
+    const success = await signUp({ name: sanitizedName, email: sanitizedEmail, password: trimmedPassword, role: "employee" });
     if (success) {
       router.push("/signin");
     }
