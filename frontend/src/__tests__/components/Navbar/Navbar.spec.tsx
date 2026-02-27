@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar/Navbar";
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
+  useRouter: () => ({ push: jest.fn() }),
 }));
 
 jest.mock("@/providers/AuthProvider", () => ({
