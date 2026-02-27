@@ -31,7 +31,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children, authService }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
       if (sessionUser) {
         setUser(sessionUser);
       }
+    }).finally(() => {
+      setLoading(false);
     });
   }, [authService]);
 
