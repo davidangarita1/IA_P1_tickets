@@ -57,26 +57,19 @@ describe("SignUpForm", () => {
     setupMocks({});
   });
 
-  it("renders name, email, password inputs and role selector", () => {
+  it("renders name, email and password inputs", () => {
     render(<SignUpForm />);
 
     expect(screen.getByPlaceholderText(/nombre|name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/contraseña|password/i)).toBeInTheDocument();
-    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
   it("renders the submit button", () => {
     render(<SignUpForm />);
 
     expect(screen.getByRole("button", { name: /registrarse|sign up/i })).toBeInTheDocument();
-  });
-
-  it("role selector contains admin and employee options", () => {
-    render(<SignUpForm />);
-
-    expect(screen.getByRole("option", { name: /admin/i })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: /employee|empleado/i })).toBeInTheDocument();
   });
 
   it("does not call signUp when name is empty", async () => {
@@ -143,9 +136,6 @@ describe("SignUpForm", () => {
     });
     fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
       target: { value: "pass1234" },
-    });
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "employee" },
     });
 
     fireEvent.submit(screen.getByRole("button").closest("form")!);
@@ -244,10 +234,19 @@ describe("SignUpForm", () => {
     expect(screen.getByRole("button")).toHaveTextContent("Registrando...");
   });
 
-  it("defaults role selector to employee", () => {
+  it("always sends role as employee", async () => {
+    const signUp = jest.fn().mockResolvedValue(true);
+    setupMocks({ signUp });
+
     render(<SignUpForm />);
 
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
-    expect(select.value).toBe("employee");
+    fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), { target: { value: "Test" } });
+    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: "t@t.com" } });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: "pass" } });
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+
+    await waitFor(() => {
+      expect(signUp).toHaveBeenCalledWith(expect.objectContaining({ role: "employee" }));
+    });
   });
 });

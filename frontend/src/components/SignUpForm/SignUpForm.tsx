@@ -4,14 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
-import type { UserRole } from "@/domain/User";
 import styles from "@/styles/SignUpForm.module.css";
 
 export default function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("employee");
   const { signUp, loading, error } = useAuth();
   const router = useRouter();
 
@@ -19,7 +17,7 @@ export default function SignUpForm() {
     e.preventDefault();
     if (!name || !email || !password) return;
 
-    const success = await signUp({ name, email, password, role });
+    const success = await signUp({ name, email, password, role: "employee" });
     if (success) {
       router.push("/signin");
     }
@@ -51,14 +49,6 @@ export default function SignUpForm() {
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
         />
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value as UserRole)}
-          className={styles.select}
-        >
-          <option value="employee">Employee</option>
-          <option value="admin">Admin</option>
-        </select>
         <button type="submit" disabled={loading} className={styles.button}>
           {loading ? "Registrando..." : "Registrarse"}
         </button>
