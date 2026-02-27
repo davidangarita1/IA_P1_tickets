@@ -19,6 +19,18 @@ export class SignupUseCase {
 
   // Ejecuta el registro: verifica unicidad, cifra la contraseña y persiste el usuario.
   async execute(credentials: SignupCredentials): Promise<string> {
-    throw new Error('Signup flow not implemented yet');
+    const existing = await this.deps.userRepository.findByEmail(credentials.email);
+
+    if (existing) {
+      throw new Error('Email already in use');
+    }
+
+    const passwordHash = await this.deps.passwordHasher.hash(credentials.password);
+    const user = await this.deps.userRepository.create({
+      email: credentials.email,
+      passwordHash,
+    });
+
+    return user.id;
   }
 }

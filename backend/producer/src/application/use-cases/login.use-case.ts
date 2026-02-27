@@ -25,6 +25,18 @@ export class LoginUseCase {
 
   // Ejecuta el flujo de login, usando los adapters inyectados.
   async execute(credentials: LoginCredentials): Promise<string> {
-    throw new Error('Login flow not implemented yet');
+    const user = await this.deps.userRepository.findByEmail(credentials.email);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const matches = await this.deps.passwordHasher.compare(credentials.password, user.passwordHash);
+
+    if (!matches) {
+      throw new Error('Invalid credentials');
+    }
+
+    return this.deps.tokenService.generateToken({ sub: user.id, email: user.email });
   }
 }
