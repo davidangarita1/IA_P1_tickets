@@ -17,6 +17,7 @@
   font-weight: 600;
   color: var(--foreground);
   letter-spacing: 0.3px;
+  text-decoration: none;
 }
 
 .logo span {
