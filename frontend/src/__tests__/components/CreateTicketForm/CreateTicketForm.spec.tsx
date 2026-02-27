@@ -139,7 +139,7 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("navigates to home on successful submission", async () => {
+  it("clears the form on successful submission", async () => {
     const submit = jest.fn().mockResolvedValue(true);
     setupMocks({ submit });
 
@@ -156,11 +156,12 @@ describe("CreateTicketForm", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/");
+      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("");
+      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("");
     });
   });
 
-  it("does not navigate when submission fails", async () => {
+  it("does not clear the form when submission fails", async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
@@ -177,7 +178,8 @@ describe("CreateTicketForm", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("Maria");
+      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("12345678");
     });
   });
 

@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/CreateTicketForm.module.css";
 
 export default function CreateTicketForm() {
-  const router = useRouter();
   const { ticketWriter, sanitizer } = useDeps();
   const { submit, loading, success, error } = useCreateTicket(ticketWriter);
 
@@ -25,7 +23,8 @@ export default function CreateTicketForm() {
 
     const result = await submit({ name: sanitizedName, documentId: validDocId });
     if (result) {
-      router.push("/");
+      setName("");
+      setDocumentId("");
     }
   };
 
