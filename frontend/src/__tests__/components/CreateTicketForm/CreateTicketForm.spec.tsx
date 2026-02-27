@@ -94,7 +94,7 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("does not call submit when documentId is not a valid number", async () => {
+  it("does not call submit when documentId contains only letters", async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
@@ -134,7 +134,7 @@ describe("CreateTicketForm", () => {
     await waitFor(() => {
       expect(submit).toHaveBeenCalledWith({
         name: "Maria",
-        documentId: 98765432,
+        documentId: "98765432",
       });
     });
   });
@@ -181,6 +181,29 @@ describe("CreateTicketForm", () => {
       expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("Maria");
       expect(screen.getByPlaceholderText("Cédula")).toHaveValue("12345678");
     });
+  });
+
+  it("shows inline error when documentId contains only letters", async () => {
+    setupMocks({});
+    render(<CreateTicketForm />);
+
+    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
+      target: { value: "abc" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("La cédula debe contener al menos un número")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("submit button is disabled when form is incomplete", () => {
+    setupMocks({});
+    render(<CreateTicketForm />);
+
+    const button = screen.getByRole("button", { name: "Registrar turno" });
+    expect(button).toBeDisabled();
   });
 
   it("shows loading text on button when loading", () => {

@@ -17,7 +17,7 @@ describe("ticketMapper — Anti-Corruption Layer", () => {
       expect(ticket).toEqual({
         id: "abc-123",
         name: "Carlos Pérez",
-        documentId: 12345678,
+        documentId: "12345678",
         office: "A3",
         timestamp: 1700000000000,
         status: "waiting",
@@ -79,22 +79,22 @@ describe("ticketMapper — Anti-Corruption Layer", () => {
 
   describe("toBackendCreateDTO", () => {
     it("maps English domain DTO to Spanish backend DTO", () => {
-      const dto = { name: "María López", documentId: 98765432 };
+      const dto = { name: "María López", documentId: "98765432" };
 
       const backendDTO = toBackendCreateDTO(dto);
 
       expect(backendDTO).toEqual({
         nombre: "María López",
-        cedula: 98765432,
+        cedula: "98765432",
       });
     });
 
     it("preserves exact values without mutation", () => {
-      const dto = { name: "Test", documentId: 0 };
+      const dto = { name: "Test", documentId: "" };
       const result = toBackendCreateDTO(dto);
 
       expect(result.nombre).toBe("Test");
-      expect(result.cedula).toBe(0);
+      expect(result.cedula).toBe("");
     });
   });
 });

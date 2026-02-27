@@ -20,7 +20,7 @@ export function toDomainTicket(raw: BackendTicket): Ticket {
   return {
     id: raw.id,
     name: raw.nombre,
-    documentId: raw.cedula,
+    documentId: String(raw.cedula),
     office: raw.consultorio,
     timestamp: raw.timestamp,
     status: STATUS_MAP[raw.estado] ?? "waiting",

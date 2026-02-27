@@ -1,6 +1,6 @@
 export interface CreateTicketDTO {
   name: string;
-  documentId: number;
+  documentId: string;
 }
 
 export interface CreateTicketResponse {
