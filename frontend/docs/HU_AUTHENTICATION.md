@@ -3,24 +3,24 @@
 ## 1. Análisis de Requisitos
 
 ### Objetivos del sistema
-- Incorporar autenticación con dos roles: **admin** y **empleado**.
-- Proteger la ruta `/dashboard` y las demás secciones internas (Navbar, botones de acción) para que solo sean accesibles por usuarios autenticados con rol `admin` o `empleado`.
+- Incorporar autenticación con dos roles: **admin** y **employee**.
+- Proteger la ruta `/dashboard` y las demás secciones internas (Navbar, botones de acción) para que solo sean accesibles por usuarios autenticados con rol `admin` o `employee`.
 - Mantener las páginas `/` (pantalla de turnos) y `/signUp` como públicas.
 - Proveer flujos completos de **signUp**, **signIn** y **signOut**.
 
 ### Funcionalidades principales
 | Funcionalidad | Descripción |
 |---|---|
-| **signUp** | Registro de nuevos usuarios con `email`, `password`, `name` y `role` (`admin` \| `empleado`). Ruta pública `/signUp`. |
+| **signUp** | Registro de nuevos usuarios con `email`, `password`, `name` y `role` (`admin` \| `employee`). Ruta pública `/signUp`. |
 | **signIn** | Inicio de sesión por `email` y `password`. Ruta pública `/signIn`. Redirige a `/dashboard` tras éxito. |
 | **signOut** | Cierre de sesión. Limpia el estado de autenticación y redirige a `/signIn`. Accesible desde la Navbar. |
-| **Protección de rutas** | El middleware de Next.js 16 intercepta peticiones a rutas protegidas (`/dashboard`, `/register`) y redirige a `/signIn` si no hay sesión activa. |
-| **Navbar condicional** | Solo se renderiza para usuarios autenticados (`admin` o `empleado`). En rutas públicas no se muestra. |
+| **Protección de rutas** | El middleware(proxy) de Next.js 16 intercepta peticiones a rutas protegidas (`/dashboard`, `/register`) y redirige a `/signIn` si no hay sesión activa. |
+| **Navbar condicional** | Solo se renderiza para usuarios autenticados (`admin` o `employee`). En rutas públicas no se muestra. |
 | **Control por rol** | Ambos roles ven el Dashboard y la Navbar. Se expone el rol desde el contexto para futuras restricciones granulares. |
 
 ### Requisitos no funcionales
 - **Seguridad**: tokens JWT almacenados en cookies `httpOnly` con flags `Secure`, `SameSite=Strict`. Nunca en `localStorage`.
-- **Rendimiento**: validación de sesión en middleware (edge runtime) sin llamadas extra al backend en cada navegación.
+- **Rendimiento**: validación de sesión en middleware(proxy) (edge runtime) sin llamadas extra al backend en cada navegación.
 - **Accesibilidad**: formularios con labels semánticas, estados de error visibles y focus management.
 - **Testabilidad**: 100 % de cobertura en lógica de dominio, hooks, adaptadores y componentes de autenticación.
 - **Mantenibilidad**: seguir la arquitectura hexagonal existente — puerto → adaptador → hook → componente.
@@ -64,7 +64,7 @@ Se extiende la **arquitectura hexagonal** ya establecida en el proyecto. La capa
 │  User { id, email, name, role }                                 │
 │  AuthCredentials { email, password }                            │
 │  SignUpData { email, password, name, role }                     │
-│  UserRole = "admin" | "empleado"                                │
+│  UserRole = "admin" | "employee"                                │
 │                                                                 │
 │  Puerto: AuthService (interfaz)                                 │
 │    signIn(credentials) → AuthResult                             │
@@ -95,7 +95,7 @@ Se extiende la **arquitectura hexagonal** ya establecida en el proyecto. La capa
 - **Propósito**: Representa al usuario autenticado en el sistema.
 - **Interfaz**:
   ```typescript
-  type UserRole = "admin" | "empleado";
+  type UserRole = "admin" | "employee";
 
   interface User {
     id: string;
