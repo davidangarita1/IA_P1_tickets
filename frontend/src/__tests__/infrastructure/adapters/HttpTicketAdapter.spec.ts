@@ -59,8 +59,8 @@ describe("HttpTicketAdapter", () => {
 
   describe("createTicket()", () => {
     it("maps DTO through ACL and calls httpPost", async () => {
-      const domainDTO = { name: "Carlos", documentId: "123" };
-      const backendDTO = { nombre: "Carlos", cedula: "123" };
+      const domainDTO = { name: "Carlos", documentId: 123 };
+      const backendDTO = { nombre: "Carlos", cedula: 123 };
       const response = { status: "accepted" as const, message: "Created" };
 
       mockedToBackend.mockReturnValue(backendDTO);
@@ -77,11 +77,11 @@ describe("HttpTicketAdapter", () => {
     });
 
     it("propagates errors from httpPost", async () => {
-      mockedToBackend.mockReturnValue({ nombre: "", cedula: "" });
+      mockedToBackend.mockReturnValue({ nombre: "", cedula: 0 });
       mockedHttpPost.mockRejectedValueOnce(new Error("TIMEOUT"));
 
       await expect(
-        adapter.createTicket({ name: "", documentId: "" })
+        adapter.createTicket({ name: "", documentId: 0 })
       ).rejects.toThrow("TIMEOUT");
     });
   });

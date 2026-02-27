@@ -5,8 +5,8 @@ import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/CreateTicketForm.module.css";
 
-function hasDigit(value: string): boolean {
-  return /\d/.test(value);
+function isNumericOnly(value: string): boolean {
+  return /^\d+$/.test(value);
 }
 
 export default function CreateTicketForm() {
@@ -20,17 +20,18 @@ export default function CreateTicketForm() {
   const sanitizedDocId = sanitizer.sanitize(documentId);
 
   const docIdTouched = documentId.length > 0;
-  const docIdError = docIdTouched && !hasDigit(sanitizedDocId)
-    ? "La cédula debe contener al menos un número"
+  const docIdError = docIdTouched && !isNumericOnly(sanitizedDocId)
+    ? "La cédula solo puede contener números"
     : null;
 
-  const isFormValid = sanitizedName.length > 0 && sanitizedDocId.length > 0 && hasDigit(sanitizedDocId);
+  const isFormValid = sanitizedName.length > 0 && sanitizedDocId.length > 0 && isNumericOnly(sanitizedDocId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    const result = await submit({ name: sanitizedName, documentId: sanitizedDocId });
+    const validDocId = parseInt(sanitizedDocId, 10);
+    const result = await submit({ name: sanitizedName, documentId: validDocId });
     if (result) {
       setName("");
       setDocumentId("");
