@@ -18,9 +18,9 @@ export default function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.logo}>
+      <Link href="/" className={styles.logo}>
         Sistema de <span>Turnos</span>
-      </div>
+      </Link>
       {isAuthenticated ? (
         <div className={styles.links}>
           {NAV_ITEMS.map(({ href, label }) => (

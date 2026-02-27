@@ -62,6 +62,15 @@ describe("Navbar", () => {
     expect(screen.getByText(/Sistema de/i)).toBeInTheDocument();
   });
 
+  it("logo is a link that navigates to /", () => {
+    mockUsePathname.mockReturnValue("/dashboard");
+
+    render(<Navbar />);
+
+    const logoLink = screen.getByRole("link", { name: /sistema de turnos/i });
+    expect(logoLink).toHaveAttribute("href", "/");
+  });
+
   it("renders correct href for each nav item", () => {
     mockUsePathname.mockReturnValue("/");
 
