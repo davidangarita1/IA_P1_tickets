@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { DependencyProvider } from "@/providers/DependencyProvider";
+import ConnectedAuthProvider from "@/providers/ConnectedAuthProvider";
 import Navbar from "@/components/Navbar/Navbar";
 import "@/styles/globals.css";
 
@@ -23,8 +24,10 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className}>
         <DependencyProvider>
-          <Navbar />
-          {children}
+          <ConnectedAuthProvider>
+            <Navbar />
+            {children}
+          </ConnectedAuthProvider>
         </DependencyProvider>
       </body>
     </html>
