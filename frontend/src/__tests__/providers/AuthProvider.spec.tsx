@@ -30,7 +30,7 @@ describe("AuthProvider", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("starts with user null, loading false and isAuthenticated false after session resolves", async () => {
+  it("initializes with user null and isAuthenticated false when no session exists", async () => {
     const service = mockAuthService();
     const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
 
