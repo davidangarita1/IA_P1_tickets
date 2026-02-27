@@ -131,4 +131,24 @@ describe("Navbar", () => {
 
     expect(screen.queryByRole("button", { name: /cerrar sesión|sign out|logout/i })).not.toBeInTheDocument();
   });
+
+  it("renders Iniciar sesión link when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    const link = screen.getByRole("link", { name: /iniciar sesión/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", "/signin");
+  });
+
+  it("does not render Iniciar sesión link when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("link", { name: /iniciar sesión/i })).not.toBeInTheDocument();
+  });
 });

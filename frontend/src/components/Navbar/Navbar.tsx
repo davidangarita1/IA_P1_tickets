@@ -21,7 +21,7 @@ export default function Navbar() {
       <div className={styles.logo}>
         Sistema de <span>Turnos</span>
       </div>
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <div className={styles.links}>
           {NAV_ITEMS.map(({ href, label }) => (
             <Link
@@ -33,6 +33,12 @@ export default function Navbar() {
             </Link>
           ))}
           <SignOutButton />
+        </div>
+      ) : (
+        <div className={styles.links}>
+          <Link href="/signin" className={styles.link}>
+            Iniciar sesión
+          </Link>
         </div>
       )}
     </nav>
