@@ -83,6 +83,18 @@ The `httpClient` includes:
 
 The `infrastructure/mappers/ticketMapper.ts` translates between the Spanish backend API contract (`nombre`, `cedula`, `estado`) and the English domain model (`name`, `documentId`, `status`). This keeps the domain clean while maintaining backend compatibility.
 
+## Campo Cédula — Validación
+
+El campo **Cédula** del formulario de registro de turno acepta **únicamente valores numéricos**, ya que está diseñado exclusivamente para la **cédula de ciudadanía colombiana**, que es un identificador numérico de 6 a 10 dígitos emitido por la Registraduría Nacional del Estado Civil.
+
+- ✅ Válido: `12345678`, `1023456789`
+- ❌ Inválido: `abc`, `PE123456`, `12-34` (caracteres no numéricos)
+
+Si se ingresan caracteres no numéricos, el campo muestra el mensaje de error:
+> **"La cédula solo puede contener números"**
+
+El botón **Registrar turno** permanece deshabilitado hasta que el formulario sea válido (nombre no vacío y cédula con solo dígitos).
+
 ## Environment Variables
 
 ```env

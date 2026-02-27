@@ -16,7 +16,7 @@ export function buildTicket(overrides: Partial<Ticket> = {}): Ticket {
   return {
     id: `ticket-${idCounter}`,
     name: `Patient ${idCounter}`,
-    documentId: String(1000000 + idCounter),
+    documentId: 1000000 + idCounter,
     office: null,
     timestamp: Date.now(),
     status: "waiting",

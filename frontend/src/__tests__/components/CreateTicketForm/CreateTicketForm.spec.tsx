@@ -94,7 +94,7 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("does not call submit when documentId contains only letters", async () => {
+  it("does not call submit when documentId is not a valid number", async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
@@ -134,7 +134,7 @@ describe("CreateTicketForm", () => {
     await waitFor(() => {
       expect(submit).toHaveBeenCalledWith({
         name: "Maria",
-        documentId: "98765432",
+        documentId: 98765432,
       });
     });
   });
@@ -183,7 +183,7 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("shows inline error when documentId contains only letters", async () => {
+  it("shows inline error when documentId is not purely numeric", async () => {
     setupMocks({});
     render(<CreateTicketForm />);
 
@@ -193,7 +193,17 @@ describe("CreateTicketForm", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("La cédula debe contener al menos un número")
+        screen.getByText("La cédula solo puede contener números")
+      ).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
+      target: { value: "12ab34" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("La cédula solo puede contener números")
       ).toBeInTheDocument();
     });
   });

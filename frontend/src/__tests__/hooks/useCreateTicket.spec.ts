@@ -4,7 +4,7 @@ import { mockTicketWriter } from "../mocks/factories";
 import type { CreateTicketDTO, CreateTicketResponse } from "@/domain/CreateTicket";
 
 describe("useCreateTicket", () => {
-  const dto: CreateTicketDTO = { name: "Carlos", documentId: "12345678" };
+  const dto: CreateTicketDTO = { name: "Carlos", documentId: 12345678 };
 
   it("returns initial state: not loading, no success, no error", () => {
     const writer = mockTicketWriter();
