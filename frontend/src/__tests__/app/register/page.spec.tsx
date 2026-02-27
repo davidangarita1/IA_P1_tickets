@@ -59,6 +59,7 @@ beforeEach(() => {
       isEnabled: jest.fn(),
     },
     sanitizer: { sanitize: jest.fn((s: string) => s) },
+    authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
   });
 
   mockUseCreateTicket.mockReturnValue({
