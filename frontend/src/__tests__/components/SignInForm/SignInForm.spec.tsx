@@ -178,4 +178,26 @@ describe("SignInForm", () => {
 
     expect(screen.getByText("Credenciales inválidas")).toBeInTheDocument();
   });
+
+  it("renders the form heading", () => {
+    render(<SignInForm />);
+
+    expect(screen.getByText("Iniciar sesión", { selector: "h2" })).toBeInTheDocument();
+  });
+
+  it("renders a registration link", () => {
+    render(<SignInForm />);
+
+    const link = screen.getByText("Regístrate");
+    expect(link).toBeInTheDocument();
+    expect(link.closest("a")).toHaveAttribute("href", "/signup");
+  });
+
+  it("shows loading text on button while loading", () => {
+    setupMocks({ loading: true });
+
+    render(<SignInForm />);
+
+    expect(screen.getByRole("button")).toHaveTextContent("Ingresando...");
+  });
 });

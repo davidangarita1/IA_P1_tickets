@@ -149,4 +149,17 @@ describe("httpClient", () => {
       ).rejects.toBe("plain string error");
     });
   });
+
+  describe("config options", () => {
+    it("uses a custom timeout when provided in config", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ status: "ok" }),
+      });
+
+      const result = await httpGet("http://localhost:3000/test", { timeout: 100 });
+
+      expect(result).toEqual({ status: "ok" });
+    });
+  });
 });

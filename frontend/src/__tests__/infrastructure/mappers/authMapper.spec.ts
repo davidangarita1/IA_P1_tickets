@@ -42,6 +42,17 @@ describe("authMapper — Anti-Corruption Layer", () => {
       expect(toUser(raw).role).toBe("admin");
     });
 
+    it('defaults to "employee" for an unknown rol value', () => {
+      const raw = {
+        id: "user-4",
+        email: "unknown@example.com",
+        nombre: "Unknown Role",
+        rol: "superuser",
+      };
+
+      expect(toUser(raw).role).toBe("employee");
+    });
+
     it("preserves id and email without transformation", () => {
       const raw = {
         id: "uuid-abc-123",

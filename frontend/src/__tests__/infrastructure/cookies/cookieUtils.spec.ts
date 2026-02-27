@@ -31,6 +31,12 @@ describe("cookieUtils", () => {
       expect(getAuthCookie()).toBeNull();
     });
 
+    it("returns null when the cookie exists but has an empty value", () => {
+      document.cookie = `${AUTH_COOKIE_NAME}=; path=/`;
+
+      expect(getAuthCookie()).toBeNull();
+    });
+
     it("returns null after the cookie has been removed", () => {
       setAuthCookie("token-to-remove");
       removeAuthCookie();

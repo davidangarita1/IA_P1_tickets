@@ -221,4 +221,33 @@ describe("SignUpForm", () => {
 
     expect(screen.getByRole("button")).toBeDisabled();
   });
+
+  it("renders the form heading", () => {
+    render(<SignUpForm />);
+
+    expect(screen.getByText("Crear cuenta", { selector: "h2" })).toBeInTheDocument();
+  });
+
+  it("renders a sign-in link", () => {
+    render(<SignUpForm />);
+
+    const link = screen.getByText("Inicia sesión");
+    expect(link).toBeInTheDocument();
+    expect(link.closest("a")).toHaveAttribute("href", "/signin");
+  });
+
+  it("shows loading text on button while loading", () => {
+    setupMocks({ loading: true });
+
+    render(<SignUpForm />);
+
+    expect(screen.getByRole("button")).toHaveTextContent("Registrando...");
+  });
+
+  it("defaults role selector to employee", () => {
+    render(<SignUpForm />);
+
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    expect(select.value).toBe("employee");
+  });
 });

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import styles from "@/styles/Navbar.module.css";
 
 export default function SignOutButton() {
   const { signOut } = useAuth();
@@ -13,7 +14,7 @@ export default function SignOutButton() {
   };
 
   return (
-    <button type="button" onClick={handleClick}>
+    <button type="button" onClick={handleClick} className={styles.signOutBtn}>
       Cerrar sesión
     </button>
   );
