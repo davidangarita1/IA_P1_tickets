@@ -9,7 +9,7 @@ export default function SignOutButton() {
 
   const handleClick = async () => {
     await signOut();
-    router.push("/signIn");
+    router.push("/signin");
   };
 
   return (

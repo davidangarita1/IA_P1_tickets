@@ -63,7 +63,7 @@ describe("SignOutButton", () => {
     fireEvent.click(screen.getByRole("button", { name: /cerrar sesión|sign out|logout/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/signIn");
+      expect(mockPush).toHaveBeenCalledWith("/signin");
     });
   });
 

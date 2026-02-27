@@ -179,7 +179,7 @@ describe("SignUpForm", () => {
     fireEvent.submit(screen.getByRole("button").closest("form")!);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/signIn");
+      expect(mockPush).toHaveBeenCalledWith("/signin");
     });
   });
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import SignInPage from "@/app/signIn/page";
+import SignUpPage from "@/app/signup/page";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -12,10 +12,6 @@ jest.mock("@/providers/AuthProvider", () => ({
 
 jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
-}));
-
-jest.mock("@/hooks/useCreateTicket", () => ({
-  useCreateTicket: jest.fn(),
 }));
 
 import { useAuth } from "@/providers/AuthProvider";
@@ -47,17 +43,24 @@ beforeEach(() => {
   });
 });
 
-describe("SignInPage", () => {
-  it("renders the SignInForm", () => {
-    render(<SignInPage />);
+describe("SignUpPage", () => {
+  it("renders the SignUpForm", () => {
+    render(<SignUpPage />);
 
+    expect(screen.getByPlaceholderText(/nombre|name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/contraseña|password/i)).toBeInTheDocument();
   });
 
-  it("renders the submit button from SignInForm", () => {
-    render(<SignInPage />);
+  it("renders the role selector from SignUpForm", () => {
+    render(<SignUpPage />);
 
-    expect(screen.getByRole("button", { name: /iniciar sesión|sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it("renders the submit button from SignUpForm", () => {
+    render(<SignUpPage />);
+
+    expect(screen.getByRole("button", { name: /registrarse|sign up/i })).toBeInTheDocument();
   });
 });
