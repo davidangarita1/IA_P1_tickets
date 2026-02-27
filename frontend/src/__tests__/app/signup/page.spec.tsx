@@ -52,10 +52,10 @@ describe("SignUpPage", () => {
     expect(screen.getByPlaceholderText(/contraseña|password/i)).toBeInTheDocument();
   });
 
-  it("renders the role selector from SignUpForm", () => {
+  it("does not render a role selector (role is always employee)", () => {
     render(<SignUpPage />);
 
-    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
   it("renders the submit button from SignUpForm", () => {
