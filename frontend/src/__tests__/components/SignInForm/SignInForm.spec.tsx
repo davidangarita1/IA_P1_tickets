@@ -123,6 +123,29 @@ describe("SignInForm", () => {
     });
   });
 
+  it("trims whitespace from email and password before calling signIn", async () => {
+    const signIn = jest.fn().mockResolvedValue(true);
+    setupMocks({ signIn });
+
+    render(<SignInForm />);
+
+    fireEvent.change(screen.getByPlaceholderText(/email/i), {
+      target: { value: "  user@test.com  " },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
+      target: { value: "  secret123  " },
+    });
+
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalledWith({
+        email: "user@test.com",
+        password: "secret123",
+      });
+    });
+  });
+
   it("redirects to /dashboard after successful signIn", async () => {
     const signIn = jest.fn().mockResolvedValue(true);
     setupMocks({ signIn });

@@ -4,19 +4,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/SignInForm.module.css";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, loading, error } = useAuth();
+  const { sanitizer } = useDeps();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    const sanitizedEmail = sanitizer.sanitize(email);
+    const trimmedPassword = password.trim();
+    if (!sanitizedEmail || !trimmedPassword) return;
 
-    const success = await signIn({ email, password });
+    const success = await signIn({ email: sanitizedEmail, password: trimmedPassword });
     if (success) {
       router.push("/dashboard");
     }
