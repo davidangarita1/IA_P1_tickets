@@ -64,7 +64,7 @@ describe("AuthGuard", () => {
       </AuthGuard>
     );
 
-    expect(mockPush).toHaveBeenCalledWith("/signIn");
+    expect(mockPush).toHaveBeenCalledWith("/signin");
     expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
   });
 

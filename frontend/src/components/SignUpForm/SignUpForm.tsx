@@ -19,7 +19,7 @@ export default function SignUpForm() {
 
     const success = await signUp({ name, email, password, role });
     if (success) {
-      router.push("/signIn");
+      router.push("/signin");
     }
   };
 

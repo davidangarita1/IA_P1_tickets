@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
 import { useAudioNotification } from "@/hooks/useAudioNotification";
 import { useDeps } from "@/providers/DependencyProvider";
@@ -36,6 +37,11 @@ export default function TicketsScreen() {
 
   return (
     <main className={styles.container}>
+      <div className={styles.loginButtonContainer}>
+        <Link href="/signin">
+          <button className={styles.loginButton}>Iniciar sesión</button>
+        </Link>
+      </div>
       <h1 className={styles.title}>Turnos Habilitados</h1>
 
       <p className={connected ? styles.connected : styles.disconnected}>
