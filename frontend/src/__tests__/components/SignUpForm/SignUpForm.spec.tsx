@@ -150,6 +150,34 @@ describe("SignUpForm", () => {
     });
   });
 
+  it("trims whitespace from inputs before calling signUp", async () => {
+    const signUp = jest.fn().mockResolvedValue(true);
+    setupMocks({ signUp });
+
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), {
+      target: { value: "  Ana García  " },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/email/i), {
+      target: { value: "  ana@test.com  " },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
+      target: { value: "  pass1234  " },
+    });
+
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+
+    await waitFor(() => {
+      expect(signUp).toHaveBeenCalledWith({
+        name: "Ana García",
+        email: "ana@test.com",
+        password: "pass1234",
+        role: "employee",
+      });
+    });
+  });
+
   it("redirects to /signIn after successful signUp", async () => {
     const signUp = jest.fn().mockResolvedValue(true);
     setupMocks({ signUp });
