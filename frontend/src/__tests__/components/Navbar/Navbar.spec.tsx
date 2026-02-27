@@ -6,6 +6,10 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }));
 
+jest.mock("@/providers/AuthProvider", () => ({
+  useAuth: jest.fn(),
+}));
+
 jest.mock("@/styles/Navbar.module.css", () => ({
   navbar: "navbar",
   logo: "logo",
@@ -15,10 +19,30 @@ jest.mock("@/styles/Navbar.module.css", () => ({
 }));
 
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+
+function setupAuth(isAuthenticated: boolean) {
+  mockUseAuth.mockReturnValue({
+    user: isAuthenticated ? { id: "1", email: "u@u.com", name: "User", role: "employee" } : null,
+    loading: false,
+    error: null,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn(),
+    isAuthenticated,
+    hasRole: jest.fn().mockReturnValue(false),
+  });
+}
 
 describe("Navbar", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setupAuth(true);
+  });
+
   it("renders all navigation items", () => {
     mockUsePathname.mockReturnValue("/");
 
@@ -65,5 +89,45 @@ describe("Navbar", () => {
 
     const turnosLink = screen.getByRole("link", { name: "Turnos" });
     expect(turnosLink.className).toBe("link");
+  });
+
+  it("does not render navigation links when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("link", { name: "Turnos" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Registro" })).not.toBeInTheDocument();
+  });
+
+  it("renders navigation links when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.getByRole("link", { name: "Turnos" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Registro" })).toBeInTheDocument();
+  });
+
+  it("renders SignOutButton when user is authenticated", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.getByRole("button", { name: /cerrar sesión|sign out|logout/i })).toBeInTheDocument();
+  });
+
+  it("does not render SignOutButton when user is not authenticated", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("button", { name: /cerrar sesión|sign out|logout/i })).not.toBeInTheDocument();
   });
 });
