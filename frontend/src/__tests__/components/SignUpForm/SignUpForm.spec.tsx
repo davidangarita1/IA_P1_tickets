@@ -1,6 +1,5 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import SignUpForm, { WEAK_PASSWORD_MSG, SUCCESS_SIGNUP_MSG } from "@/components/SignUpForm/SignUpForm";
+import SignUpForm, { SIGNUP_SUCCESS_KEY, SUCCESS_SIGNUP_MSG, WEAK_PASSWORD_MSG } from "@/components/SignUpForm/SignUpForm";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 
@@ -16,9 +15,9 @@ jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
 }));
 
+import { mockSanitizer } from "@/__tests__/mocks/factories";
 import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
-import { mockSanitizer } from "@/__tests__/mocks/factories";
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -178,7 +177,7 @@ describe("SignUpForm", () => {
     });
   });
 
-  it("[Validate] shows success message when signUp succeeds", async () => {
+  it("[Validar] stores success message in sessionStorage when signUp succeeds", async () => {
     const signUp = jest.fn().mockResolvedValue(true);
     setupMocks({ signUp });
 
@@ -190,7 +189,7 @@ describe("SignUpForm", () => {
     fireEvent.submit(screen.getByRole("button").closest("form")!);
 
     await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent(SUCCESS_SIGNUP_MSG);
+      expect(sessionStorage.getItem(SIGNUP_SUCCESS_KEY)).toBe(SUCCESS_SIGNUP_MSG);
     });
   });
 

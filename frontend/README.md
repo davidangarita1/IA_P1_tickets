@@ -37,7 +37,8 @@ src/
 │   │   ├── SocketIOAdapter.ts
 │   │   ├── BrowserAudioAdapter.ts
 │   │   ├── HtmlSanitizer.ts
-│   │   └── NoopAuthAdapter.ts   ← Stub adapter (no backend yet)
+│   │   ├── HttpAuthAdapter.ts   ← Active adapter: calls backend REST auth endpoints
+│   │   └── NoopAuthAdapter.ts   ← Stub adapter for tests and contexts without auth
 │   ├── http/
 │   │   ├── CircuitBreaker.ts
 │   │   └── httpClient.ts
@@ -111,7 +112,23 @@ New users created via `/signup` are always registered as `employee`. The `admin`
 
 ### Current Adapter
 
-`NoopAuthAdapter` is the active adapter (no auth backend yet). It always returns `{ success: false, message: "Auth not configured" }`. Replace it with `HttpAuthAdapter` once the backend exposes the auth endpoints.
+`HttpAuthAdapter` connects to the backend REST endpoints (`/auth/signIn`, `/auth/signUp`, `/auth/signOut`, `/auth/me`). `NoopAuthAdapter` is kept as a stub for testing and environments without an auth backend.
+
+### Business Rule Validations
+
+The following rules are enforced client-side with full `[Validar]` test coverage:
+
+| Rule | Location | Error message |
+|---|---|---|
+| **Strong password** | `SignUpForm` (pre-submit) | "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial." |
+| **Duplicate email** | `AuthProvider` → backend error passed through | "El correo ya está registrado." |
+| **Duplicate active ticket** | `useCreateTicket` hook (pre-submit) | "Ya existe un turno activo para esta cédula." |
+| **Protected routes** | `AuthGuard` component | Redirect to `/signin` |
+| **Role-based redirect** | `AuthGuard` component | Redirect to `/` when role insufficient |
+
+### SignUp Success Toast
+
+After successful registration, a **4-second success toast** is displayed on the `/signin` page via `sessionStorage`. This survives the route transition so the user sees the confirmation even after being redirected.
 
 ### AuthContext Interface
 
@@ -148,7 +165,8 @@ The `httpClient` includes:
 Two mappers translate between the Spanish backend API contract and the English domain model:
 
 - `ticketMapper.ts` — `nombre`, `cedula`, `estado` → `name`, `documentId`, `status`
-- `authMapper.ts` — `nombre`, `rol`, `usuario` → `name`, `role`, `user` (also maps `"empleado"` → `"employee"`)
+- `authMapper.ts` — `nombre`, `rol`, `usuario` → `name`, `role`, `user` (also maps `"empleado"` → `"employee"`);
+  includes `translateAuthMessage()` to convert known English backend error messages to Spanish (e.g. `"Email already in use"` → `"El correo ya está registrado."`)
 
 ## Campo Cédula — Validación
 
@@ -180,9 +198,9 @@ npm run dev
 
 ## Testing
 
-Comprehensive test suite with **225 tests** across 28 suites using Jest + React Testing Library.
+Comprehensive test suite with **285 tests** across 29 suites using Jest + React Testing Library.
 
-**Coverage:** ~99.8% statements · 100% lines · ~99% branches
+**Coverage:** 100% statements · 100% lines · 100% branches · 100% functions
 
 ### Test Commands
 
