@@ -245,13 +245,13 @@ describe("CreateTicketForm", () => {
     ).toBeInTheDocument();
   });
 
-  it("[Validate] shows duplicate-waiting error when the same documentId already has a waiting ticket", () => {
-    setupMocks({ error: "Ya existe un turno en espera para esta cédula." });
+  it("[Validar] shows duplicate-active error when the same documentId already has a waiting or called ticket", () => {
+    setupMocks({ error: "Ya existe un turno activo para esta cédula." });
 
     render(<CreateTicketForm />);
 
     expect(
-      screen.getByText("Ya existe un turno en espera para esta cédula.")
+      screen.getByText("Ya existe un turno activo para esta cédula.")
     ).toBeInTheDocument();
   });
 });

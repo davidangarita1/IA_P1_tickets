@@ -13,8 +13,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   CIRCUIT_OPEN: "Servidor temporalmente no disponible. Reintentando...",
 };
 
-export const DUPLICATE_WAITING_MSG =
-  "Ya existe un turno en espera para esta cédula.";
+export const DUPLICATE_ACTIVE_MSG =
+  "Ya existe un turno activo para esta cédula.";
 
 function mapError(err: unknown): string {
   const message = err instanceof Error ? err.message : "";
@@ -50,10 +50,12 @@ export function useCreateTicket(writer: TicketWriter, reader: TicketReader) {
     try {
       const existingTickets = await reader.getTickets();
       const hasDuplicate = existingTickets.some(
-        (t) => t.documentId === data.documentId && t.status === "waiting",
+        (t) =>
+          t.documentId === data.documentId &&
+          (t.status === "waiting" || t.status === "called"),
       );
       if (hasDuplicate) {
-        safeSet(setError, DUPLICATE_WAITING_MSG);
+        safeSet(setError, DUPLICATE_ACTIVE_MSG);
         return false;
       }
 

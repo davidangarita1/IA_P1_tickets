@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { useCreateTicket, DUPLICATE_WAITING_MSG } from "@/hooks/useCreateTicket";
+import { useCreateTicket, DUPLICATE_ACTIVE_MSG } from "@/hooks/useCreateTicket";
 import { mockTicketWriter, mockTicketReader, buildTicket } from "../mocks/factories";
 import type { CreateTicketDTO, CreateTicketResponse } from "@/domain/CreateTicket";
 
@@ -223,8 +223,8 @@ describe("useCreateTicket", () => {
     expect(result.current.success).toBeNull();
   });
 
-  describe("[Validar] duplicate waiting ticket rule", () => {
-    it("blocks submission and shows error when a waiting ticket with the same documentId already exists", async () => {
+  describe("[Validar] duplicate active ticket rule", () => {
+    it("blocks submission when a ticket with the same documentId has status 'waiting'", async () => {
       const writer = mockTicketWriter();
       const reader = mockTicketReader([
         buildTicket({ documentId: dto.documentId, status: "waiting" }),
@@ -238,13 +238,13 @@ describe("useCreateTicket", () => {
       });
 
       expect(returned).toBe(false);
-      expect(result.current.error).toBe(DUPLICATE_WAITING_MSG);
+      expect(result.current.error).toBe(DUPLICATE_ACTIVE_MSG);
       expect(result.current.success).toBeNull();
       expect(writer.createTicket).not.toHaveBeenCalled();
     });
 
-    it("allows submission when the existing ticket with the same documentId has status 'called'", async () => {
-      const writer = mockTicketWriter({ status: "accepted", message: "OK" });
+    it("blocks submission when a ticket with the same documentId has status 'called'", async () => {
+      const writer = mockTicketWriter();
       const reader = mockTicketReader([
         buildTicket({ documentId: dto.documentId, status: "called" }),
       ]);
@@ -256,9 +256,10 @@ describe("useCreateTicket", () => {
         returned = await result.current.submit(dto);
       });
 
-      expect(returned).toBe(true);
-      expect(result.current.error).toBeNull();
-      expect(writer.createTicket).toHaveBeenCalledWith(dto);
+      expect(returned).toBe(false);
+      expect(result.current.error).toBe(DUPLICATE_ACTIVE_MSG);
+      expect(result.current.success).toBeNull();
+      expect(writer.createTicket).not.toHaveBeenCalled();
     });
 
     it("allows submission when the existing ticket with the same documentId has status 'served'", async () => {
@@ -311,7 +312,7 @@ describe("useCreateTicket", () => {
     it("resets loading to false after duplicate is detected", async () => {
       const writer = mockTicketWriter();
       const reader = mockTicketReader([
-        buildTicket({ documentId: dto.documentId, status: "waiting" }),
+        buildTicket({ documentId: dto.documentId, status: "called" }),
       ]);
 
       const { result } = renderHook(() => useCreateTicket(writer, reader));
