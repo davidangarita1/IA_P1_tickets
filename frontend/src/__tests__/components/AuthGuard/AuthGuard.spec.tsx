@@ -55,7 +55,7 @@ describe("AuthGuard", () => {
     expect(screen.getByText("Protected content")).toBeInTheDocument();
   });
 
-  it("redirects to /signIn when user is not authenticated", () => {
+  it("[Validate] redirects to /signin when user is not authenticated", () => {
     setupAuth({ isAuthenticated: false });
 
     render(
@@ -94,7 +94,7 @@ describe("AuthGuard", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("redirects to / when authenticated user lacks the required role", () => {
+  it("[Validar] redirects to / when authenticated user lacks the required role", () => {
     setupAuth({ isAuthenticated: true, role: "employee" });
 
     render(

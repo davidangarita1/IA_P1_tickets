@@ -192,7 +192,7 @@ describe("ServedDashboard", () => {
     expect(screen.getByText("✅ Turno completado")).toBeInTheDocument();
   });
 
-  it("redirects to /signin when user is not authenticated", () => {
+  it("[Validate] redirects to /signin when user is not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,
@@ -209,7 +209,7 @@ describe("ServedDashboard", () => {
     expect(mockPush).toHaveBeenCalledWith("/signin");
   });
 
-  it("does not render content when not authenticated", () => {
+  it("[Validar] does not render content when not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,
