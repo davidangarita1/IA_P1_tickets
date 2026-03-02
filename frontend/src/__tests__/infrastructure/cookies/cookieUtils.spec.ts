@@ -21,15 +21,15 @@ describe("cookieUtils", () => {
 
     it("sets Max-Age on the cookie string", () => {
       const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
-      if (!cookieDescriptor) return;
+      expect(cookieDescriptor).toBeDefined();
       const setSpy = jest.fn();
-      Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor.get, configurable: true });
+      Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
 
       setAuthCookie("token-with-expiry");
 
       expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age="));
 
-      Object.defineProperty(document, "cookie", cookieDescriptor);
+      Object.defineProperty(document, "cookie", cookieDescriptor!);
     });
   });
 
@@ -70,5 +70,115 @@ describe("cookieUtils", () => {
     it("does not throw when called without a cookie set", () => {
       expect(() => removeAuthCookie()).not.toThrow();
     });
+  });
+});
+
+describe("cookieUtils — module-level env branches", () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it("uses NEXT_PUBLIC_AUTH_COOKIE_NAME when the env variable is defined", async () => {
+    process.env = { ...originalEnv, NEXT_PUBLIC_AUTH_COOKIE_NAME: "custom_session" };
+
+    const { AUTH_COOKIE_NAME: name } = await import("@/infrastructure/cookies/cookieUtils");
+
+    expect(name).toBe("custom_session");
+  });
+
+  it("uses NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE when it is a valid positive integer", async () => {
+    process.env = { ...originalEnv, NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE: "7200" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age=7200"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
+  });
+
+  it("falls back to 86400 when NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE is not a number", async () => {
+    process.env = { ...originalEnv, NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE: "invalid" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age=86400"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
+  });
+
+  it("falls back to 86400 when NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE is negative", async () => {
+    process.env = { ...originalEnv, NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE: "-500" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age=86400"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
+  });
+
+  it("falls back to 86400 when NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE is a float", async () => {
+    process.env = { ...originalEnv, NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE: "3.14" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("Max-Age=86400"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
+  });
+
+  it("appends Secure flag when NODE_ENV is production", async () => {
+    process.env = { ...originalEnv, NODE_ENV: "production" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("secure-token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.stringContaining("; Secure"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
+  });
+
+  it("omits Secure flag when NODE_ENV is not production", async () => {
+    process.env = { ...originalEnv, NODE_ENV: "test" };
+    const cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    expect(cookieDescriptor).toBeDefined();
+    const setSpy = jest.fn();
+    Object.defineProperty(document, "cookie", { set: setSpy, get: cookieDescriptor!.get, configurable: true });
+
+    const { setAuthCookie: setCookie } = await import("@/infrastructure/cookies/cookieUtils");
+    setCookie("test-token");
+
+    expect(setSpy).toHaveBeenCalledWith(expect.not.stringContaining("; Secure"));
+
+    Object.defineProperty(document, "cookie", cookieDescriptor!);
   });
 });

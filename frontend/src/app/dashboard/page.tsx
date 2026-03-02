@@ -28,7 +28,7 @@ function ServedDashboardContent() {
   const { audioEnabled, showToast, toastMessage, notify } =
     useAudioNotification(audio);
 
-  const lastCountRef = useRef<number | null>(null);
+  const lastCountRef = useRef(0);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function ServedDashboardContent() {
       return;
     }
 
-    if (servedCount > (lastCountRef.current ?? 0)) {
+    if (servedCount > lastCountRef.current) {
       notify("✅ Turno completado");
     }
 

@@ -12,7 +12,7 @@ export default function TicketsScreen() {
   const { audioEnabled, showToast, toastMessage, notify } =
     useAudioNotification(audio);
 
-  const lastCountRef = useRef<number | null>(null);
+  const lastCountRef = useRef(0);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function TicketsScreen() {
       return;
     }
 
-    if (tickets.length > (lastCountRef.current ?? 0)) {
+    if (tickets.length > lastCountRef.current) {
       notify("🔔 Nuevo turno llamado");
     }
 

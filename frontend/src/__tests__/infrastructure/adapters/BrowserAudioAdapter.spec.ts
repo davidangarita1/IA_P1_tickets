@@ -107,4 +107,28 @@ describe("BrowserAudioAdapter", () => {
 
     expect(() => adapter.play()).not.toThrow();
   });
+
+  it("silently catches play rejection when enabled and ready", async () => {
+    adapter.init("/sounds/ding.mp3");
+    listeners["canplaythrough"]?.();
+    await adapter.unlock();
+    mockPlay.mockClear();
+    mockPlay.mockRejectedValueOnce(new Error("Play interrupted"));
+
+    adapter.play();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockPlay).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not play when init was never called", () => {
+    expect(() => adapter.play()).not.toThrow();
+    expect(mockPlay).not.toHaveBeenCalled();
+  });
+
+  it("unlock resolves immediately when init was never called", async () => {
+    await adapter.unlock();
+
+    expect(adapter.isEnabled()).toBe(false);
+  });
 });
