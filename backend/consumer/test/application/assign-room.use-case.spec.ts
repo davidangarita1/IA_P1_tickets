@@ -76,4 +76,125 @@ describe('AssignRoomUseCase', () => {
         expect(repository.asignarConsultorio).not.toHaveBeenCalled();
         expect(eventPublisher.publish).not.toHaveBeenCalled();
     });
+
+    it('no asigna turno cuando no hay pacientes en espera', async () => {
+        // Arrange: consultorios disponibles pero ningún paciente esperando.
+        const repository: jest.Mocked<ITurnoRepository> = {
+            findActivoPorCedula: jest.fn(),
+            save: jest.fn(),
+            findPacientesEnEspera: jest.fn(async () => []),
+            getConsultoriosOcupados: jest.fn(async () => ['1']),
+            asignarConsultorio: jest.fn(),
+            finalizarTurnosLlamados: jest.fn(),
+        };
+        const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
+        const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+        // Act
+        const resultado = await useCase.execute(5);
+
+        // Assert
+        expect(resultado).toBeNull();
+        expect(repository.asignarConsultorio).not.toHaveBeenCalled();
+    });
+
+    describe('executeAll', () => {
+        it('asigna múltiples turnos hasta agotar consultorios o pacientes', async () => {
+            // Arrange: 2 pacientes y 2 consultorios libres.
+            const paciente1 = buildTurnoEnEspera('t1', 101, 1);
+            const paciente2 = buildTurnoEnEspera('t2', 102, 2);
+            const turno1 = new Turno({ ...paciente1, consultorio: '1', estado: 'llamado', finAtencionAt: Date.now() });
+            const turno2 = new Turno({ ...paciente2, consultorio: '2', estado: 'llamado', finAtencionAt: Date.now() });
+
+            let callCount = 0;
+            const repository: jest.Mocked<ITurnoRepository> = {
+                findActivoPorCedula: jest.fn(),
+                save: jest.fn(),
+                findPacientesEnEspera: jest.fn(async () => {
+                    callCount++;
+                    if (callCount === 1) return [paciente1, paciente2];
+                    if (callCount === 2) return [paciente2];
+                    return [];
+                }),
+                getConsultoriosOcupados: jest.fn(async () => {
+                    if (callCount <= 1) return ['3', '4', '5'];
+                    if (callCount === 2) return ['1', '3', '4', '5'];
+                    return ['1', '2', '3', '4', '5'];
+                }),
+                asignarConsultorio: jest.fn()
+                    .mockResolvedValueOnce(turno1)
+                    .mockResolvedValueOnce(turno2)
+                    .mockResolvedValue(null),
+                finalizarTurnosLlamados: jest.fn(),
+            };
+            const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
+            const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+            // Act
+            const asignados = await useCase.executeAll(5);
+
+            // Assert
+            expect(asignados).toHaveLength(2);
+        });
+
+        it('retorna array vacío con totalConsultorios inválido (negativo)', async () => {
+            // Arrange
+            const repository: jest.Mocked<ITurnoRepository> = {
+                findActivoPorCedula: jest.fn(),
+                save: jest.fn(),
+                findPacientesEnEspera: jest.fn(),
+                getConsultoriosOcupados: jest.fn(),
+                asignarConsultorio: jest.fn(),
+                finalizarTurnosLlamados: jest.fn(),
+            };
+            const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
+            const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+            // Act
+            const resultado = await useCase.executeAll(-1);
+
+            // Assert
+            expect(resultado).toEqual([]);
+        });
+
+        it('retorna array vacío con totalConsultorios no entero', async () => {
+            // Arrange
+            const repository: jest.Mocked<ITurnoRepository> = {
+                findActivoPorCedula: jest.fn(),
+                save: jest.fn(),
+                findPacientesEnEspera: jest.fn(),
+                getConsultoriosOcupados: jest.fn(),
+                asignarConsultorio: jest.fn(),
+                finalizarTurnosLlamados: jest.fn(),
+            };
+            const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
+            const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+            // Act
+            const resultado = await useCase.executeAll(2.5);
+
+            // Assert
+            expect(resultado).toEqual([]);
+        });
+
+        it('retorna array vacío con totalConsultorios cero', async () => {
+            // Arrange
+            const repository: jest.Mocked<ITurnoRepository> = {
+                findActivoPorCedula: jest.fn(),
+                save: jest.fn(),
+                findPacientesEnEspera: jest.fn(),
+                getConsultoriosOcupados: jest.fn(),
+                asignarConsultorio: jest.fn(),
+                finalizarTurnosLlamados: jest.fn(),
+            };
+            const eventPublisher: jest.Mocked<IEventPublisher> = { publish: jest.fn() };
+            const useCase = new AssignRoomUseCase(repository, eventPublisher);
+
+            // Act
+            const resultado = await useCase.executeAll(0);
+
+            // Assert
+            expect(resultado).toEqual([]);
+        });
+    });
 });
