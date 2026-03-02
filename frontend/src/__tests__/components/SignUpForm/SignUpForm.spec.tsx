@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import SignUpForm, { WEAK_PASSWORD_MSG } from "@/components/SignUpForm/SignUpForm";
+import SignUpForm, { WEAK_PASSWORD_MSG, SUCCESS_SIGNUP_MSG } from "@/components/SignUpForm/SignUpForm";
 
 const mockPush = jest.fn();
 
@@ -175,6 +175,22 @@ describe("SignUpForm", () => {
         password: "Pass1234!",
         role: "employee",
       });
+    });
+  });
+
+  it("[Validate] shows success message when signUp succeeds", async () => {
+    const signUp = jest.fn().mockResolvedValue(true);
+    setupMocks({ signUp });
+
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), { target: { value: "Ana" } });
+    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: "ana@test.com" } });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: "Pass1234!" } });
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(SUCCESS_SIGNUP_MSG);
     });
   });
 

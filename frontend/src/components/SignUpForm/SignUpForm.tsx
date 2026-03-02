@@ -10,6 +10,8 @@ import styles from "@/styles/SignUpForm.module.css";
 export const WEAK_PASSWORD_MSG =
   "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
 
+export const SUCCESS_SIGNUP_MSG = "¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...";
+
 const STRONG_PASSWORD_RE =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
 
@@ -18,6 +20,7 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const { signUp, loading, error } = useAuth();
   const { sanitizer } = useDeps();
   const router = useRouter();
@@ -35,8 +38,9 @@ export default function SignUpForm() {
       return;
     }
 
-    const success = await signUp({ name: sanitizedName, email: sanitizedEmail, password: trimmedPassword, role: "employee" });
-    if (success) {
+    const ok = await signUp({ name: sanitizedName, email: sanitizedEmail, password: trimmedPassword, role: "employee" });
+    if (ok) {
+      setSuccessMsg(SUCCESS_SIGNUP_MSG);
       router.push("/signin");
     }
   };
@@ -45,6 +49,7 @@ export default function SignUpForm() {
     <div className={styles.wrapper}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Crear cuenta</h2>
+        {successMsg && <p role="status" className={styles.success}>{successMsg}</p>}
         {(formError || error) && <p role="alert" className={styles.error}>{formError ?? error}</p>}
         <input
           type="text"

@@ -77,8 +77,7 @@ export function AuthProvider({ children, authService }: AuthProviderProps) {
       setLoading(true);
       try {
         const result = await authService.signUp(data);
-        if (result.success && result.user) {
-          setUser(result.user);
+        if (result.success) {
           return true;
         }
         setError(result.message);
