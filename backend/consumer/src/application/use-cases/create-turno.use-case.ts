@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Turno, TurnoEventPayload } from '../../domain/entities/turno.entity';
 import { ITurnoRepository, CreateTurnoData } from '../../domain/ports/ITurnoRepository';
@@ -42,6 +42,11 @@ export class CreateTurnoUseCase {
     }
 
     async execute(data: CreateTurnoData): Promise<CreateTurnoResult> {
+        const activo = await this.turnoRepository.findActivoPorCedula(data.cedula);
+        if (activo) {
+            throw new BadRequestException('El paciente ya tiene un turno en espera o en atención');
+        }
+
         // 1. Persistir turno en estado 'espera'
         const turno = await this.turnoRepository.save(data);
         this.logger.log(`Turno creado en espera — paciente ${turno.cedula}, ID: ${turno.id}`);

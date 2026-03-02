@@ -3,13 +3,26 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProducerController } from './presentation/producer.controller';
+import { AuthController } from './presentation/auth.controller';
 import { TurnosModule } from './turnos/turnos.module';
 import { EventsModule } from './events/events.module';
 import { RabbitMQEventPublisher } from './infrastructure/adapters/rabbitmq-event-publisher.adapter';
-import { EVENT_PUBLISHER_TOKEN } from './domain/ports/tokens';
+import {
+    ACCESS_TOKEN_VERIFIER_TOKEN,
+    EVENT_PUBLISHER_TOKEN,
+    PASSWORD_HASHER_TOKEN,
+    TOKEN_SERVICE_TOKEN,
+    USER_REPOSITORY_TOKEN,
+} from './domain/ports/tokens';
 import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
 import { GetAllTurnosUseCase } from './application/use-cases/get-all-turnos.use-case';
 import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-cedula.use-case';
+import { LoginUseCase } from './application/use-cases/login.use-case';
+import { SignupUseCase } from './application/use-cases/signup.use-case';
+import { InMemoryUserRepository } from './infrastructure/adapters/in-memory-user.repository';
+import { ScryptPasswordHasherAdapter } from './infrastructure/adapters/scrypt-password-hasher.adapter';
+import { HmacTokenService } from './infrastructure/adapters/hmac-token.service';
+import { AuthGuard } from './presentation/auth.guard';
 
 @Module({
     imports: [
@@ -53,7 +66,7 @@ import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-
         // ⚕️ HUMAN CHECK - Módulo de Eventos (WebSocket + RabbitMQ listener)
         EventsModule,
     ],
-    controllers: [ProducerController],
+    controllers: [ProducerController, AuthController],
     // ⚕️ HUMAN CHECK - DIP: Use Cases inyectan puertos, registrados con tokens
     providers: [
         CreateTurnoUseCase,
@@ -63,6 +76,35 @@ import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-
             provide: EVENT_PUBLISHER_TOKEN,
             useClass: RabbitMQEventPublisher,
         },
+        {
+            provide: USER_REPOSITORY_TOKEN,
+            useClass: InMemoryUserRepository,
+        },
+        {
+            provide: PASSWORD_HASHER_TOKEN,
+            useClass: ScryptPasswordHasherAdapter,
+        },
+        {
+            provide: TOKEN_SERVICE_TOKEN,
+            useClass: HmacTokenService,
+        },
+        {
+            provide: ACCESS_TOKEN_VERIFIER_TOKEN,
+            useExisting: TOKEN_SERVICE_TOKEN,
+        },
+        {
+            provide: LoginUseCase,
+            useFactory: (userRepository, passwordHasher, tokenService) =>
+                new LoginUseCase({ userRepository, passwordHasher, tokenService }),
+            inject: [USER_REPOSITORY_TOKEN, PASSWORD_HASHER_TOKEN, TOKEN_SERVICE_TOKEN],
+        },
+        {
+            provide: SignupUseCase,
+            useFactory: (userRepository, passwordHasher, tokenService) =>
+                new SignupUseCase({ userRepository, passwordHasher, tokenService }),
+            inject: [USER_REPOSITORY_TOKEN, PASSWORD_HASHER_TOKEN, TOKEN_SERVICE_TOKEN],
+        },
+        AuthGuard,
     ],
 })
 export class AppModule { }
