@@ -201,7 +201,11 @@ describe("SignUpForm", () => {
     });
   });
 
+<<<<<<< HEAD
   it("[Validate] does not redirect when signUp fails due to duplicate email", async () => {
+=======
+  it("[Validar] does not redirect when signUp fails due to duplicate email", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = jest.fn().mockResolvedValue(false);
     setupMocks({ signUp });
 
@@ -279,7 +283,11 @@ describe("SignUpForm", () => {
   });
 });
 
+<<<<<<< HEAD
 describe("[Validate] contraseña fuerte", () => {
+=======
+describe("[Validar] contraseña fuerte", () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -294,37 +302,61 @@ describe("[Validate] contraseña fuerte", () => {
     return signUp;
   }
 
+<<<<<<< HEAD
   it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene mayúscula", async () => {
+=======
+  it("[Validar] no llama signUp y muestra error cuando la contraseña no tiene mayúscula", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = fillAndSubmit("pass1234!");
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
     expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
   });
 
+<<<<<<< HEAD
   it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene minúscula", async () => {
+=======
+  it("[Validar] no llama signUp y muestra error cuando la contraseña no tiene minúscula", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = fillAndSubmit("PASS1234!");
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
     expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
   });
 
+<<<<<<< HEAD
   it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene número", async () => {
+=======
+  it("[Validar] no llama signUp y muestra error cuando la contraseña no tiene número", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = fillAndSubmit("Password!");
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
     expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
   });
 
+<<<<<<< HEAD
   it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene carácter especial", async () => {
+=======
+  it("[Validar] no llama signUp y muestra error cuando la contraseña no tiene carácter especial", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = fillAndSubmit("Password1");
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
     expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
   });
 
+<<<<<<< HEAD
   it("[Validate] no llama signUp y muestra error cuando la contraseña tiene menos de 8 caracteres", async () => {
+=======
+  it("[Validar] no llama signUp y muestra error cuando la contraseña tiene menos de 8 caracteres", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = fillAndSubmit("Pa1!");
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
     expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
   });
 
+<<<<<<< HEAD
   it("[Validate] llama signUp cuando la contraseña cumple todos los criterios de seguridad", async () => {
+=======
+  it("[Validar] llama signUp cuando la contraseña cumple todos los criterios de seguridad", async () => {
+>>>>>>> 6f90a54eb7bedccba83f102f587c16820ac40dc6
     const signUp = jest.fn().mockResolvedValue(true);
     fillAndSubmit("Pass1234!", signUp);
     await waitFor(() => expect(signUp).toHaveBeenCalled());
