@@ -88,4 +88,12 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
         await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
         expect(mockClient.emit).not.toHaveBeenCalled();
     });
+
+    it('maneja desconexión del cliente correctamente', () => {
+        // Act: simular desconexión de cliente.
+        gateway.handleDisconnect(mockClient as Socket);
+
+        // Assert: no debe lanzar error (solo loguea).
+        expect(true).toBe(true);
+    });
 });

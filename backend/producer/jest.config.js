@@ -1,4 +1,5 @@
 module.exports = {
+  displayName: '🚀 PRODUCER',
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',

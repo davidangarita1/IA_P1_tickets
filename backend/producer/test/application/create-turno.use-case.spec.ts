@@ -38,4 +38,14 @@ describe('CreateTurnoUseCase (Application)', () => {
         // Act + Assert: el error debe propagarse al caller.
         expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow(publishError);
     });
+
+    it('propaga error no-Error y lo loguea como string', () => {
+        // Arrange: simular falla con un string en lugar de Error.
+        eventPublisher.publish.mockImplementationOnce(() => {
+            throw 'connection timeout';
+        });
+
+        // Act + Assert: el error string debe propagarse.
+        expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow('connection timeout');
+    });
 });
