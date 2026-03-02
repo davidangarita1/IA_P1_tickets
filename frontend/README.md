@@ -72,8 +72,8 @@ src/
 │   ├── page.tsx             ← Public: tickets screen
 │   ├── signin/page.tsx      ← Public: login page
 │   ├── signup/page.tsx      ← Public: registration page
-│   ├── dashboard/page.tsx   ← Protected (AuthGuard): served history
-│   └── register/page.tsx    ← Protected (AuthGuard): registration form
+│   ├── register/page.tsx    ← Public: ticket registration form
+│   └── dashboard/page.tsx   ← Protected (AuthGuard): served history
 │
 ├── config/env.ts            ← Environment variables
 ├── proxy.ts                 ← Security headers + route protection middleware
@@ -105,8 +105,9 @@ New users created via `/signup` are always registered as `employee`. The `admin`
 
 ### Route Protection
 
-- **`AuthGuard` component** — wraps `dashboard` and `register` pages; redirects to `/signin` if not authenticated.
-- **`proxy.ts` middleware` (current)** — applies security headers and HTTP method filtering only; it does **not** yet perform auth cookie validation or redirects. Edge-level auth checks are planned for a future iteration.
+- **`AuthGuard` component** — wraps the `dashboard` page only; redirects to `/signin` if not authenticated.
+- `/register` is **public** — any visitor (authenticated or not) can submit a ticket. No login is required to use the queue.
+- **`proxy.ts` middleware (current)** — applies security headers and HTTP method filtering only; it does **not** yet perform auth cookie validation or redirects. Edge-level auth checks are planned for a future iteration.
 
 ### Current Adapter
 

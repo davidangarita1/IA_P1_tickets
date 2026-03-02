@@ -1,6 +1,5 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
 import SignInPage from "@/app/signin/page";
+import { render, screen } from "@testing-library/react";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -18,9 +17,9 @@ jest.mock("@/hooks/useCreateTicket", () => ({
   useCreateTicket: jest.fn(),
 }));
 
+import { mockSanitizer } from "@/__tests__/mocks/factories";
 import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
-import { mockSanitizer } from "@/__tests__/mocks/factories";
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
