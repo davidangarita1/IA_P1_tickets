@@ -19,6 +19,7 @@ describe('CreateTurnoUseCase (Application)', () => {
     });
 
     const turnoRepository: jest.Mocked<ITurnoRepository> = {
+        findActivoPorCedula: jest.fn(),
         save: jest.fn(),
         findPacientesEnEspera: jest.fn(),
         getConsultoriosOcupados: jest.fn(),
@@ -57,6 +58,7 @@ describe('CreateTurnoUseCase (Application)', () => {
 
     it('crea turno, notifica, publica evento y dispara asignación inmediata', async () => {
         // Arrange: repositorio retorna el turno persistido.
+        turnoRepository.findActivoPorCedula.mockResolvedValue(null);
         turnoRepository.save.mockResolvedValue(turnoCreado);
         notificationGateway.sendNotification.mockResolvedValue(undefined);
         (assignRoomUseCase.executeAll as jest.Mock).mockResolvedValue([]);
@@ -82,6 +84,7 @@ describe('CreateTurnoUseCase (Application)', () => {
 
     it('no falla si la asignación inmediata lanza error (best-effort)', async () => {
         // Arrange: creación exitosa pero falla la asignación posterior.
+        turnoRepository.findActivoPorCedula.mockResolvedValue(null);
         turnoRepository.save.mockResolvedValue(turnoCreado);
         notificationGateway.sendNotification.mockResolvedValue(undefined);
         (assignRoomUseCase.executeAll as jest.Mock).mockRejectedValue(new Error('boom'));
@@ -93,5 +96,16 @@ describe('CreateTurnoUseCase (Application)', () => {
             turno: turnoCreado,
             eventPayload: turnoCreado.toEventPayload(),
         });
+    });
+
+    it('rechaza creación si la cédula ya tiene un turno activo', async () => {
+        // Arrange: ya existe un turno en espera para la cédula.
+        turnoRepository.findActivoPorCedula.mockResolvedValue(turnoCreado);
+
+        // Act + Assert: se lanza BadRequest y no se intenta guardar.
+        await expect(
+            useCase.execute({ cedula: 12345, nombre: 'Paciente Test', priority: 'media' }),
+        ).rejects.toThrow('El paciente ya tiene un turno en espera o en atención');
+        expect(turnoRepository.save).not.toHaveBeenCalled();
     });
 });

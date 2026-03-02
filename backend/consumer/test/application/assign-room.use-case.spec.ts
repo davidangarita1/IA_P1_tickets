@@ -27,6 +27,7 @@ describe('AssignRoomUseCase', () => {
         });
 
         const repository: jest.Mocked<ITurnoRepository> = {
+            findActivoPorCedula: jest.fn(),
             save: jest.fn(),
             findPacientesEnEspera: jest.fn(async () => [paciente]),
             getConsultoriosOcupados: jest.fn(async () => ['1', '3', '4', '5']),
@@ -55,6 +56,7 @@ describe('AssignRoomUseCase', () => {
         // Arrange: todos los consultorios ocupados.
         const enEspera: Turno[] = [buildTurnoEnEspera('t1', 201, 1)];
         const repository: jest.Mocked<ITurnoRepository> = {
+            findActivoPorCedula: jest.fn(),
             save: jest.fn(),
             findPacientesEnEspera: jest.fn(async () => [...enEspera]),
             getConsultoriosOcupados: jest.fn(async () => ['1', '2', '3', '4', '5']),
