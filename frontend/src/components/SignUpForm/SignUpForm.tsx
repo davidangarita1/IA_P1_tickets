@@ -7,20 +7,33 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/SignUpForm.module.css";
 
+export const WEAK_PASSWORD_MSG =
+  "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
+
+const STRONG_PASSWORD_RE =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+
 export default function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
   const { signUp, loading, error } = useAuth();
   const { sanitizer } = useDeps();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     const sanitizedName = sanitizer.sanitize(name);
     const sanitizedEmail = sanitizer.sanitize(email);
     const trimmedPassword = password.trim();
     if (!sanitizedName || !sanitizedEmail || !trimmedPassword) return;
+
+    if (!STRONG_PASSWORD_RE.test(trimmedPassword)) {
+      setFormError(WEAK_PASSWORD_MSG);
+      return;
+    }
 
     const success = await signUp({ name: sanitizedName, email: sanitizedEmail, password: trimmedPassword, role: "employee" });
     if (success) {
@@ -32,7 +45,7 @@ export default function SignUpForm() {
     <div className={styles.wrapper}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Crear cuenta</h2>
-        {error && <p role="alert" className={styles.error}>{error}</p>}
+        {(formError || error) && <p role="alert" className={styles.error}>{formError ?? error}</p>}
         <input
           type="text"
           placeholder="Nombre"
