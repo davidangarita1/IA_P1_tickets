@@ -98,3 +98,38 @@ Se implementó la capa de autenticación completa siguiendo TDD estricto:
 - El rol en el registro (`SignUpForm`) fue hardcodeado a `"employee"` por alcance de la HU; el selector de rol fue eliminado del formulario.
 - `/signup` es ruta pública en esta iteración; en HUs futuras se podría restringir a admins.
 - `NoopAuthAdapter` permite que páginas o tests que no necesitan auth compilen y corran sin proporcionar una implementación real.
+
+---
+
+### Reglas de negocio validadas en el frontend (`[Validar]`)
+
+Estas reglas de negocio tienen cobertura de tests etiquetados con `[Validar]` en las suites correspondientes:
+
+#### Rutas protegidas y control de acceso
+- `[Validar]` `AuthGuard` redirige a `/signin` cuando el usuario **no** está autenticado.
+- `[Validar]` `AuthGuard` redirige a `/` cuando el usuario autenticado **no tiene el rol requerido**.
+- `[Validar]` `dashboard/page` redirige a `/signin` y oculta el contenido si no hay sesión activa.
+
+#### Contraseña segura (registro)
+- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene mayúscula**.
+- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene minúscula**.
+- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene número**.
+- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene carácter especial**.
+- `[Validar]` Bloquea el envío y muestra error si la contraseña **tiene menos de 8 caracteres**.
+- `[Validar]` Permite el envío cuando la contraseña **cumple todos los criterios**.
+
+#### Correo duplicado (registro)
+- `[Validar]` No redirige cuando el backend rechaza el correo por estar ya registrado.
+- `[Validar]` Muestra el mensaje de error en español: `"El correo ya está registrado"`.
+- `[Validar]` `translateAuthMessage` convierte `"Email already in use"` → `"El correo ya está registrado."`.
+
+#### Turno duplicado (registro de turno)
+- `[Validar]` Bloquea la creación de turno si la misma cédula ya tiene un turno en estado `waiting`.
+- `[Validar]` Bloquea la creación de turno si la misma cédula ya tiene un turno en estado `called`.
+- `[Validar]` Permite la creación si el turno previo tiene estado `served`.
+
+#### Toast de éxito tras registro
+- `[Validar]` Guarda el mensaje en `sessionStorage` al crear cuenta exitosamente.
+- `[Validar]` El formulario de login lee el mensaje de `sessionStorage` y muestra el toast al montar.
+- `[Validar]` Elimina el mensaje de `sessionStorage` tras leerlo (no se muestra dos veces).
+- `[Validar]` El toast desaparece automáticamente a los 4 segundos.

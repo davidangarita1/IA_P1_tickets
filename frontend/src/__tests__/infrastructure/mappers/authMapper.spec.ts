@@ -1,4 +1,4 @@
-import { toUser, toAuthResult } from "@/infrastructure/mappers/authMapper";
+import { toUser, toAuthResult, translateAuthMessage } from "@/infrastructure/mappers/authMapper";
 
 describe("authMapper — Anti-Corruption Layer", () => {
   describe("toUser", () => {
@@ -119,6 +119,24 @@ describe("authMapper — Anti-Corruption Layer", () => {
       const result = toAuthResult(raw);
 
       expect(result.user).toBeUndefined();
+    });
+  });
+
+  describe("translateAuthMessage", () => {
+    it("[Validate] translates 'Email already in use' to Spanish", () => {
+      expect(translateAuthMessage("Email already in use")).toBe("El correo ya está registrado.");
+    });
+
+    it("[Validate] translates lowercase variant to Spanish", () => {
+      expect(translateAuthMessage("email already in use")).toBe("El correo ya está registrado.");
+    });
+
+    it("passes through messages that have no translation", () => {
+      expect(translateAuthMessage("Credenciales inválidas")).toBe("Credenciales inválidas");
+    });
+
+    it("passes through empty string", () => {
+      expect(translateAuthMessage("")).toBe("");
     });
   });
 });

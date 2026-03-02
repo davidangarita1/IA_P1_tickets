@@ -112,6 +112,34 @@ describe("httpClient", () => {
         cedula: 123,
       });
     });
+
+    it("throws CIRCUIT_OPEN when circuit breaker is open", async () => {
+      mockCanRequest.mockReturnValue(false);
+
+      await expect(
+        httpPost("http://localhost:3000/turnos", { nombre: "X", cedula: 1 })
+      ).rejects.toThrow("CIRCUIT_OPEN");
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("throws SERVER_ERROR on 500+ status after retries", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 500 });
+
+      await expect(
+        httpPost("http://localhost:3000/turnos", { nombre: "X", cedula: 1 })
+      ).rejects.toThrow("SERVER_ERROR");
+
+      expect(mockFail).toHaveBeenCalled();
+    });
+
+    it("throws RATE_LIMIT on 429 status", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 429 });
+
+      await expect(
+        httpPost("http://localhost:3000/turnos", { nombre: "X", cedula: 1 })
+      ).rejects.toThrow("RATE_LIMIT");
+    });
   });
 
   describe("retries", () => {
@@ -160,6 +188,26 @@ describe("httpClient", () => {
       const result = await httpGet("http://localhost:3000/test", { timeout: 100 });
 
       expect(result).toEqual({ status: "ok" });
+    });
+  });
+
+  describe("timeout abort callback", () => {
+    it("fires the abort callback when the timeout elapses before fetch resolves", async () => {
+      jest.useFakeTimers();
+      mockFetch.mockImplementation((_url: string, opts: RequestInit) => {
+        return new Promise<Response>((_resolve, reject) => {
+          opts.signal?.addEventListener("abort", () => {
+            reject(Object.assign(new Error("Aborted"), { name: "AbortError" }));
+          });
+        });
+      });
+
+      const promise = httpGet("http://localhost:3000/test", { timeout: 50, retries: 0 });
+      jest.advanceTimersByTime(51);
+
+      await expect(promise).rejects.toThrow("TIMEOUT");
+
+      jest.useRealTimers();
     });
   });
 });

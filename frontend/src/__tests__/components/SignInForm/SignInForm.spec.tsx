@@ -1,6 +1,6 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import SignInForm from "@/components/SignInForm/SignInForm";
+import { SIGNUP_SUCCESS_KEY } from "@/components/SignUpForm/SignUpForm";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 
@@ -16,9 +16,9 @@ jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
 }));
 
+import { mockSanitizer } from "@/__tests__/mocks/factories";
 import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
-import { mockSanitizer } from "@/__tests__/mocks/factories";
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -54,6 +54,7 @@ function setupMocks(options: {
 describe("SignInForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    sessionStorage.clear();
     setupMocks({});
   });
 
@@ -222,5 +223,42 @@ describe("SignInForm", () => {
     render(<SignInForm />);
 
     expect(screen.getByRole("button")).toHaveTextContent("Ingresando...");
+  });
+
+  it("[Validate] shows signup success toast when sessionStorage contains the message", () => {
+    sessionStorage.setItem(SIGNUP_SUCCESS_KEY, "¡Cuenta creada exitosamente!");
+
+    render(<SignInForm />);
+
+    expect(screen.getByRole("status")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("¡Cuenta creada exitosamente!");
+  });
+
+  it("[Validate] removes signup success from sessionStorage after reading it", () => {
+    sessionStorage.setItem(SIGNUP_SUCCESS_KEY, "¡Cuenta creada!");
+
+    render(<SignInForm />);
+
+    expect(sessionStorage.getItem(SIGNUP_SUCCESS_KEY)).toBeNull();
+  });
+
+  it("[Validate] does not show toast when sessionStorage has no signup message", () => {
+    render(<SignInForm />);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("[Validate] auto-dismisses toast after 4 seconds", () => {
+    jest.useFakeTimers();
+    sessionStorage.setItem(SIGNUP_SUCCESS_KEY, "¡Cuenta creada!");
+
+    render(<SignInForm />);
+
+    expect(screen.getByRole("status")).toBeInTheDocument();
+
+    act(() => { jest.advanceTimersByTime(4001); });
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    jest.useRealTimers();
   });
 });

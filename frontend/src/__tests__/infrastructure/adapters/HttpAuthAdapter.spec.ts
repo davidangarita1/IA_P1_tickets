@@ -83,6 +83,19 @@ describe("HttpAuthAdapter", () => {
       expect(result.success).toBe(false);
       expect(result.message).toBe("TIMEOUT");
     });
+
+    it("returns fallback message when httpPost throws a non-Error on signIn", async () => {
+      mockedHttpPost.mockRejectedValue(null);
+      const result = await adapter.signIn({ email: "a@b.com", password: "x" });
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Error en login");
+    });
+
+    it("does not set cookie when backend is successful but returns no token", async () => {
+      mockedHttpPost.mockResolvedValue({ success: true, message: "OK" });
+      await adapter.signIn({ email: "a@b.com", password: "x" });
+      expect(mockedSetCookie).not.toHaveBeenCalled();
+    });
   });
 
   // ─── signUp ──────────────────────────────────────────────────────────
@@ -127,41 +140,57 @@ describe("HttpAuthAdapter", () => {
       expect(mockedSetCookie).not.toHaveBeenCalled();
     });
 
-    it("returns failure when backend returns success: false", async () => {
-      // Arrange
+    it("[Validate] returns failure with Spanish message when backend returns 'Email already in use'", async () => {
       mockedHttpPost.mockResolvedValue({ success: false, message: "Email already in use" });
 
-      // Act
       const result = await adapter.signUp({ email: "dup@eps.com", password: "s", name: "X", role: "employee" });
 
-      // Assert
       expect(result.success).toBe(false);
-      expect(result.message).toBe("Email already in use");
+      expect(result.message).toBe("El correo ya está registrado.");
+    });
+
+    it("returns failure with error message when httpPost throws an Error", async () => {
+      mockedHttpPost.mockRejectedValue(new Error("Network timeout"));
+      const result = await adapter.signUp({ email: "a@b.com", password: "x", name: "Y", role: "employee" });
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Network timeout");
+    });
+
+    it("returns fallback message when httpPost throws a non-Error", async () => {
+      mockedHttpPost.mockRejectedValue("string error");
+
+      const result = await adapter.signUp({ email: "a@b.com", password: "x", name: "Y", role: "employee" });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe("Error en registro");
+    });
+
+    it("falls back to 'empleado' when role is not in the map", async () => {
+      mockedHttpPost.mockResolvedValue({ success: true, message: "OK" });
+      await adapter.signUp({ email: "a@b.com", password: "x", name: "Y", role: "unknown" as any });
+      expect(mockedHttpPost).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ rol: "empleado" }),
+      );
     });
   });
 
   // ─── signOut ─────────────────────────────────────────────────────────
   describe("signOut", () => {
     it("calls POST /auth/signOut and removes the cookie", async () => {
-      // Arrange
       mockedHttpPost.mockResolvedValue({ success: true, message: "Sesión cerrada" });
 
-      // Act
       await adapter.signOut();
 
-      // Assert
       expect(mockedHttpPost).toHaveBeenCalledWith(`${BASE}/auth/signOut`, {});
       expect(mockedRemoveCookie).toHaveBeenCalled();
     });
 
     it("removes cookie even when the backend call fails", async () => {
-      // Arrange
       mockedHttpPost.mockRejectedValue(new Error("TIMEOUT"));
 
-      // Act
       await adapter.signOut();
 
-      // Assert
       expect(mockedRemoveCookie).toHaveBeenCalled();
     });
   });
@@ -169,17 +198,14 @@ describe("HttpAuthAdapter", () => {
   // ─── getSession ──────────────────────────────────────────────────────
   describe("getSession", () => {
     it("returns user when cookie exists and GET /auth/me succeeds", async () => {
-      // Arrange
       mockedGetCookie.mockReturnValue("valid-token");
       mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ id: "u1", email: "admin@eps.com", nombre: "Admin", rol: "admin" }),
       } as Response);
 
-      // Act
       const user: User | null = await adapter.getSession();
 
-      // Assert
       expect(mockFetch).toHaveBeenCalledWith(`${BASE}/auth/me`, {
         method: "GET",
         headers: { Authorization: "Bearer valid-token" },
@@ -189,26 +215,30 @@ describe("HttpAuthAdapter", () => {
     });
 
     it("returns null when no cookie is present", async () => {
-      // Arrange
       mockedGetCookie.mockReturnValue(null);
 
-      // Act
       const user = await adapter.getSession();
 
-      // Assert
       expect(user).toBeNull();
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it("returns null and removes cookie when GET /auth/me fails", async () => {
-      // Arrange
       mockedGetCookie.mockReturnValue("expired-token");
       mockFetch.mockResolvedValue({ ok: false, status: 401 } as Response);
 
-      // Act
       const user = await adapter.getSession();
 
-      // Assert
+      expect(user).toBeNull();
+      expect(mockedRemoveCookie).toHaveBeenCalled();
+    });
+
+    it("returns null and removes cookie when fetch throws", async () => {
+      mockedGetCookie.mockReturnValue("valid-token");
+      mockFetch.mockRejectedValue(new Error("Network error"));
+
+      const user = await adapter.getSession();
+
       expect(user).toBeNull();
       expect(mockedRemoveCookie).toHaveBeenCalled();
     });

@@ -1,6 +1,5 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import SignUpForm from "@/components/SignUpForm/SignUpForm";
+import SignUpForm, { SIGNUP_SUCCESS_KEY, SUCCESS_SIGNUP_MSG, WEAK_PASSWORD_MSG } from "@/components/SignUpForm/SignUpForm";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mockPush = jest.fn();
 
@@ -16,9 +15,9 @@ jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
 }));
 
+import { mockSanitizer } from "@/__tests__/mocks/factories";
 import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
-import { mockSanitizer } from "@/__tests__/mocks/factories";
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -135,7 +134,7 @@ describe("SignUpForm", () => {
       target: { value: "ana@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
-      target: { value: "pass1234" },
+      target: { value: "Pass1234!" },
     });
 
     fireEvent.submit(screen.getByRole("button").closest("form")!);
@@ -144,7 +143,7 @@ describe("SignUpForm", () => {
       expect(signUp).toHaveBeenCalledWith({
         name: "Ana García",
         email: "ana@test.com",
-        password: "pass1234",
+        password: "Pass1234!",
         role: "employee",
       });
     });
@@ -163,7 +162,7 @@ describe("SignUpForm", () => {
       target: { value: "  ana@test.com  " },
     });
     fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
-      target: { value: "  pass1234  " },
+      target: { value: "  Pass1234!  " },
     });
 
     fireEvent.submit(screen.getByRole("button").closest("form")!);
@@ -172,9 +171,25 @@ describe("SignUpForm", () => {
       expect(signUp).toHaveBeenCalledWith({
         name: "Ana García",
         email: "ana@test.com",
-        password: "pass1234",
+        password: "Pass1234!",
         role: "employee",
       });
+    });
+  });
+
+  it("[Validar] stores success message in sessionStorage when signUp succeeds", async () => {
+    const signUp = jest.fn().mockResolvedValue(true);
+    setupMocks({ signUp });
+
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), { target: { value: "Ana" } });
+    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: "ana@test.com" } });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: "Pass1234!" } });
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+
+    await waitFor(() => {
+      expect(sessionStorage.getItem(SIGNUP_SUCCESS_KEY)).toBe(SUCCESS_SIGNUP_MSG);
     });
   });
 
@@ -191,7 +206,7 @@ describe("SignUpForm", () => {
       target: { value: "ana@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
-      target: { value: "pass1234" },
+      target: { value: "Pass1234!" },
     });
 
     fireEvent.submit(screen.getByRole("button").closest("form")!);
@@ -201,7 +216,7 @@ describe("SignUpForm", () => {
     });
   });
 
-  it("does not redirect when signUp returns false", async () => {
+  it("[Validate] does not redirect when signUp fails due to duplicate email", async () => {
     const signUp = jest.fn().mockResolvedValue(false);
     setupMocks({ signUp });
 
@@ -214,7 +229,7 @@ describe("SignUpForm", () => {
       target: { value: "dup@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), {
-      target: { value: "pass1234" },
+      target: { value: "Pass1234!" },
     });
 
     fireEvent.submit(screen.getByRole("button").closest("form")!);
@@ -224,7 +239,7 @@ describe("SignUpForm", () => {
     });
   });
 
-  it("shows error message when signUp fails", () => {
+  it("[Validate] shows error message when the email is already registered", () => {
     setupMocks({ error: "El correo ya está registrado" });
 
     render(<SignUpForm />);
@@ -270,11 +285,64 @@ describe("SignUpForm", () => {
 
     fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), { target: { value: "Test" } });
     fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: "t@t.com" } });
-    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: "pass" } });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: "Pass1234!" } });
     fireEvent.submit(screen.getByRole("button").closest("form")!);
 
     await waitFor(() => {
       expect(signUp).toHaveBeenCalledWith(expect.objectContaining({ role: "employee" }));
     });
+  });
+});
+
+describe("[Validate] contraseña fuerte", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  function fillAndSubmit(password: string, signUp = jest.fn()) {
+    setupMocks({ signUp });
+    render(<SignUpForm />);
+    fireEvent.change(screen.getByPlaceholderText(/nombre|name/i), { target: { value: "Ana" } });
+    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: "ana@test.com" } });
+    fireEvent.change(screen.getByPlaceholderText(/contraseña|password/i), { target: { value: password } });
+    fireEvent.submit(screen.getByRole("button").closest("form")!);
+    return signUp;
+  }
+
+  it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene mayúscula", async () => {
+    const signUp = fillAndSubmit("pass1234!");
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+    expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
+  });
+
+  it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene minúscula", async () => {
+    const signUp = fillAndSubmit("PASS1234!");
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+    expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
+  });
+
+  it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene número", async () => {
+    const signUp = fillAndSubmit("Password!");
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+    expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
+  });
+
+  it("[Validate] no llama signUp y muestra error cuando la contraseña no tiene carácter especial", async () => {
+    const signUp = fillAndSubmit("Password1");
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+    expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
+  });
+
+  it("[Validate] no llama signUp y muestra error cuando la contraseña tiene menos de 8 caracteres", async () => {
+    const signUp = fillAndSubmit("Pa1!");
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+    expect(screen.getByRole("alert")).toHaveTextContent(WEAK_PASSWORD_MSG);
+  });
+
+  it("[Validate] llama signUp cuando la contraseña cumple todos los criterios de seguridad", async () => {
+    const signUp = jest.fn().mockResolvedValue(true);
+    fillAndSubmit("Pass1234!", signUp);
+    await waitFor(() => expect(signUp).toHaveBeenCalled());
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

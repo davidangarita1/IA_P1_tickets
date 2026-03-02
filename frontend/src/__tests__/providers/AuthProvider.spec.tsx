@@ -109,7 +109,7 @@ describe("AuthProvider", () => {
     expect(result.current.isAuthenticated).toBe(false);
   });
 
-  it("signUp: sets user and isAuthenticated true on success", async () => {
+  it("signUp: returns true and does NOT set user (user must sign in separately)", async () => {
     const user = buildUser({ role: "employee" });
     const service = mockAuthService(
       { success: true, message: "OK" },
@@ -118,12 +118,14 @@ describe("AuthProvider", () => {
 
     const { result } = renderHook(() => useAuth(), { wrapper: wrapper(service) });
 
+    let returned: boolean | undefined;
     await act(async () => {
-      await result.current.signUp({ name: "Ana", email: "ana@test.com", password: "pass123", role: "employee" });
+      returned = await result.current.signUp({ name: "Ana", email: "ana@test.com", password: "pass123", role: "employee" });
     });
 
-    expect(result.current.user).toEqual(user);
-    expect(result.current.isAuthenticated).toBe(true);
+    expect(returned).toBe(true);
+    expect(result.current.user).toBeNull();
+    expect(result.current.isAuthenticated).toBe(false);
   });
 
   it("signUp: sets error on failure", async () => {
