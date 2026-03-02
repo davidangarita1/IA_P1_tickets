@@ -1,30 +1,47 @@
-# Testing Guide - Consumer Service
+# 📦 Testing Guide - Consumer Service
 
-## Patrones de testing aplicados
+> Worker de procesamiento de turnos con scheduler automático
 
-- AAA (Arrange, Act, Assert) en cada caso de prueba.
-- Test Doubles sobre puertos (`ITurnoRepository`, `IEventPublisher`) para respetar arquitectura hexagonal.
-- Test Data Builder para crear turnos de prueba legibles y reutilizables.
-- Enfoque de comportamiento: validar reglas de negocio (asignación inmediata + cola en espera).
+---
 
-## Estructura
+## Documentación
 
-```txt
-test/
-├── README.md
-├── application/
-│   └── assign-room.use-case.spec.ts
-└── scheduler/
-    └── scheduler.service.spec.ts
-```
+| Archivo | Descripción |
+|---------|-------------|
+| [TESTING_SUMMARY.md](TESTING_SUMMARY.md) | Listado de todas las suites y tests |
+| [COVERAGE.md](COVERAGE.md) | Métricas de cobertura y evidencias |
 
-## Escenario clave cubierto
+---
 
-- Si hay 5 consultorios libres y entran 4 pacientes, se asignan inmediatamente los 4.
-- Los pacientes nuevos pasan a espera cuando ya no hay consultorios libres.
-
-## Ejecución
+## Quick Start
 
 ```bash
+# Ejecutar tests
 npm test -- --runInBand
+
+# Con cobertura
+npm run test:cov -- --runInBand --forceExit
+```
+
+---
+
+## Patrones Aplicados
+
+- **AAA** (Arrange, Act, Assert) en cada caso
+- **Test Doubles** sobre puertos hexagonales (`ITurnoRepository`, `IEventPublisher`)
+- **Fake Timers** para testing del scheduler
+
+---
+
+## Arquitectura de Tests
+
+```
+test/
+├── application/    → Use cases
+├── domain/         → Entidades
+├── infrastructure/ → Adapters
+├── presentation/   → Controllers
+├── scheduler/      → Scheduler service
+├── notifications/  → Notification service
+└── assets/         → Evidencias (screenshots)
 ```

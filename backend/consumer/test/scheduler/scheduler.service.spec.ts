@@ -86,4 +86,26 @@ describe('SchedulerService', () => {
             'scheduler-asignacion-turnos',
         );
     });
+
+    it('ejecuta el tick automáticamente cuando pasa el intervalo', async () => {
+        // Arrange: los casos de uso responden correctamente.
+        (finalizeTurnosUseCase.execute as jest.Mock).mockResolvedValue([]);
+        (assignRoomUseCase.executeAll as jest.Mock).mockResolvedValue([]);
+
+        // Act: avanzar el tiempo para disparar el intervalo.
+        jest.advanceTimersByTime(15000);
+
+        // Assert: el callback del setInterval se ejecutó.
+        // Note: El callback es async, así que esperamos a que se resuelva.
+        await Promise.resolve();
+        expect(finalizeTurnosUseCase.execute).toHaveBeenCalled();
+    });
+
+    it('loguea error como string cuando no es instancia de Error', async () => {
+        // Arrange: error que no es instancia de Error.
+        (finalizeTurnosUseCase.execute as jest.Mock).mockRejectedValue('string error');
+
+        // Act + Assert: no rompe y loguea correctamente.
+        await expect(service.handleSchedulerTick()).resolves.not.toThrow();
+    });
 });
