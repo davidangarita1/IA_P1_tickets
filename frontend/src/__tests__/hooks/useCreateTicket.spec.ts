@@ -223,7 +223,7 @@ describe("useCreateTicket", () => {
     expect(result.current.success).toBeNull();
   });
 
-  describe("[Validar] duplicate active ticket rule", () => {
+  describe("[Validate] duplicate active ticket rule", () => {
     it("blocks submission when a ticket with the same documentId has status 'waiting'", async () => {
       const writer = mockTicketWriter();
       const reader = mockTicketReader([

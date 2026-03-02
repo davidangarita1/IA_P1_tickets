@@ -94,7 +94,7 @@ describe("AuthGuard", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("[Validar] redirects to / when authenticated user lacks the required role", () => {
+  it("[Validate] redirects to / when authenticated user lacks the required role", () => {
     setupAuth({ isAuthenticated: true, role: "employee" });
 
     render(

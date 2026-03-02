@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 
 describe("RegisterPage", () => {
-  it("[Validar] is publicly accessible — renders without requiring authentication", () => {
+  it("[Validate] is publicly accessible — renders without requiring authentication", () => {
     render(<RegisterPage />);
 
     expect(screen.getByText("Registro de Paciente")).toBeInTheDocument();

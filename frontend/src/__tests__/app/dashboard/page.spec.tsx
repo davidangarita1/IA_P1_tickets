@@ -209,7 +209,7 @@ describe("ServedDashboard", () => {
     expect(mockPush).toHaveBeenCalledWith("/signin");
   });
 
-  it("[Validar] does not render content when not authenticated", () => {
+  it("[Validate] does not render content when not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,

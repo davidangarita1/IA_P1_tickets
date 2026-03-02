@@ -245,7 +245,7 @@ describe("CreateTicketForm", () => {
     ).toBeInTheDocument();
   });
 
-  it("[Validar] shows duplicate-active error when the same documentId already has a waiting or called ticket", () => {
+  it("[Validate] shows duplicate-active error when the same documentId already has a waiting or called ticket", () => {
     setupMocks({ error: "Ya existe un turno activo para esta cédula." });
 
     render(<CreateTicketForm />);

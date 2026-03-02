@@ -224,7 +224,7 @@ describe("SignUpForm", () => {
     });
   });
 
-  it("[Validar] shows error message when the email is already registered", () => {
+  it("[Validate] shows error message when the email is already registered", () => {
     setupMocks({ error: "El correo ya está registrado" });
 
     render(<SignUpForm />);
