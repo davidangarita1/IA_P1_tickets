@@ -6,6 +6,10 @@ backend/consumer/node_modules/
 dist/
 build/
 .next/
+coverage/
+backend/**/coverage/
+backend/producer/coverage/
+backend/consumer/coverage/
 
 # Environment files
 .env
