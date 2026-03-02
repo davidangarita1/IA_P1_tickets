@@ -10,8 +10,8 @@ function isNumericOnly(value: string): boolean {
 }
 
 export default function CreateTicketForm() {
-  const { ticketWriter, sanitizer } = useDeps();
-  const { submit, loading, success, error } = useCreateTicket(ticketWriter);
+  const { ticketWriter, ticketReader, sanitizer } = useDeps();
+  const { submit, loading, success, error } = useCreateTicket(ticketWriter, ticketReader);
 
   const [name, setName] = useState("");
   const [documentId, setDocumentId] = useState("");

@@ -244,4 +244,14 @@ describe("CreateTicketForm", () => {
       screen.getByText("No se pudo registrar el turno.")
     ).toBeInTheDocument();
   });
+
+  it("[Validate] shows duplicate-waiting error when the same documentId already has a waiting ticket", () => {
+    setupMocks({ error: "Ya existe un turno en espera para esta cédula." });
+
+    render(<CreateTicketForm />);
+
+    expect(
+      screen.getByText("Ya existe un turno en espera para esta cédula.")
+    ).toBeInTheDocument();
+  });
 });
