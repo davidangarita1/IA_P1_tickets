@@ -133,3 +133,6 @@ Estas reglas de negocio tienen cobertura de tests etiquetados con `[Validar]` en
 - `[Validar]` El formulario de login lee el mensaje de `sessionStorage` y muestra el toast al montar.
 - `[Validar]` Elimina el mensaje de `sessionStorage` tras leerlo (no se muestra dos veces).
 - `[Validar]` El toast desaparece automáticamente a los 4 segundos.
+
+
+![frontend coverage](docs/frontend_coverage.png)
