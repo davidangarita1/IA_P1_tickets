@@ -1,4 +1,4 @@
-## v1.0.0
+v1.0.0
 
 - Add MVP foundation with basic project structure for frontend, producer (backend), and consumer (backend) services.
 - Add Docker Compose configuration for local development environment with MongoDB, RabbitMQ, and service orchestration.
