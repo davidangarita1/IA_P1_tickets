@@ -105,34 +105,34 @@ Se implementó la capa de autenticación completa siguiendo TDD estricto:
 
 Estas reglas de negocio tienen cobertura de tests etiquetados con `[Validar]` en las suites correspondientes:
 
-#### Rutas protegidas y control de acceso
-- `[Validar]` `AuthGuard` redirige a `/signin` cuando el usuario **no** está autenticado.
-- `[Validar]` `AuthGuard` redirige a `/` cuando el usuario autenticado **no tiene el rol requerido**.
-- `[Validar]` `dashboard/page` redirige a `/signin` y oculta el contenido si no hay sesión activa.
+#### Acceso restringido
+- `[Validar]` Un usuario que no ha iniciado sesión no puede ver páginas privadas y es enviado al login.
+- `[Validar]` Un usuario autenticado sin el permiso adecuado no puede acceder a secciones restringidas y es enviado al inicio.
+- `[Validar]` El panel principal no muestra su contenido si no hay una sesión activa.
 
 #### Contraseña segura (registro)
-- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene mayúscula**.
-- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene minúscula**.
-- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene número**.
-- `[Validar]` Bloquea el envío y muestra error si la contraseña **no tiene carácter especial**.
-- `[Validar]` Bloquea el envío y muestra error si la contraseña **tiene menos de 8 caracteres**.
-- `[Validar]` Permite el envío cuando la contraseña **cumple todos los criterios**.
+- `[Validar]` El sistema no permite registrarse con una contraseña que no tenga al menos una letra mayúscula.
+- `[Validar]` El sistema no permite registrarse con una contraseña que no tenga al menos una letra minúscula.
+- `[Validar]` El sistema no permite registrarse con una contraseña que no tenga al menos un número.
+- `[Validar]` El sistema no permite registrarse con una contraseña que no tenga al menos un carácter especial.
+- `[Validar]` El sistema no permite registrarse con una contraseña de menos de 8 caracteres.
+- `[Validar]` El sistema permite continuar el registro cuando la contraseña cumple todos los requisitos de seguridad.
 
 #### Correo duplicado (registro)
-- `[Validar]` No redirige cuando el backend rechaza el correo por estar ya registrado.
-- `[Validar]` Muestra el mensaje de error en español: `"El correo ya está registrado"`.
-- `[Validar]` `translateAuthMessage` convierte `"Email already in use"` → `"El correo ya está registrado."`.
+- `[Validar]` Si el correo ingresado ya pertenece a una cuenta existente, el usuario no es redirigido y permanece en el formulario.
+- `[Validar]` El sistema muestra al usuario un mensaje claro indicando que el correo ya está registrado.
+- `[Validar]` El mensaje de error se presenta en español sin importar el idioma en que lo reporte el servidor.
 
 #### Turno duplicado (registro de turno)
-- `[Validar]` Bloquea la creación de turno si la misma cédula ya tiene un turno en estado `waiting`.
-- `[Validar]` Bloquea la creación de turno si la misma cédula ya tiene un turno en estado `called`.
-- `[Validar]` Permite la creación si el turno previo tiene estado `served`.
+- `[Validar]` No se puede generar un nuevo turno para una cédula que ya tiene un turno en espera de ser atendido.
+- `[Validar]` No se puede generar un nuevo turno para una cédula que ya está siendo llamada en ese momento.
+- `[Validar]` Sí se puede generar un nuevo turno para una cédula cuyo turno anterior ya fue atendido.
 
-#### Toast de éxito tras registro
-- `[Validar]` Guarda el mensaje en `sessionStorage` al crear cuenta exitosamente.
-- `[Validar]` El formulario de login lee el mensaje de `sessionStorage` y muestra el toast al montar.
-- `[Validar]` Elimina el mensaje de `sessionStorage` tras leerlo (no se muestra dos veces).
-- `[Validar]` El toast desaparece automáticamente a los 4 segundos.
+#### Confirmación visual tras registro exitoso
+- `[Validar]` Al crear una cuenta con éxito, el sistema guarda un mensaje de confirmación para mostrarlo en la siguiente pantalla.
+- `[Validar]` Al ingresar a la pantalla de login después de registrarse, el usuario ve un mensaje de bienvenida que confirma que su cuenta fue creada.
+- `[Validar]` El mensaje de confirmación desaparece una vez que el usuario lo ha visto y no vuelve a aparecer si recarga la página.
+- `[Validar]` El mensaje de confirmación se oculta automáticamente a los 4 segundos sin que el usuario tenga que cerrarlo.
 
 
 ![frontend coverage](docs/frontend_coverage.png)
