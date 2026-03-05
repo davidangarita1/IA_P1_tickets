@@ -97,41 +97,41 @@ Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos 
 **Descripción:** Como usuario nuevo, quiero registrarme con nombre, correo y contraseña para acceder al sistema.
 
 **Criterios de aceptación:**
-- El formulario no se envía si nombre, correo o contraseña están vacíos.
-- El sistema rechaza contraseñas que no cumplan: mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
-- Al registrarse con éxito, se almacena el mensaje `signup_success` en `sessionStorage` y se redirige a `/signin`.
-- Si el correo ya existe, se muestra el mensaje traducido "El correo ya está registrado."
-- Los campos de texto son sanitizados antes de enviarse al backend.
+- El sistema no permite continuar si el usuario deja algún campo vacío.
+- El sistema no permite registrarse con una contraseña que no tenga al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial; en ese caso muestra un mensaje explicando el requisito incumplido.
+- Al crear la cuenta exitosamente, el usuario es redirigido a la pantalla de inicio de sesión y ve un mensaje confirmando que su cuenta fue creada.
+- Si el correo ingresado ya pertenece a una cuenta existente, el usuario no es redirigido y se le informa que ese correo ya está registrado.
+- El sistema limpia y valida las entradas del usuario antes de procesarlas.
 
 ### HU-AUTH-02: Inicio de sesión
 
-**Descripción:** Como usuario registrado, quiero iniciar sesión con correo y contraseña para acceder al dashboard.
+**Descripción:** Como usuario registrado, quiero iniciar sesión con correo y contraseña para acceder al panel principal.
 
 **Criterios de aceptación:**
-- El formulario no se envía si algún campo está vacío tras sanitización y trim.
-- Al iniciar sesión correctamente, se almacena el JWT en cookie y se redirige a `/dashboard`.
-- Si las credenciales son inválidas, se muestra el mensaje de error proveniente del backend.
-- Al montar el componente, se lee `sessionStorage` por el mensaje de registro exitoso, se muestra como toast y se elimina del storage.
-- El toast desaparece automáticamente a los 4 segundos.
+- El sistema no permite continuar si el correo o la contraseña están en blanco.
+- Al ingresar credenciales correctas, el usuario es llevado al panel principal y su sesión queda activa.
+- Si las credenciales son incorrectas, el usuario ve un mensaje de error sin ser redirigido.
+- Si el usuario llega desde un registro exitoso, ve un mensaje de bienvenida confirmando la creación de su cuenta; ese mensaje no vuelve a aparecer si recarga la página.
+- El mensaje de bienvenida desaparece automáticamente a los 4 segundos.
 
 ### HU-AUTH-03: Protección de rutas por autenticación y rol
 
-**Descripción:** Como sistema, quiero proteger las rutas que requieren autenticación o roles específicos para evitar accesos no autorizados.
+**Descripción:** Como sistema, quiero proteger las secciones que requieren autenticación o permisos específicos para evitar accesos no autorizados.
 
 **Criterios de aceptación:**
-- Si el usuario no está autenticado, `AuthGuard` redirige a `/signin`.
-- Si el usuario está autenticado pero no tiene el rol requerido, `AuthGuard` redirige a `/`.
-- Si el usuario está autenticado y tiene el rol correcto, se renderiza el contenido protegido.
-- Mientras `loading` es `true`, `AuthGuard` no renderiza nada (evita flash de contenido).
+- Un usuario que no ha iniciado sesión no puede acceder a secciones privadas; el sistema lo redirige automáticamente a la pantalla de login.
+- Un usuario autenticado que no tiene el perfil requerido para una sección es enviado a la página de inicio sin ver el contenido restringido.
+- Un usuario autenticado con el perfil correcto puede ver y usar la sección sin interrupciones.
+- Mientras el sistema verifica la sesión del usuario, no se muestra ningún contenido para evitar accesos momentáneos no autorizados.
 
 ### HU-AUTH-04: Restauración de sesión (persistencia)
 
 **Descripción:** Como usuario, quiero que mi sesión se restaure al recargar la página para no tener que autenticarme nuevamente.
 
 **Criterios de aceptación:**
-- `AuthProvider` llama a `getSession()` al montarse y establece el usuario si existe sesión activa.
-- `HttpAuthAdapter.getSession()` lee la cookie JWT, llama a `GET /auth/me` con el header `Authorization: Bearer <token>` y devuelve el usuario mapeado.
-- Si no hay cookie o la sesión es inválida, `getSession()` devuelve `null` y `isAuthenticated` queda en `false`.
+- Al recargar la página, el sistema verifica automáticamente si el usuario ya tiene una sesión activa.
+- Si existe una sesión válida, el usuario permanece autenticado y puede continuar usando la aplicación sin interrupciones.
+- Si no existe sesión activa o la sesión expiró, el usuario es tratado como no autenticado y debe iniciar sesión nuevamente.
 
 ---
 
