@@ -66,6 +66,10 @@ RUN npm install --omit=dev --legacy-peer-deps \
 
 COPY --from=build /app/dist ./dist
 
+# ⚕️ HUMAN CHECK - Ejecutar como usuario no-root (requerimiento de inmutabilidad)
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
+
 # ⚕️ HUMAN CHECK - Puerto expuesto
 # Verificar que coincida con la variable de entorno PRODUCER_PORT
 EXPOSE 3000
