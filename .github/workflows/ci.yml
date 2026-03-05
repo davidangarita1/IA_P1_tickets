@@ -7,44 +7,40 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
-jobs:
-  test-and-typecheck:
-    runs-on: ubuntu-latest
+# ─────────────────────────────────────────────────────────────────────────────
+# Pipeline multinivel — Shift-Left Quality
+#
+# Flujo de ejecución:
+#   lint-and-typecheck
+#        ├──► component-tests  (Caja Blanca)
+#        └──► integration-tests (Caja Negra)
+#                    └──► docker-security-scan
+# ─────────────────────────────────────────────────────────────────────────────
 
-    strategy:
-      matrix:
-        node-version: [20]
+jobs:
+
+  # ── Job 1: Verificación estática ──────────────────────────────────────────
+  lint-and-typecheck:
+    name: 🔍 Lint & Typecheck
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/producer/package-lock.json
+            backend/consumer/package-lock.json
 
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Install producer dependencies
-        working-directory: backend/producer
-        run: npm ci
-
-      - name: Install consumer dependencies
-        working-directory: backend/consumer
-        run: npm ci
-
-      - name: Test frontend
-        working-directory: frontend
-        run: npm test
-
-      - name: Test producer
-        working-directory: backend/producer
-        run: npm test
-
-      - name: Test consumer
-        working-directory: backend/consumer
-        run: npm test
+      - name: Install dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix backend/producer
+          npm ci --prefix backend/consumer
 
       - name: Typecheck frontend
         working-directory: frontend
@@ -57,3 +53,106 @@ jobs:
       - name: Typecheck consumer
         working-directory: backend/consumer
         run: npx tsc --noEmit
+
+  # ── Job 2: Pruebas de Componente — Caja Blanca ────────────────────────────
+  component-tests:
+    name: 🧪 Component Tests (White-Box)
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/producer/package-lock.json
+            backend/consumer/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix backend/producer
+          npm ci --prefix backend/consumer
+
+      - name: "[Frontend] Component tests — providers, components, hooks, app"
+        working-directory: frontend
+        run: npx jest --testPathPattern="(components|providers|hooks|app)" --passWithNoTests --coverage
+
+      - name: "[Producer] Component tests — application, domain, presentation"
+        working-directory: backend/producer
+        run: npx jest --testPathPattern="(application|domain|presentation)" --passWithNoTests
+
+      - name: "[Consumer] Component tests — application, domain, presentation"
+        working-directory: backend/consumer
+        run: npx jest --testPathPattern="(application|domain|presentation)" --passWithNoTests
+
+  # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
+  integration-tests:
+    name: 🔗 Integration Tests (Black-Box)
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/producer/package-lock.json
+            backend/consumer/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix backend/producer
+          npm ci --prefix backend/consumer
+
+      - name: "[Frontend] Integration tests — infrastructure adapters"
+        working-directory: frontend
+        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+
+      - name: "[Producer] Integration tests — infrastructure"
+        working-directory: backend/producer
+        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+
+      - name: "[Consumer] Integration tests — infrastructure"
+        working-directory: backend/consumer
+        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+
+  # ── Job 4: Build Docker + Escaneo de seguridad ───────────────────────────
+  docker-security-scan:
+    name: 🐳 Docker Build & Security Scan
+    runs-on: ubuntu-latest
+    needs: [component-tests, integration-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build frontend image
+        run: docker build -t frontend:ci ./frontend
+
+      - name: Build producer image
+        run: docker build -t producer:ci ./backend/producer
+
+      - name: Build consumer image
+        run: docker build -t consumer:ci ./backend/consumer
+
+      - name: Install Trivy scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan frontend image
+        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table frontend:ci
+
+      - name: Scan producer image
+        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table producer:ci
+
+      - name: Scan consumer image
+        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table consumer:ci
