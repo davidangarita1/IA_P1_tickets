@@ -1,5 +1,5 @@
 # --- Stage: development ---
-FROM node:20-slim AS development
+FROM node:20-alpine AS development
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY consumer/ .
 CMD ["npm", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:20-slim AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ COPY consumer/ .
 RUN npm run build
 
 # --- Stage: production ---
-FROM node:20-slim AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 

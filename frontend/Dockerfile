@@ -2,7 +2,7 @@
 # Asegurarse de usar una versión LTS de Node.js
 
 # --- Stage: development ---
-FROM node:20-slim AS development
+FROM node:20-alpine AS development
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ EXPOSE 3001
 CMD ["npm", "run", "dev", "--", "-p", "3001", "-H", "0.0.0.0"]
 
 # --- Stage: build ---
-FROM node:20-slim AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -36,7 +36,7 @@ RUN npm run build
 
 # --- Stage: production ---
 # ⚕️ HUMAN CHECK - Imagen ligera y usuario no-root para producción
-FROM node:20-slim AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
