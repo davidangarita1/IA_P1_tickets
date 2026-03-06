@@ -7,7 +7,7 @@ ARG NPM_FETCH_RETRIES=5
 ARG NPM_FETCH_RETRY_FACTOR=10
 
 # --- Stage: development ---
-FROM node:20-alpine AS development
+FROM node:22-alpine AS development
 ARG NPM_FETCH_TIMEOUT
 ARG NPM_FETCH_RETRIES
 ARG NPM_FETCH_RETRY_FACTOR
@@ -30,7 +30,7 @@ EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 ARG NPM_FETCH_TIMEOUT
 ARG NPM_FETCH_RETRIES
 ARG NPM_FETCH_RETRY_FACTOR
@@ -49,7 +49,7 @@ COPY producer/ .
 RUN npm run build
 
 # --- Stage: production ---
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 ARG NPM_FETCH_TIMEOUT
 ARG NPM_FETCH_RETRIES
 ARG NPM_FETCH_RETRY_FACTOR
