@@ -6,22 +6,28 @@ FROM node:22-alpine AS development
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+RUN npm install -g pnpm
+
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+RUN pnpm install
 
 COPY . .
 
 EXPOSE 3001
 
-CMD ["npm", "run", "dev", "--", "-p", "3001", "-H", "0.0.0.0"]
+CMD ["pnpm", "run", "dev", "--", "-p", "3001", "-H", "0.0.0.0"]
 
 # --- Stage: build ---
 FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
+RUN npm install -g pnpm
+
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+RUN pnpm install
 
 COPY . .
 
@@ -32,7 +38,7 @@ ARG NEXT_PUBLIC_WS_URL=http://localhost:3000
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 
-RUN npm run build
+RUN pnpm run build
 
 # --- Stage: production ---
 # ⚕️ HUMAN CHECK - Imagen ligera y usuario no-root para producción
@@ -40,8 +46,9 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --omit=dev
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
 
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
@@ -55,4 +62,4 @@ USER appuser
 # Verificar que coincida con la variable de entorno FRONTEND_PORT
 EXPOSE 3001
 
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "run", "start"]

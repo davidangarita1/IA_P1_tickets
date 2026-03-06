@@ -27,20 +27,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+          cache: pnpm
           cache-dependency-path: |
-            frontend/package-lock.json
-            backend/producer/package-lock.json
-            backend/consumer/package-lock.json
+            frontend/pnpm-lock.yaml
+            backend/producer/pnpm-lock.yaml
+            backend/consumer/pnpm-lock.yaml
 
       - name: Install dependencies
         run: |
-          npm ci --prefix frontend
-          npm ci --prefix backend/producer
-          npm ci --prefix backend/consumer
+          pnpm install --prefix frontend
+          pnpm install --prefix backend/producer
+          pnpm install --prefix backend/consumer
 
       - name: Typecheck frontend
         working-directory: frontend
@@ -63,32 +67,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+          cache: pnpm
           cache-dependency-path: |
-            frontend/package-lock.json
-            backend/producer/package-lock.json
-            backend/consumer/package-lock.json
+            frontend/pnpm-lock.yaml
+            backend/producer/pnpm-lock.yaml
+            backend/consumer/pnpm-lock.yaml
 
       - name: Install dependencies
         run: |
-          npm ci --prefix frontend
-          npm ci --prefix backend/producer
-          npm ci --prefix backend/consumer
+          pnpm install --prefix frontend
+          pnpm install --prefix backend/producer
+          pnpm install --prefix backend/consumer
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
-        run: npx jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
+        run: pnpm jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
 
       - name: "[Producer] Component tests — application, domain, presentation"
         working-directory: backend/producer
-        run: npx jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+        run: pnpm jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
       - name: "[Consumer] Component tests — application, domain, presentation"
         working-directory: backend/consumer
-        run: npx jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+        run: pnpm jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
   # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
   integration-tests:
@@ -99,38 +107,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+          cache: pnpm
           cache-dependency-path: |
-            frontend/package-lock.json
-            backend/producer/package-lock.json
-            backend/consumer/package-lock.json
+            frontend/pnpm-lock.yaml
+            backend/producer/pnpm-lock.yaml
+            backend/consumer/pnpm-lock.yaml
 
       - name: Install dependencies
         run: |
-          npm ci --prefix frontend
-          npm ci --prefix backend/producer
-          npm ci --prefix backend/consumer
+          pnpm install --prefix frontend
+          pnpm install --prefix backend/producer
+          pnpm install --prefix backend/consumer
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
-        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Producer] Integration tests — infrastructure"
         working-directory: backend/producer
-        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Consumer] Integration tests — infrastructure"
         working-directory: backend/consumer
-        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
 
       # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
       # Ejecutan escenarios declarativos contra la API usando cucumber-js
       - name: "[Producer] Acceptance tests — Gherkin (Black-Box)"
         working-directory: backend/producer
-        run: npx cucumber-js
+        run: pnpm cucumber-js
 
   # ── Job 4: Build Docker + Escaneo de seguridad ───────────────────────────
   docker-security-scan:
