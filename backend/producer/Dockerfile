@@ -1,48 +1,42 @@
 # ⚕️ HUMAN CHECK - Dockerfile del Producer
-# Asegurarse de usar una versión LTS de Node.js
+# Asegurarse de usar una versión LTS de Bun
 
 # --- Stage: development ---
-FROM node:24-alpine AS development
+FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY producer/pnpm-lock.yaml ./
+COPY producer/bun.lockb ./
 COPY producer/package.json ./
-RUN pnpm install
+RUN bun install
 
 # Copiar código fuente (en dev, volumes sobreescriben esto)
 COPY producer/ .
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:dev"]
+CMD ["bun", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:24-alpine AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY producer/pnpm-lock.yaml ./
+COPY producer/bun.lockb ./
 COPY producer/package.json ./
-RUN pnpm install
+RUN bun install
 
 COPY producer/ .
-RUN pnpm run build
+RUN bun run build
 
 # --- Stage: production ---
-FROM node:24-alpine AS production
+FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY producer/pnpm-lock.yaml ./
+COPY producer/bun.lockb ./
 COPY producer/package.json ./
-RUN pnpm install --prod
+RUN bun install --production
 
 COPY --from=build /app/dist ./dist
 
@@ -54,4 +48,4 @@ USER appuser
 # Verificar que coincida con la variable de entorno PRODUCER_PORT
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:prod"]
+CMD ["bun", "run", "start:prod"]
