@@ -6,7 +6,7 @@ FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-COPY bun.lockb ./
+COPY bun.lock ./
 COPY package.json ./
 RUN bun install
 
@@ -28,7 +28,7 @@ ARG NEXT_PUBLIC_WS_URL=http://localhost:3000
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 
-COPY bun.lockb ./
+COPY bun.lock ./
 COPY package.json ./
 RUN bun install
 
@@ -42,7 +42,7 @@ FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-COPY bun.lockb ./
+COPY bun.lock ./
 COPY package.json ./
 RUN bun install --production
 

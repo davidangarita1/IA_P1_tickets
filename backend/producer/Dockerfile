@@ -6,7 +6,7 @@ FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-COPY producer/bun.lockb ./
+COPY producer/bun.lock ./
 COPY producer/package.json ./
 RUN bun install
 
@@ -22,7 +22,7 @@ FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-COPY producer/bun.lockb ./
+COPY producer/bun.lock ./
 COPY producer/package.json ./
 RUN bun install
 
@@ -34,7 +34,7 @@ FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-COPY producer/bun.lockb ./
+COPY producer/bun.lock ./
 COPY producer/package.json ./
 RUN bun install --production
 
