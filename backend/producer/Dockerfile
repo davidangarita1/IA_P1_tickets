@@ -10,7 +10,7 @@ RUN npm install -g pnpm
 
 COPY producer/pnpm-lock.yaml ./
 COPY producer/package.json ./
-RUN pnpm install --legacy-peer-deps
+RUN pnpm install
 
 # Copiar código fuente (en dev, volumes sobreescriben esto)
 COPY producer/ .
@@ -28,7 +28,7 @@ RUN npm install -g pnpm
 
 COPY producer/pnpm-lock.yaml ./
 COPY producer/package.json ./
-RUN pnpm install --legacy-peer-deps
+RUN pnpm install
 
 COPY producer/ .
 RUN pnpm run build
@@ -42,7 +42,7 @@ RUN npm install -g pnpm
 
 COPY producer/pnpm-lock.yaml ./
 COPY producer/package.json ./
-RUN pnpm install --legacy-peer-deps --prod
+RUN pnpm install --prod
 
 COPY --from=build /app/dist ./dist
 
