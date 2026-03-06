@@ -27,13 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: |
-          bun install
-          cd backend/producer && bun install && cd ../
-          cd backend/consumer && bun install && cd ../
+          bun install --cwd frontend
+          bun install --cwd backend/producer
+          bun install --cwd backend/consumer
 
       - name: Typecheck frontend
         working-directory: frontend
@@ -56,13 +56,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: |
-          bun install
-          cd backend/producer && bun install && cd ../
-          cd backend/consumer && bun install && cd ../
+          bun install --cwd frontend
+          bun install --cwd backend/producer
+          bun install --cwd backend/consumer
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
@@ -85,13 +85,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: |
-          bun install
-          cd backend/producer && bun install && cd ../
-          cd backend/consumer && bun install && cd ../
+          bun install --cwd frontend
+          bun install --cwd backend/producer
+          bun install --cwd backend/consumer
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
