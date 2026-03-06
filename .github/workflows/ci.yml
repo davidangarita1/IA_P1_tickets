@@ -80,7 +80,7 @@ jobs:
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
-        run: npx jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests --coverage
+        run: npx jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
 
       - name: "[Producer] Component tests — application, domain, presentation"
         working-directory: backend/producer
