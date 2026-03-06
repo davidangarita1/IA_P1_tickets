@@ -66,15 +66,15 @@ jobs:
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
-        run: bun run test -- --testPathPattern="(components|providers|hooks|app)" --passWithNoTests
+        run: bun run test -- --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
 
       - name: "[Producer] Component tests — application, domain, presentation"
         working-directory: backend/producer
-        run: bun run test -- --testPathPattern="(application|domain|presentation)" --passWithNoTests
+        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
       - name: "[Consumer] Component tests — application, domain, presentation"
         working-directory: backend/consumer
-        run: bun run test -- --testPathPattern="(application|domain|presentation)" --passWithNoTests
+        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
   # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
   integration-tests:
@@ -95,15 +95,15 @@ jobs:
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
-        run: bun run test -- --testPathPattern="infrastructure" --passWithNoTests
+        run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Producer] Integration tests — infrastructure"
         working-directory: backend/producer
-        run: bun run test -- --testPathPattern="infrastructure" --passWithNoTests
+        run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Consumer] Integration tests — infrastructure"
         working-directory: backend/consumer
-        run: bun run test -- --testPathPattern="infrastructure" --passWithNoTests
+        run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
 
       # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
       # Ejecutan escenarios declarativos contra la API usando cucumber-js
