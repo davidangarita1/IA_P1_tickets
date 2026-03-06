@@ -1,0 +1,88 @@
+# ⚕️ HUMAN CHECK - Workflow de Release: Auto-tagging semántico en merge a main
+# Se activa al cerrar un PR hacia main. Genera un tag de versión automáticamente.
+#
+# Flujo GitFlow:
+#   feature/* → develop → main (PR documentado) → tag vX.Y.Z
+
+name: Release & Tag
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  create-release-tag:
+    name: Create Semantic Version Tag
+    # Solo ejecutar si el PR fue mergeado (no cerrado sin merge)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Historial completo para leer tags previos
+
+      # ⚕️ HUMAN CHECK - Determinar nueva versión basada en el último tag
+      # Convención: si el título del PR contiene [major], [minor] o [patch],
+      # se incrementa la versión correspondiente. Default: patch.
+      - name: Determine next version
+        id: version
+        run: |
+          # Obtener último tag semántico
+          LAST_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$LAST_TAG" ]; then
+            LAST_TAG="v0.0.0"
+          fi
+
+          echo "Last tag: $LAST_TAG"
+
+          # Extraer major.minor.patch
+          MAJOR=$(echo "$LAST_TAG" | sed 's/v//' | cut -d. -f1)
+          MINOR=$(echo "$LAST_TAG" | sed 's/v//' | cut -d. -f2)
+          PATCH=$(echo "$LAST_TAG" | sed 's/v//' | cut -d. -f3)
+
+          # Determinar tipo de bump según título del PR
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if echo "$PR_TITLE" | grep -qi '\[major\]'; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif echo "$PR_TITLE" | grep -qi '\[minor\]'; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "New tag: $NEW_TAG"
+          echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+
+      # ⚕️ HUMAN CHECK - Crear tag y release en GitHub
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.new_tag }}" -m "Release ${{ steps.version.outputs.new_tag }} — merged PR #${{ github.event.pull_request.number }}"
+          git push origin "${{ steps.version.outputs.new_tag }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: Release ${{ steps.version.outputs.new_tag }}
+          body: |
+            ## Release ${{ steps.version.outputs.new_tag }}
+
+            **PR:** #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.title }}
+            **Autor:** @${{ github.event.pull_request.user.login }}
+            **Fecha:** ${{ github.event.pull_request.merged_at }}
+
+            ### Cambios incluidos
+            ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false

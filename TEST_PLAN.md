@@ -1,10 +1,10 @@
-# Test Plan — Feature: Authentication (Frontend)
+# Test Plan — Sistema de Turnos EPS
 
 **Proyecto:** Sistema de turnos EPS  
-**Módulo:** `frontend/` — feature/authentication  
+**Módulos:** `frontend/` — feature/authentication | `backend/producer/` — API y aceptación  
 **Responsable:** David Angarita  
 **Fecha:** 2026-03-05  
-**Versión:** 1.0
+**Versión:** 2.0
 
 ---
 
@@ -72,6 +72,12 @@ Validan la lógica interna de cada unidad de forma aislada. Se conoce la impleme
 **Pruebas de Integración (Caja Negra)**  
 Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos del backend sin conocer detalles internos de la implementación del servidor. Se mocka únicamente `fetch` global para simular respuestas HTTP reales y se verifica que el adaptador mapee correctamente las respuestas, establezca cookies y propague errores tal como lo haría ante un backend real.
 
+**Pruebas de Aceptación — Gherkin (Caja Negra Declarativa)**  
+Validan el comportamiento del sistema desde la perspectiva del negocio usando sintaxis **Given/When/Then** (patrón Estado-Acción-Estado). Se ejecutan con `cucumber-js` contra la API del Producer mediante `supertest`. Los escenarios son **declarativos**: describen QUÉ debería ocurrir en términos de negocio, sin mencionar clics, campos de formulario ni detalles de implementación. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs in-memory para garantizar aislamiento y velocidad.
+
+**Justificación del uso de Gherkin (Principio 6 — Contexto):**  
+El contexto del proyecto es un sistema de turnos EPS donde el flujo principal (crear turno, registrar usuario) es un comportamiento de negocio crítico cuya validación no debe depender de la implementación técnica. Gherkin permite expresar estos flujos como escenarios de negocio comprensibles por stakeholders no técnicos, aplicando el **patrón Estado-Acción-Estado**: el Given establece un estado conocido del sistema, el When ejecuta una acción de negocio, y el Then verifica que el sistema transicionó al estado esperado. Esto garantiza que si se refactoriza la implementación interna (ej. cambiar de RabbitMQ a Kafka), los escenarios Gherkin siguen siendo válidos.
+
 ### 3.2 Técnicas aplicadas
 
 | Técnica | Nivel | Aplicación |
@@ -81,12 +87,14 @@ Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos 
 | Tabla de decisiones | Componente | Combinaciones de estado del usuario en `AuthGuard` (no autenticado, autenticado sin rol, autenticado con rol) |
 | Prueba de estado | Componente | Transiciones de `loading → authenticated → unauthenticated` en `AuthProvider` |
 | Prueba de contrato | Integración | `HttpAuthAdapter` verifica que los payloads enviados coincidan con la API del backend |
+| BDD Gherkin (Estado-Acción-Estado) | Aceptación | Escenarios declarativos de creación de turno y registro de usuario vía API |
 
 ### 3.3 Ciclos de ejecución
 
 1. **Unit / Component (CI — cada PR):** Ejecución automática de toda la suite Jest al abrir un Pull Request. Bloquea el merge si hay fallos.
 2. **Integration (CI — cada PR hacia develop):** Job diferenciado en el pipeline que ejecuta únicamente los tests de `infrastructure/` con `testPathPattern=infrastructure`.
-3. **Regresión manual (previo a release):** Verificación funcional del flujo completo en un entorno con el backend levantado vía `docker-compose`.
+3. **Acceptance / Gherkin (CI — cada PR hacia develop):** Job de integración ejecuta `cucumber-js` en el Producer para validar escenarios de Caja Negra declarativa. Bloquea el merge si algún escenario falla.
+4. **Regresión manual (previo a release):** Verificación funcional del flujo completo en un entorno con el backend levantado vía `docker-compose`.
 
 ---
 
@@ -197,6 +205,79 @@ Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos 
 | TC-HA-09 | Rol `empleado` del backend se mapea a `employee` en dominio | `{ rol: "empleado" }` | `user.role === "employee"` |
 | TC-HA-10 | Rol `admin` del backend se mantiene como `admin` en dominio | `{ rol: "admin" }` | `user.role === "admin"` |
 
+### Suite 6 — Creación de turno vía API (Gherkin — Caja Negra Declarativa)
+
+Ubicación: `backend/producer/test/acceptance/features/crear-turno.feature`
+
+Los escenarios siguen el **patrón Estado-Acción-Estado** exigido por la evaluación. Cada paso es declarativo y describe comportamiento de negocio, no implementación.
+
+```gherkin
+Feature: Creación de turno médico vía API
+
+  Scenario: Registrar turno con datos válidos y prioridad alta
+    Given el sistema de turnos está disponible
+    And no existe un turno previo para el paciente con cédula 123456789
+    When el paciente "Juan Pérez" con cédula 123456789 solicita un turno con prioridad "alta"
+    Then el sistema acepta el turno para procesamiento asíncrono
+    And la respuesta contiene estado "accepted"
+    And la respuesta contiene mensaje "Turno en proceso de asignación"
+
+  Scenario: Registrar turno sin especificar prioridad asigna prioridad por defecto
+    Given no existe un turno previo para el paciente con cédula 987654321
+    When el paciente "María López" con cédula 987654321 solicita un turno sin prioridad
+    Then el sistema acepta el turno para procesamiento asíncrono
+
+  Scenario: Rechazar turno con datos incompletos
+    When se envía una solicitud de turno sin nombre ni cédula
+    Then el sistema rechaza la solicitud con error de validación
+    And el código de respuesta HTTP es 400
+```
+
+| ID | Escenario Gherkin | Estado inicial (Given) | Acción (When) | Estado final (Then) |
+| :--- | :--- | :--- | :--- | :--- |
+| TC-GT-01 | Turno válido con prioridad alta | Sistema disponible, sin turno previo | Solicitar turno con datos completos | HTTP 202, status `accepted` |
+| TC-GT-02 | Turno sin prioridad | Sistema disponible, sin turno previo | Solicitar turno sin campo prioridad | HTTP 202, turno aceptado |
+| TC-GT-03 | Turno con datos incompletos | Sistema disponible | Enviar payload vacío | HTTP 400, error de validación |
+
+### Suite 7 — Registro de usuario vía API (Gherkin — Caja Negra Declarativa)
+
+Ubicación: `backend/producer/test/acceptance/features/registro-usuario.feature`
+
+```gherkin
+Feature: Registro de usuario interno vía API
+
+  Scenario: Registrar un usuario nuevo con datos válidos
+    Given el sistema de autenticación está disponible
+    And no existe un usuario registrado con correo "nuevo@eps.com"
+    When se registra un usuario con nombre "Carlos Medina", correo "nuevo@eps.com",
+         contraseña "SecurePass1!" y rol "empleado"
+    Then el registro es exitoso
+    And se obtiene un token de acceso válido
+    And los datos del usuario contienen nombre "Carlos Medina" y rol "empleado"
+
+  Scenario: Rechazar registro con correo ya existente
+    Given existe un usuario registrado con correo "existente@eps.com"
+    When se intenta registrar otro usuario con correo "existente@eps.com"
+    Then el registro es rechazado
+    And el mensaje de error indica "Email already in use"
+
+  Scenario: Iniciar sesión después de un registro exitoso
+    Given existe un usuario registrado con correo "login@eps.com" y contraseña "SecurePass1!"
+    When el usuario inicia sesión con correo "login@eps.com" y contraseña "SecurePass1!"
+    Then la autenticación es exitosa
+    And se obtiene un token de acceso válido
+```
+
+| ID | Escenario Gherkin | Estado inicial (Given) | Acción (When) | Estado final (Then) |
+| :--- | :--- | :--- | :--- | :--- |
+| TC-GU-01 | Registro exitoso | Sistema listo, correo no existe | Registrar con datos válidos | Token válido, datos de usuario correctos |
+| TC-GU-02 | Correo duplicado | Usuario ya registrado con ese correo | Registrar otro con mismo correo | Registro rechazado, error "Email already in use" |
+| TC-GU-03 | Login post-registro | Usuario registrado previamente | Iniciar sesión con credenciales correctas | Autenticación exitosa, token válido |
+
+### Paradoja del pesticida aplicada a Gherkin (Principio 5)
+
+Los escenarios Gherkin se diseñan para evolucionar con el negocio. Si el sistema incorpora nuevas reglas (ej. límite de turnos por cédula, validación de horario), los escenarios `Given` deben ampliarse para reflejar el nuevo estado inicial. Mantener escenarios estáticos genera una falsa sensación de cobertura — el "pesticida" deja de ser efectivo contra los nuevos defectos.
+
 ---
 
 ## 6. REQUERIMIENTOS
@@ -225,10 +306,13 @@ Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos 
 
 ---
 
-## 8. DISTINCIÓN TÉCNICA: CAJA BLANCA vs CAJA NEGRA
+## 8. DISTINCIÓN TÉCNICA: CAJA BLANCA vs CAJA NEGRA vs GHERKIN DECLARATIVO
 
 **Pruebas de Caja Blanca (Suites 1–4)**  
 Se conoce la implementación interna. Los tests importan directamente los componentes y providers, inspeccionan el árbol del DOM resultante, verifican que se llamaron funciones específicas (ej. `router.push`, `sessionStorage.setItem`) y validan transiciones de estado interno. Las dependencias (`authService`, `useRouter`) son mocks controlados que permiten forzar cualquier escenario.
 
 **Pruebas de Caja Negra (Suite 5 — HttpAuthAdapter)**  
 Se valida el comportamiento observable del adaptador sin conocer cómo el servidor procesa la solicitud. El adaptador recibe una respuesta simulada del servidor (mock de `fetch`) y se verifica únicamente lo que produce hacia afuera: el `AuthResult` retornado, las cookies seteadas y los payloads enviados. No se accede a variables internas del adaptador ni se verifica su lógica de flujo de control; solo sus entradas y salidas.
+
+**Pruebas Gherkin Declarativas (Suites 6–7 — Aceptación)**  
+Elevan la Caja Negra al nivel de negocio. Los escenarios están escritos en lenguaje natural siguiendo el **patrón Estado-Acción-Estado** (Given/When/Then). Se ejecutan contra la API real del Producer vía HTTP (`supertest`), sin conocimiento de la implementación interna. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs para garantizar determinismo, pero la capa HTTP, validación de DTOs (class-validator) y lógica de use cases se ejecutan de forma real —exactamente como en producción—. Esto las convierte en pruebas de Caja Negra de alto nivel donde **el lenguaje del test es el lenguaje del negocio**, no el del código.

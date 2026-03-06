@@ -126,6 +126,12 @@ jobs:
         working-directory: backend/consumer
         run: npx jest --testPathPattern="infrastructure" --passWithNoTests
 
+      # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
+      # Ejecutan escenarios declarativos contra la API usando cucumber-js
+      - name: "[Producer] Acceptance tests — Gherkin (Black-Box)"
+        working-directory: backend/producer
+        run: npx cucumber-js
+
   # ── Job 4: Build Docker + Escaneo de seguridad ───────────────────────────
   docker-security-scan:
     name: Docker Build & Security Scan
@@ -138,21 +144,37 @@ jobs:
       - name: Build frontend image
         run: docker build -t frontend:ci ./frontend
 
+      # ⚕️ HUMAN CHECK - El context del build es ./backend (no ./backend/producer)
+      # porque el Dockerfile usa COPY producer/package*.json desde la raíz del context
       - name: Build producer image
-        run: docker build -t producer:ci ./backend/producer
+        run: docker build -t producer:ci -f backend/producer/Dockerfile ./backend
 
       - name: Build consumer image
-        run: docker build -t consumer:ci ./backend/consumer
+        run: docker build -t consumer:ci -f backend/consumer/Dockerfile ./backend
 
       - name: Install Trivy scanner
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Scan frontend image
-        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table frontend:ci
+      # ⚕️ HUMAN CHECK - SAST Shift-Left: exit-code 1 en CRITICAL bloquea el merge
+      # HIGH se reporta pero no bloquea (exit-code 0) para evitar falsos positivos
+      - name: Scan frontend image (CRITICAL = block)
+        run: trivy image --exit-code 1 --severity CRITICAL --format table frontend:ci
 
-      - name: Scan producer image
-        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table producer:ci
+      - name: Scan frontend image (HIGH = report)
+        if: always()
+        run: trivy image --exit-code 0 --severity HIGH --format table frontend:ci
 
-      - name: Scan consumer image
-        run: trivy image --exit-code 0 --severity HIGH,CRITICAL --format table consumer:ci
+      - name: Scan producer image (CRITICAL = block)
+        run: trivy image --exit-code 1 --severity CRITICAL --format table producer:ci
+
+      - name: Scan producer image (HIGH = report)
+        if: always()
+        run: trivy image --exit-code 0 --severity HIGH --format table producer:ci
+
+      - name: Scan consumer image (CRITICAL = block)
+        run: trivy image --exit-code 1 --severity CRITICAL --format table consumer:ci
+
+      - name: Scan consumer image (HIGH = report)
+        if: always()
+        run: trivy image --exit-code 0 --severity HIGH --format table consumer:ci
