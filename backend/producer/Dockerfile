@@ -2,7 +2,7 @@
 # Asegurarse de usar una versión LTS de Node.js
 
 # --- Stage: development ---
-FROM node:22-alpine AS development
+FROM node:24-alpine AS development
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ EXPOSE 3000
 CMD ["pnpm", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 

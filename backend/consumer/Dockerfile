@@ -1,5 +1,5 @@
 # --- Stage: development ---
-FROM node:22-alpine AS development
+FROM node:24-alpine AS development
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY consumer/ .
 CMD ["pnpm", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ COPY consumer/ .
 RUN pnpm run build
 
 # --- Stage: production ---
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
