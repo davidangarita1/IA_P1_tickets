@@ -22,7 +22,7 @@ COPY consumer/package.json ./
 RUN bun install
 
 COPY consumer/ .
-RUN pnpm run build
+RUN bun run build
 
 # --- Stage: production ---
 FROM oven/bun:latest AS production
