@@ -21,18 +21,18 @@ FROM oven/bun:latest AS build
 
 WORKDIR /app
 
+# ⚕️ HUMAN CHECK - Build args para variables públicas de Next.js
+# Estos deben especificarse en docker-compose o CLI
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+ARG NEXT_PUBLIC_WS_URL=http://localhost:3000
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+
 COPY bun.lockb ./
 COPY package.json ./
 RUN bun install
 
 COPY . .
-
-# ⚕️ HUMAN CHECK - Variables públicas de Next.js para build-time
-# Estos defaults son placeholders para CI. En deploy real, sobreescribir con --build-arg.
-ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-ARG NEXT_PUBLIC_WS_URL=http://localhost:3000
-ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 
 RUN bun run build
 

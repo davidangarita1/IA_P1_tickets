@@ -9,7 +9,7 @@ services:
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run start:dev
+    command: bun run start:dev
     # ⚕️ HUMAN CHECK - Puertos Expuestos
     # Verificar que el puerto mapeado no entre en conflicto con otros servicios del host
     ports:
@@ -46,7 +46,7 @@ services:
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run start:dev
+    command: bun run start:dev
     # ⚕️ HUMAN CHECK - Volúmenes de Desarrollo (Hot-Reload)
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
@@ -79,9 +79,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
+      # ⚕️ HUMAN CHECK - Build args para variables públicas de Next.js
+      # Required en tiempo de build para que Next.js las compile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000}
+        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-http://localhost:3000}
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run dev -- -p 3001 -H 0.0.0.0
+    command: bun run dev -- -p 3001 -H 0.0.0.0
     ports:
       - "${FRONTEND_PORT:-3001}:3001"
     volumes:
@@ -92,9 +98,9 @@ services:
       # ⚕️ HUMAN CHECK - NEXT_PUBLIC_* se ejecutan en el NAVEGADOR del usuario, no en Docker
       # Por eso usan localhost (no el hostname interno 'producer')
       # Para probar en red local, cambia 'localhost' por tu IP local (ej. http://192.168.1.50:3000)
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000}
       # ⚕️ HUMAN CHECK - URL del WebSocket
-      - NEXT_PUBLIC_WS_URL=http://localhost:3000
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-http://localhost:3000}
     depends_on:
       - producer
     networks:
