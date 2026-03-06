@@ -80,15 +80,15 @@ jobs:
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
-        run: npx jest --testPathPattern="(components|providers|hooks|app)" --passWithNoTests --coverage
+        run: npx jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests --coverage
 
       - name: "[Producer] Component tests — application, domain, presentation"
         working-directory: backend/producer
-        run: npx jest --testPathPattern="(application|domain|presentation)" --passWithNoTests
+        run: npx jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
       - name: "[Consumer] Component tests — application, domain, presentation"
         working-directory: backend/consumer
-        run: npx jest --testPathPattern="(application|domain|presentation)" --passWithNoTests
+        run: npx jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
   # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
   integration-tests:
@@ -116,15 +116,15 @@ jobs:
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
-        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Producer] Integration tests — infrastructure"
         working-directory: backend/producer
-        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Consumer] Integration tests — infrastructure"
         working-directory: backend/consumer
-        run: npx jest --testPathPattern="infrastructure" --passWithNoTests
+        run: npx jest --testPathPatterns="infrastructure" --passWithNoTests
 
       # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
       # Ejecutan escenarios declarativos contra la API usando cucumber-js
