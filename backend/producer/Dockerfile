@@ -34,7 +34,7 @@ COPY producer/ .
 RUN pnpm run build
 
 # --- Stage: production ---
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
