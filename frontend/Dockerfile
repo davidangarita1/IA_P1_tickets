@@ -51,7 +51,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/next.config.ts ./
 
 # ⚕️ HUMAN CHECK - Ejecutar como usuario no-root (requerimiento de inmutabilidad)
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
 USER appuser
 
 # ⚕️ HUMAN CHECK - Puerto expuesto

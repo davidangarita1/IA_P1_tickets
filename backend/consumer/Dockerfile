@@ -36,7 +36,7 @@ RUN bun install --production
 COPY --from=build /app/dist ./dist
 
 # ⚕️ HUMAN CHECK - Ejecutar como usuario no-root (requerimiento de inmutabilidad)
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
 USER appuser
 
 CMD ["bun", "run", "start:prod"]
