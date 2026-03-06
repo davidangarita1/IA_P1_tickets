@@ -27,36 +27,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-          cache-dependency-path: |
-            frontend/pnpm-lock.yaml
-            backend/producer/pnpm-lock.yaml
-            backend/consumer/pnpm-lock.yaml
+      - uses: oven/setup-bun@v1
 
       - name: Install dependencies
         run: |
-          pnpm install --prefix frontend
-          pnpm install --prefix backend/producer
-          pnpm install --prefix backend/consumer
+          bun install
+          cd backend/producer && bun install && cd ../
+          cd backend/consumer && bun install && cd ../
 
       - name: Typecheck frontend
         working-directory: frontend
-        run: npx tsc --noEmit
+        run: bun run typecheck
 
       - name: Typecheck producer
         working-directory: backend/producer
-        run: npx tsc --noEmit
+        run: bun run typecheck
 
       - name: Typecheck consumer
         working-directory: backend/consumer
-        run: npx tsc --noEmit
+        run: bun run typecheck
 
   # ── Job 2: Pruebas de Componente — Caja Blanca ────────────────────────────
   component-tests:
@@ -67,36 +56,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-          cache-dependency-path: |
-            frontend/pnpm-lock.yaml
-            backend/producer/pnpm-lock.yaml
-            backend/consumer/pnpm-lock.yaml
+      - uses: oven/setup-bun@v1
 
       - name: Install dependencies
         run: |
-          pnpm install --prefix frontend
-          pnpm install --prefix backend/producer
-          pnpm install --prefix backend/consumer
+          bun install
+          cd backend/producer && bun install && cd ../
+          cd backend/consumer && bun install && cd ../
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
-        run: pnpm jest --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
+        run: bun test --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
 
       - name: "[Producer] Component tests — application, domain, presentation"
         working-directory: backend/producer
-        run: pnpm jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+        run: bun test --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
       - name: "[Consumer] Component tests — application, domain, presentation"
         working-directory: backend/consumer
-        run: pnpm jest --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+        run: bun test --testPathPatterns="(application|domain|presentation)" --passWithNoTests
 
   # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
   integration-tests:
@@ -107,42 +85,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-          cache-dependency-path: |
-            frontend/pnpm-lock.yaml
-            backend/producer/pnpm-lock.yaml
-            backend/consumer/pnpm-lock.yaml
+      - uses: oven/setup-bun@v1
 
       - name: Install dependencies
         run: |
-          pnpm install --prefix frontend
-          pnpm install --prefix backend/producer
-          pnpm install --prefix backend/consumer
+          bun install
+          cd backend/producer && bun install && cd ../
+          cd backend/consumer && bun install && cd ../
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
-        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: bun test --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Producer] Integration tests — infrastructure"
         working-directory: backend/producer
-        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: bun test --testPathPatterns="infrastructure" --passWithNoTests
 
       - name: "[Consumer] Integration tests — infrastructure"
         working-directory: backend/consumer
-        run: pnpm jest --testPathPatterns="infrastructure" --passWithNoTests
+        run: bun test --testPathPatterns="infrastructure" --passWithNoTests
 
       # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
       # Ejecutan escenarios declarativos contra la API usando cucumber-js
       - name: "[Producer] Acceptance tests — Gherkin (Black-Box)"
         working-directory: backend/producer
-        run: pnpm cucumber-js
+        run: bun run cucumber
 
   # ── Job 4: Build Docker + Escaneo de seguridad ───────────────────────────
   docker-security-scan:

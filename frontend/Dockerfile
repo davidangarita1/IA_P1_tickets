@@ -1,33 +1,29 @@
 # ⚕️ HUMAN CHECK - Dockerfile del Frontend
-# Asegurarse de usar una versión LTS de Node.js
+# Asegurarse de usar una versión LTS de Bun
 
 # --- Stage: development ---
-FROM node:24-alpine AS development
+FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY pnpm-lock.yaml ./
+COPY bun.lockb ./
 COPY package.json ./
-RUN pnpm install
+RUN bun install
 
 COPY . .
 
 EXPOSE 3001
 
-CMD ["pnpm", "run", "dev", "--", "-p", "3001", "-H", "0.0.0.0"]
+CMD ["bun", "run", "dev", "--", "-p", "3001", "-H", "0.0.0.0"]
 
 # --- Stage: build ---
-FROM node:24-alpine AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY pnpm-lock.yaml ./
+COPY bun.lockb ./
 COPY package.json ./
-RUN pnpm install
+RUN bun install
 
 COPY . .
 
@@ -38,17 +34,17 @@ ARG NEXT_PUBLIC_WS_URL=http://localhost:3000
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 
-RUN pnpm run build
+RUN bun run build
 
 # --- Stage: production ---
 # ⚕️ HUMAN CHECK - Imagen ligera y usuario no-root para producción
-FROM node:24-alpine AS production
+FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-COPY pnpm-lock.yaml ./
+COPY bun.lockb ./
 COPY package.json ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+RUN bun install --production
 
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
@@ -62,4 +58,4 @@ USER appuser
 # Verificar que coincida con la variable de entorno FRONTEND_PORT
 EXPOSE 3001
 
-CMD ["pnpm", "run", "start"]
+CMD ["bun", "run", "start"]
