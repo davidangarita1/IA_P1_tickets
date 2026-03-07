@@ -1,35 +1,42 @@
 # --- Stage: development ---
-FROM node:20-slim AS development
+FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-COPY consumer/package*.json ./
-RUN npm install
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install
 
 # Copiar código fuente (en dev, volumes sobreescriben esto)
 COPY consumer/ .
 
-CMD ["npm", "run", "start:dev"]
+CMD ["bun", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:20-slim AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-COPY consumer/package*.json ./
-RUN npm install
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install
 
 COPY consumer/ .
-RUN npm run build
+RUN bun run build
 
 # --- Stage: production ---
-FROM node:20-slim AS production
+FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-COPY consumer/package*.json ./
-RUN npm install --omit=dev
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install --production
 
 COPY --from=build /app/dist ./dist
 
-CMD ["node", "dist/main.js"]
+# ⚕️ HUMAN CHECK - Ejecutar como usuario no-root (requerimiento de inmutabilidad)
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
+USER appuser
+
+CMD ["bun", "run", "start:prod"]
