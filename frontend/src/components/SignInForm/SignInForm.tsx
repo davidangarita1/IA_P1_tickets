@@ -20,9 +20,12 @@ export default function SignInForm() {
     const msg = sessionStorage.getItem(SIGNUP_SUCCESS_KEY);
     if (msg) {
       sessionStorage.removeItem(SIGNUP_SUCCESS_KEY);
-      setToast(msg);
-      const id = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(id);
+      const displayId = setTimeout(() => setToast(msg), 0);
+      const clearId = setTimeout(() => setToast(null), 4000);
+      return () => {
+        clearTimeout(displayId);
+        clearTimeout(clearId);
+      };
     }
   }, []);
 
