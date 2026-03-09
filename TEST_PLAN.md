@@ -283,7 +283,7 @@ Feature: Registro de usuario interno
 
 ---
 
-## 7. NOTA FINAL
+## 8. DISTINCIÓN TÉCNICA: CAJA BLANCA vs CAJA NEGRA vs GHERKIN DECLARATIVO
 
 Este plan se enfoca en el comportamiento funcional esperado del sistema, usando lenguaje orientado al negocio y a la validación del proyecto.
 
