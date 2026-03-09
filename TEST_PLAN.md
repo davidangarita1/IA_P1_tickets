@@ -2,9 +2,9 @@
 
 **Proyecto:** Sistema de turnos EPS  
 **Módulos:** `frontend/` — feature/authentication | `backend/producer/` — API y aceptación  
-**Responsable:** David Angarita  
-**Fecha:** 2026-03-05  
-**Versión:** 2.0
+**Responsable:** David Angarita y Duver Betancur  
+**Fecha:** 2026-03-09  
+**Versión:** 3.0
 
 ---
 
@@ -42,29 +42,9 @@ El flujo de autenticación del frontend cubre tres responsabilidades principales
 
 ---
 
-## 2. JUSTIFICACIÓN TEÓRICA: 7 PRINCIPIOS DEL TESTING
+## 2. ESTRATEGIA DE PRUEBAS
 
-La estrategia de pruebas de esta feature se fundamenta en los 7 principios del testing. A continuación se describe cómo cada principio guía las decisiones tomadas:
-
-**Principio 1 — Las pruebas muestran la presencia de defectos, no su ausencia.** Las suites de pruebas de `SignUpForm` y `AuthProvider` cubren los caminos conocidos de falla, pero no garantizan que el sistema esté libre de defectos. Por eso se combina cobertura de ramas con revisión humana de los casos límite.
-
-**Principio 2 — Las pruebas exhaustivas son imposibles.** No se prueban todas las combinaciones posibles de email y contraseña. En cambio, se aplican técnicas de partición de equivalencia (entradas válidas, inválidas y vacías) para maximizar la cobertura con el menor número de casos.
-
-**Principio 3 — Las pruebas tempranas ahorran tiempo y dinero (Shift-Left).** Los tests de componente e integración se ejecutan en el pipeline CI antes de que cualquier rama llegue a `develop`. Si una prueba del `AuthProvider` falla, el merge queda bloqueado automáticamente.
-
-**Principio 4 — Agrupación de defectos.** La lógica crítica se concentra en `AuthProvider` (gestión de estado) y `HttpAuthAdapter` (comunicación con API). Por eso estas clases tienen la mayor densidad de casos de prueba y son las primeras en ejecutarse en el pipeline.
-
-**Principio 5 — La paradoja del pesticida.** Los mocks del `mockAuthService` se renuevan conforme evolucionan los contratos del backend. Mantener mocks desactualizados crea una falsa sensación de seguridad. Se exige que los mocks reflejen exactamente la forma del `AuthService` port.
-
-**Principio 6 — Las pruebas dependen del contexto.** Esta feature es de tipo SPA con renderizado del lado del cliente (`"use client"`). Por eso se utiliza `jsdom` como entorno Jest, se mockea `next/navigation` y `sessionStorage`, y las pruebas de infraestructura mockean `fetch` global en lugar de usar un servidor HTTP real.
-
-**Principio 7 — La falacia de la ausencia de errores.** Un 100% de cobertura de líneas no significa que el sistema sea correcto. El `AuthGuard` puede pasar todos sus tests unitarios y aun así fallar si la cookie JWT no se setea correctamente en el flujo real. Por eso se diseñan pruebas de integración que validan el flujo completo sin mocks en las capas de dominio.
-
----
-
-## 3. ESTRATEGIA DE PRUEBAS
-
-### 3.1 Niveles de prueba
+### 2.1 Niveles de prueba
 
 **Pruebas de Componente (Caja Blanca)**  
 Validan la lógica interna de cada unidad de forma aislada. Se conoce la implementación y se prueba el flujo de ramas, estados y efectos secundarios. Se ejecutan con Jest + React Testing Library. Las dependencias externas (`authService`, `router`, `sessionStorage`) se sustituyen por mocks.
@@ -75,10 +55,10 @@ Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos 
 **Pruebas de Aceptación — Gherkin (Caja Negra Declarativa)**  
 Validan el comportamiento del sistema desde la perspectiva del negocio usando sintaxis **Given/When/Then** (patrón Estado-Acción-Estado). Se ejecutan con `cucumber-js` contra la API del Producer mediante `supertest`. Los escenarios son **declarativos**: describen QUÉ debería ocurrir en términos de negocio, sin mencionar clics, campos de formulario ni detalles de implementación. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs in-memory para garantizar aislamiento y velocidad.
 
-**Justificación del uso de Gherkin (Principio 6 — Contexto):**  
-El contexto del proyecto es un sistema de turnos EPS donde el flujo principal (crear turno, registrar usuario) es un comportamiento de negocio crítico cuya validación no debe depender de la implementación técnica. Gherkin permite expresar estos flujos como escenarios de negocio comprensibles por stakeholders no técnicos, aplicando el **patrón Estado-Acción-Estado**: el Given establece un estado conocido del sistema, el When ejecuta una acción de negocio, y el Then verifica que el sistema transicionó al estado esperado. Esto garantiza que si se refactoriza la implementación interna (ej. cambiar de RabbitMQ a Kafka), los escenarios Gherkin siguen siendo válidos.
+**Uso de Gherkin:**  
+Los escenarios Gherkin se usan para expresar el comportamiento esperado del sistema en lenguaje de negocio. El **Given** define el estado inicial, el **When** ejecuta la acción y el **Then** valida el resultado esperado. Esto permite que el plan se mantenga enfocado en comportamiento funcional y no en detalles de implementación.
 
-### 3.2 Técnicas aplicadas
+### 2.2 Técnicas aplicadas
 
 | Técnica | Nivel | Aplicación |
 | :--- | :--- | :--- |
@@ -89,7 +69,7 @@ El contexto del proyecto es un sistema de turnos EPS donde el flujo principal (c
 | Prueba de contrato | Integración | `HttpAuthAdapter` verifica que los payloads enviados coincidan con la API del backend |
 | BDD Gherkin (Estado-Acción-Estado) | Aceptación | Escenarios declarativos de creación de turno y registro de usuario vía API |
 
-### 3.3 Ciclos de ejecución
+### 2.3 Ciclos de ejecución
 
 1. **Unit / Component (CI — cada PR):** Ejecución automática de toda la suite Jest al abrir un Pull Request. Bloquea el merge si hay fallos.
 2. **Integration (CI — cada PR hacia develop):** Job diferenciado en el pipeline que ejecuta únicamente los tests de `infrastructure/` con `testPathPattern=infrastructure`.
@@ -98,7 +78,7 @@ El contexto del proyecto es un sistema de turnos EPS donde el flujo principal (c
 
 ---
 
-## 4. HISTORIAS DE USUARIO Y CRITERIOS DE ACEPTACIÓN
+## 3. HISTORIAS DE USUARIO Y CRITERIOS DE ACEPTACIÓN
 
 ### HU-AUTH-01: Registro de usuario
 
@@ -143,7 +123,7 @@ El contexto del proyecto es un sistema de turnos EPS donde el flujo principal (c
 
 ---
 
-## 5. DISEÑO DE CASOS DE PRUEBA
+## 4. DISEÑO DE CASOS DE PRUEBA
 
 ### Suite 1 — SignUpForm (Caja Blanca — Componente)
 
@@ -274,13 +254,7 @@ Feature: Registro de usuario interno vía API
 | TC-GU-02 | Correo duplicado | Usuario ya registrado con ese correo | Registrar otro con mismo correo | Registro rechazado, error "Email already in use" |
 | TC-GU-03 | Login post-registro | Usuario registrado previamente | Iniciar sesión con credenciales correctas | Autenticación exitosa, token válido |
 
-### Paradoja del pesticida aplicada a Gherkin (Principio 5)
-
-Los escenarios Gherkin se diseñan para evolucionar con el negocio. Si el sistema incorpora nuevas reglas (ej. límite de turnos por cédula, validación de horario), los escenarios `Given` deben ampliarse para reflejar el nuevo estado inicial. Mantener escenarios estáticos genera una falsa sensación de cobertura — el "pesticida" deja de ser efectivo contra los nuevos defectos.
-
----
-
-## 6. REQUERIMIENTOS
+## 5. REQUERIMIENTOS
 
 1. Node.js 20+ y dependencias instaladas (`npm install` en `frontend/`).
 2. Acceso al repositorio con permisos de lectura/escritura para el pipeline CI.
@@ -290,7 +264,7 @@ Los escenarios Gherkin se diseñan para evolucionar con el negocio. Si el sistem
 
 ---
 
-## 7. MATRIZ DE RIESGOS
+## 6. MATRIZ DE RIESGOS
 
 | Historia de Usuario | Probabilidad | Impacto | Riesgo (P×I) | Mitigación |
 | :--- | :---: | :---: | :---: | :--- |
