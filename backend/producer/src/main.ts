@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
@@ -16,8 +17,17 @@ async function bootstrap(): Promise<void> {
         origin: '*',
     });
 
-    // Habilitar validación global (class-validator)
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    // Seguridad HTTP: headers de seguridad (CSP, HSTS, X-Frame-Options, etc.)
+    app.use(helmet());
+
+    // Habilitar validación global (class-validator + class-transformer)
+    // transform: true convierte payloads al tipo del DTO antes de validar
+    // → un string '123' en campo @IsNumber() será rechazado antes de llegar al handler
+    app.useGlobalPipes(new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+    }));
 
     // ⚕️ HUMAN CHECK - Configuración de Swagger
     // Revisar que la info sea correcta antes de desplegar
