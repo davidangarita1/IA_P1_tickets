@@ -280,8 +280,13 @@ Feature: Registro de usuario interno vía API
 
 ---
 
-## 7. NOTA FINAL
+## 8. DISTINCIÓN TÉCNICA: CAJA BLANCA vs CAJA NEGRA vs GHERKIN DECLARATIVO
 
-Este test plan se enfoca en cobertura funcional, diseño de casos de prueba y planificación de escenarios en Gherkin.
+**Pruebas de Caja Blanca (Suites 1–4)**  
+Se conoce la implementación interna. Los tests importan directamente los componentes y providers, inspeccionan el árbol del DOM resultante, verifican que se llamaron funciones específicas (ej. `router.push`, `sessionStorage.setItem`) y validan transiciones de estado interno. Las dependencias (`authService`, `useRouter`) son mocks controlados que permiten forzar cualquier escenario.
 
-La evidencia de ejecución del pipeline, capturas y reportes de cobertura se mantiene fuera de este documento.
+**Pruebas de Caja Negra (Suite 5 — HttpAuthAdapter)**  
+Se valida el comportamiento observable del adaptador sin conocer cómo el servidor procesa la solicitud. El adaptador recibe una respuesta simulada del servidor (mock de `fetch`) y se verifica únicamente lo que produce hacia afuera: el `AuthResult` retornado, las cookies seteadas y los payloads enviados. No se accede a variables internas del adaptador ni se verifica su lógica de flujo de control; solo sus entradas y salidas.
+
+**Pruebas Gherkin Declarativas (Suites 6–7 — Aceptación)**  
+Elevan la Caja Negra al nivel de negocio. Los escenarios están escritos en lenguaje natural siguiendo el **patrón Estado-Acción-Estado** (Given/When/Then). Se ejecutan contra la API real del Producer vía HTTP (`supertest`), sin conocimiento de la implementación interna. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs para garantizar determinismo, pero la capa HTTP, validación de DTOs (class-validator) y lógica de use cases se ejecutan de forma real —exactamente como en producción—. Esto las convierte en pruebas de Caja Negra de alto nivel donde **el lenguaje del test es el lenguaje del negocio**, no el del código.
