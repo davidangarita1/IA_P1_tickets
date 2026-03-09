@@ -31,6 +31,8 @@ jobs:
       # se incrementa la versión correspondiente. Default: patch.
       - name: Determine next version
         id: version
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Obtener último tag semántico
           LAST_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
@@ -46,12 +48,11 @@ jobs:
           PATCH=$(echo "$LAST_TAG" | sed 's/v//' | cut -d. -f3)
 
           # Determinar tipo de bump según título del PR
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          if echo "$PR_TITLE" | grep -qi '\[major\]'; then
+          if printf '%s\n' "$PR_TITLE" | grep -qi '\[major\]'; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
-          elif echo "$PR_TITLE" | grep -qi '\[minor\]'; then
+          elif printf '%s\n' "$PR_TITLE" | grep -qi '\[minor\]'; then
             MINOR=$((MINOR + 1))
             PATCH=0
           else
