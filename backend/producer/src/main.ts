@@ -48,6 +48,7 @@ async function bootstrap(): Promise<void> {
 
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT') ?? 3000;
+    const host = configService.get<string>('HOST') ?? '0.0.0.0';
 
     // ⚕️ HUMAN CHECK - Hybrid App: HTTP + Microservice (RabbitMQ listener)
     // El Producer escucha eventos del Consumer (turno_creado, turno_actualizado)
@@ -70,10 +71,10 @@ async function bootstrap(): Promise<void> {
     });
 
     await app.startAllMicroservices();
-    await app.listen(port);
+    await app.listen(port, host);
 
     // ⚕️ HUMAN CHECK - Reemplazado console.log por Logger (consistencia)
-    logger.log(`Producer running on port ${port}`);
+    logger.log(`Producer running on http://${host}:${port}`);
     logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
     logger.log(`WebSocket: ws://localhost:${port}/ws/turnos`);
     logger.log(`Listening for notifications on queue: ${notificationsQueue}`);
