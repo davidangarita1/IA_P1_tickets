@@ -1,44 +1,41 @@
-# Test Plan — Sistema de Turnos EPS
+# Plan de Pruebas — Sistema de Turnos EPS
 
 **Proyecto:** Sistema de turnos EPS  
-**Módulos:** `frontend/` — feature/authentication | `backend/producer/` — API y aceptación  
-**Responsable:** David Angarita y Duver Betancur  
+**Alcance principal:** autenticación de usuarios y creación de turnos  
+**Responsables:** David Angarita y Duver Betancur  
 **Fecha:** 2026-03-09  
-**Versión:** 3.0
+**Versión:** 3.1
 
 ---
 
 ## 1. ALCANCE DE LAS PRUEBAS
 
-### 1.1 Descripción del Proceso
+### 1.1 Descripción del proceso
 
-El flujo de autenticación del frontend cubre tres responsabilidades principales:
+Este plan valida los comportamientos funcionales más importantes del sistema en dos frentes:
 
-1. **Registro (Sign Up):** El usuario completa un formulario con nombre, correo y contraseña. El sistema valida las reglas de formato de contraseña, sanitiza las entradas y llama al endpoint `POST /auth/signUp` a través del `HttpAuthAdapter`. Al éxito, guarda un mensaje en `sessionStorage` y redirige a `/signin`.
+1. **Registro de usuario:** una persona puede crear su cuenta ingresando sus datos básicos y una contraseña válida.
+2. **Inicio de sesión:** una persona registrada puede autenticarse para ingresar al sistema.
+3. **Control de acceso:** el sistema restringe el ingreso a zonas privadas cuando el usuario no ha iniciado sesión o no cuenta con el perfil requerido.
+4. **Restauración de sesión:** al volver a entrar o recargar, el sistema conserva la sesión si sigue siendo válida.
+5. **Creación de turnos:** el sistema recibe solicitudes de turnos y responde según la información suministrada.
 
-2. **Inicio de sesión (Sign In):** El usuario ingresa correo y contraseña. El sistema sanitiza las entradas, llama al endpoint `POST /auth/signIn`. Al éxito, el backend devuelve un JWT que se almacena en cookie y el usuario es redirigido a `/dashboard`.
+### 1.2 Procesos bajo prueba
 
-3. **Protección de rutas (AuthGuard):** Componente que envuelve rutas protegidas. Verifica sesión activa y, opcionalmente, roles permitidos. Si el usuario no está autenticado redirige a `/signin`; si no tiene el rol requerido redirige a `/`.
+| Proceso | Objetivo de validación |
+| :--- | :--- |
+| Registro de usuario | Confirmar que el sistema permite crear cuentas con datos válidos y rechaza datos incorrectos o duplicados |
+| Inicio de sesión | Confirmar que el acceso funciona con credenciales correctas y muestra mensajes claros ante errores |
+| Control de acceso | Confirmar que solo los usuarios autorizados pueden ingresar a las secciones restringidas |
+| Persistencia de sesión | Confirmar que una sesión válida se mantiene y que una sesión inexistente o vencida obliga a autenticarse de nuevo |
+| Solicitud de turnos | Confirmar que el sistema acepta solicitudes completas y rechaza solicitudes incompletas |
 
-### 1.2 Componentes bajo prueba
+### 1.3 Fuera de alcance
 
-| Componente | Ruta | Tipo |
-| :--- | :--- | :--- |
-| `AuthProvider` | `src/providers/AuthProvider.tsx` | Provider de estado global |
-| `ConnectedAuthProvider` | `src/providers/ConnectedAuthProvider.tsx` | Wiring de dependencias |
-| `SignInForm` | `src/components/SignInForm/SignInForm.tsx` | Componente UI |
-| `SignUpForm` | `src/components/SignUpForm/SignUpForm.tsx` | Componente UI |
-| `AuthGuard` | `src/components/AuthGuard/AuthGuard.tsx` | Componente de protección |
-| `HttpAuthAdapter` | `src/infrastructure/adapters/HttpAuthAdapter.ts` | Adaptador HTTP |
-| `authMapper` | `src/infrastructure/mappers/authMapper.ts` | Mapper de respuestas |
-| `AuthService` (port) | `src/domain/ports/AuthService.ts` | Contrato de dominio |
-
-### 1.3 Fuera de Alcance
-
-- Pruebas de la UI sobre navegadores reales (pruebas cross-browser).
-- Pruebas de rendimiento y carga sobre los endpoints del backend.
-- Módulos de tickets, WebSocket y notificaciones de audio.
-- Pruebas E2E con Playwright/Cypress (no configurado en este sprint).
+- Evaluación de desempeño, carga o estrés.
+- Validación comparativa en múltiples navegadores o dispositivos reales.
+- Pruebas detalladas de módulos distintos a autenticación y creación de turnos.
+- Validaciones visuales o de experiencia de usuario fuera del flujo funcional definido.
 
 ---
 
@@ -46,35 +43,32 @@ El flujo de autenticación del frontend cubre tres responsabilidades principales
 
 ### 2.1 Niveles de prueba
 
-**Pruebas de Componente (Caja Blanca)**  
-Validan la lógica interna de cada unidad de forma aislada. Se conoce la implementación y se prueba el flujo de ramas, estados y efectos secundarios. Se ejecutan con Jest + React Testing Library. Las dependencias externas (`authService`, `router`, `sessionStorage`) se sustituyen por mocks.
+**Pruebas funcionales de interfaz**  
+Verifican el comportamiento visible para la persona usuaria en formularios, mensajes, validaciones y redirecciones.
 
-**Pruebas de Integración (Caja Negra)**  
-Validan el comportamiento observable del `HttpAuthAdapter` contra los contratos del backend sin conocer detalles internos de la implementación del servidor. Se mocka únicamente `fetch` global para simular respuestas HTTP reales y se verifica que el adaptador mapee correctamente las respuestas, establezca cookies y propague errores tal como lo haría ante un backend real.
+**Pruebas de integración funcional**  
+Verifican que las solicitudes y respuestas entre el sistema y los servicios de autenticación mantengan el comportamiento esperado.
 
-**Pruebas de Aceptación — Gherkin (Caja Negra Declarativa)**  
-Validan el comportamiento del sistema desde la perspectiva del negocio usando sintaxis **Given/When/Then** (patrón Estado-Acción-Estado). Se ejecutan con `cucumber-js` contra la API del Producer mediante `supertest`. Los escenarios son **declarativos**: describen QUÉ debería ocurrir en términos de negocio, sin mencionar clics, campos de formulario ni detalles de implementación. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs in-memory para garantizar aislamiento y velocidad.
-
-**Uso de Gherkin:**  
-Los escenarios Gherkin se usan para expresar el comportamiento esperado del sistema en lenguaje de negocio. El **Given** define el estado inicial, el **When** ejecuta la acción y el **Then** valida el resultado esperado. Esto permite que el plan se mantenga enfocado en comportamiento funcional y no en detalles de implementación.
+**Pruebas de aceptación del negocio**  
+Verifican escenarios completos descritos en lenguaje de negocio, enfocados en el resultado esperado y no en detalles de implementación.
 
 ### 2.2 Técnicas aplicadas
 
-| Técnica | Nivel | Aplicación |
-| :--- | :--- | :--- |
-| Partición de equivalencia | Componente | Entradas válidas/inválidas en `SignUpForm` y `SignInForm` |
-| Análisis de valores límite | Componente | Contraseña de 7 caracteres (inválida) vs. 8 caracteres (válida) |
-| Tabla de decisiones | Componente | Combinaciones de estado del usuario en `AuthGuard` (no autenticado, autenticado sin rol, autenticado con rol) |
-| Prueba de estado | Componente | Transiciones de `loading → authenticated → unauthenticated` en `AuthProvider` |
-| Prueba de contrato | Integración | `HttpAuthAdapter` verifica que los payloads enviados coincidan con la API del backend |
-| BDD Gherkin (Estado-Acción-Estado) | Aceptación | Escenarios declarativos de creación de turno y registro de usuario vía API |
+| Técnica | Aplicación en el proyecto |
+| :--- | :--- |
+| Partición de equivalencia | Separar datos válidos e inválidos en registro e inicio de sesión |
+| Análisis de valores límite | Validar longitudes mínimas y reglas críticas de contraseña |
+| Tabla de decisiones | Cubrir combinaciones de acceso según autenticación y perfil del usuario |
+| Transición de estados | Revisar el paso entre sesión cargando, sesión activa y sesión no disponible |
+| Validación de consistencia | Comprobar que la información enviada y recibida conserve el significado esperado |
+| Escenarios de negocio | Describir comportamientos completos de registro, autenticación y creación de turnos |
 
-### 2.3 Ciclos de ejecución
+### 2.3 Momentos de ejecución
 
-1. **Unit / Component (CI — cada PR):** Ejecución automática de toda la suite Jest al abrir un Pull Request. Bloquea el merge si hay fallos.
-2. **Integration (CI — cada PR hacia develop):** Job diferenciado en el pipeline que ejecuta únicamente los tests de `infrastructure/` con `testPathPattern=infrastructure`.
-3. **Acceptance / Gherkin (CI — cada PR hacia develop):** Job de integración ejecuta `cucumber-js` en el Producer para validar escenarios de Caja Negra declarativa. Bloquea el merge si algún escenario falla.
-4. **Regresión manual (previo a release):** Verificación funcional del flujo completo en un entorno con el backend levantado vía `docker-compose`.
+1. **Durante el desarrollo de cada historia:** para detectar fallas tempranas.
+2. **Al cierre de cada funcionalidad:** para confirmar que se cumplieron los criterios de aceptación.
+3. **Antes de una entrega o liberación:** para validar que los flujos principales siguen funcionando.
+4. **En regresión funcional:** cuando haya cambios sobre autenticación, permisos o turnos.
 
 ---
 
@@ -87,7 +81,7 @@ Los escenarios Gherkin se usan para expresar el comportamiento esperado del sist
 **Criterios de aceptación:**
 - El sistema no permite continuar si el usuario deja algún campo vacío.
 - El sistema no permite registrarse con una contraseña que no tenga al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial; en ese caso muestra un mensaje explicando el requisito incumplido.
-- Al crear la cuenta exitosamente, el usuario es redirigido a la pantalla de inicio de sesión y ve un mensaje confirmando que su cuenta fue creada.
+- Al crear la cuenta exitosamente, el usuario es llevado a la pantalla de inicio de sesión y ve un mensaje confirmando que su cuenta fue creada.
 - Si el correo ingresado ya pertenece a una cuenta existente, el usuario no es redirigido y se le informa que ese correo ya está registrado.
 - El sistema limpia y valida las entradas del usuario antes de procesarlas.
 
@@ -97,22 +91,22 @@ Los escenarios Gherkin se usan para expresar el comportamiento esperado del sist
 
 **Criterios de aceptación:**
 - El sistema no permite continuar si el correo o la contraseña están en blanco.
-- Al ingresar credenciales correctas, el usuario es llevado al panel principal y su sesión queda activa.
+- Al ingresar credenciales correctas, el usuario accede al panel principal y su sesión queda activa.
 - Si las credenciales son incorrectas, el usuario ve un mensaje de error sin ser redirigido.
-- Si el usuario llega desde un registro exitoso, ve un mensaje de bienvenida confirmando la creación de su cuenta; ese mensaje no vuelve a aparecer si recarga la página.
+- Si el usuario llega después de registrarse con éxito, ve un mensaje de bienvenida confirmando la creación de su cuenta; ese mensaje no vuelve a aparecer al recargar.
 - El mensaje de bienvenida desaparece automáticamente a los 4 segundos.
 
-### HU-AUTH-03: Protección de rutas por autenticación y rol
+### HU-AUTH-03: Protección de acceso por autenticación y rol
 
 **Descripción:** Como sistema, quiero proteger las secciones que requieren autenticación o permisos específicos para evitar accesos no autorizados.
 
 **Criterios de aceptación:**
-- Un usuario que no ha iniciado sesión no puede acceder a secciones privadas; el sistema lo redirige automáticamente a la pantalla de login.
-- Un usuario autenticado que no tiene el perfil requerido para una sección es enviado a la página de inicio sin ver el contenido restringido.
+- Un usuario que no ha iniciado sesión no puede acceder a secciones privadas; el sistema lo lleva automáticamente a la pantalla de ingreso.
+- Un usuario autenticado que no tiene el perfil requerido para una sección es enviado a la página principal sin ver el contenido restringido.
 - Un usuario autenticado con el perfil correcto puede ver y usar la sección sin interrupciones.
-- Mientras el sistema verifica la sesión del usuario, no se muestra ningún contenido para evitar accesos momentáneos no autorizados.
+- Mientras el sistema verifica la sesión del usuario, no se muestra contenido restringido.
 
-### HU-AUTH-04: Restauración de sesión (persistencia)
+### HU-AUTH-04: Restauración de sesión
 
 **Descripción:** Como usuario, quiero que mi sesión se restaure al recargar la página para no tener que autenticarme nuevamente.
 
@@ -121,110 +115,117 @@ Los escenarios Gherkin se usan para expresar el comportamiento esperado del sist
 - Si existe una sesión válida, el usuario permanece autenticado y puede continuar usando la aplicación sin interrupciones.
 - Si no existe sesión activa o la sesión expiró, el usuario es tratado como no autenticado y debe iniciar sesión nuevamente.
 
+### HU-TUR-01: Solicitud de turno
+
+**Descripción:** Como paciente, quiero solicitar un turno con mis datos para que el sistema procese mi atención.
+
+**Criterios de aceptación:**
+- El sistema acepta una solicitud completa y confirma que fue recibida para procesamiento.
+- Si no se informa prioridad, el sistema asigna la prioridad por defecto definida por negocio.
+- Si faltan datos obligatorios, el sistema rechaza la solicitud e informa el error.
+
 ---
 
 ## 4. DISEÑO DE CASOS DE PRUEBA
 
-### Suite 1 — SignUpForm (Caja Blanca — Componente)
+### Suite 1 — Registro de usuario
 
 | ID | Descripción | Precondición | Paso | Resultado esperado |
 | :--- | :--- | :--- | :--- | :--- |
-| TC-SU-01 | Contraseña débil (sin mayúscula) muestra error | Formulario montado | Ingresar `test1234!` y enviar | Muestra mensaje de contraseña débil, no llama a `signUp` |
-| TC-SU-02 | Contraseña débil (menos de 8 chars) muestra error | Formulario montado | Ingresar `Ab1!` y enviar | Muestra mensaje de contraseña débil |
-| TC-SU-03 | Contraseña fuerte pasa validación | Formulario montado | Ingresar `Secure1!` y enviar | Llama a `signUp` con los datos sanitizados |
-| TC-SU-04 | Campos vacíos no disparan llamada al servicio | Formulario montado | Enviar formulario vacío | No se llama a `signUp` |
-| TC-SU-05 | Error de correo duplicado muestra mensaje traducido | `signUp` retorna error "Email already in use" | Completar formulario y enviar | Muestra "El correo ya está registrado." |
-| TC-SU-06 | Registro exitoso redirige a `/signin` y guarda `sessionStorage` | `signUp` retorna `{ success: true }` | Completar formulario y enviar | `router.push('/signin')` y `sessionStorage.setItem(SIGNUP_SUCCESS_KEY, ...)` |
+| TC-RU-01 | Contraseña sin mayúscula muestra error | Formulario disponible | Ingresar datos y enviar | Se informa que la contraseña no cumple la regla |
+| TC-RU-02 | Contraseña menor al mínimo permitido muestra error | Formulario disponible | Ingresar datos y enviar | Se informa que la contraseña no cumple la longitud mínima |
+| TC-RU-03 | Datos válidos permiten el registro | Formulario disponible | Ingresar nombre, correo y contraseña válidos | El registro se procesa correctamente |
+| TC-RU-04 | Campos vacíos impiden continuar | Formulario disponible | Enviar sin completar datos | El sistema no procesa el registro |
+| TC-RU-05 | Correo duplicado muestra mensaje claro | Existe una cuenta con ese correo | Ingresar datos y enviar | Se informa que el correo ya está registrado |
+| TC-RU-06 | Registro exitoso muestra confirmación y lleva al ingreso | Datos válidos y correo no registrado | Completar registro | Se confirma la creación de la cuenta y se dirige al inicio de sesión |
 
-### Suite 2 — SignInForm (Caja Blanca — Componente)
+### Suite 2 — Inicio de sesión
 
 | ID | Descripción | Precondición | Paso | Resultado esperado |
 | :--- | :--- | :--- | :--- | :--- |
-| TC-SI-01 | Toast de registro previo se muestra al montar | `sessionStorage` contiene `signup_success` | Montar componente | Se muestra el toast con el mensaje y se elimina del storage |
-| TC-SI-02 | Toast desaparece tras 4 segundos | Toast visible | Esperar 4000ms | El toast ya no está en el DOM |
-| TC-SI-03 | Error de autenticación se muestra con `role="alert"` | `signIn` retorna `{ success: false, message: "..." }` | Enviar formulario | Se renderiza el mensaje con `role="alert"` |
-| TC-SI-04 | Login exitoso redirige a `/dashboard` | `signIn` retorna `{ success: true }` | Enviar formulario | `router.push('/dashboard')` |
-| TC-SI-05 | Email o contraseña vacíos no disparan llamada | Formulario vacío | Enviar formulario | No se llama a `signIn` |
+| TC-IS-01 | Se informa al usuario que su cuenta fue creada | El usuario viene de un registro exitoso | Ingresar a la pantalla de inicio de sesión | Se muestra el mensaje de confirmación |
+| TC-IS-02 | El mensaje de confirmación desaparece automáticamente | Mensaje visible | Esperar 4 segundos | El mensaje deja de mostrarse |
+| TC-IS-03 | Credenciales incorrectas muestran error | Usuario no autenticado | Ingresar credenciales inválidas | Se muestra un mensaje de error |
+| TC-IS-04 | Credenciales correctas permiten el acceso | Usuario registrado | Ingresar credenciales válidas | El usuario entra al panel principal |
+| TC-IS-05 | Campos vacíos impiden continuar | Pantalla disponible | Enviar sin completar correo o contraseña | El sistema no procesa el inicio de sesión |
 
-### Suite 3 — AuthGuard (Caja Blanca — Componente)
+### Suite 3 — Control de acceso
 
 | ID | Descripción | Estado | Resultado esperado |
 | :--- | :--- | :--- | :--- |
-| TC-AG-01 | Usuario no autenticado redirige a `/signin` | `isAuthenticated: false`, `loading: false` | `router.push('/signin')` |
-| TC-AG-02 | Durante carga no renderiza nada | `loading: true` | `null` |
-| TC-AG-03 | Autenticado sin rol requerido redirige a `/` | `isAuthenticated: true`, rol `employee`, `allowedRoles: ['admin']` | `router.push('/')` |
-| TC-AG-04 | Autenticado con rol correcto renderiza children | `isAuthenticated: true`, rol `admin`, `allowedRoles: ['admin']` | Se renderiza el contenido |
-| TC-AG-05 | Sin `allowedRoles` definido, solo valida autenticación | `isAuthenticated: true`, sin `allowedRoles` | Se renderiza el contenido |
+| TC-CA-01 | Usuario no autenticado intenta entrar a zona privada | Sin sesión activa | El sistema lo dirige a la pantalla de ingreso |
+| TC-CA-02 | El sistema está validando la sesión | Verificación en curso | No se muestra contenido restringido |
+| TC-CA-03 | Usuario autenticado sin perfil permitido intenta acceder | Sesión activa, perfil insuficiente | El sistema lo envía a una zona permitida |
+| TC-CA-04 | Usuario autenticado con perfil permitido accede | Sesión activa, perfil correcto | El contenido restringido se muestra |
+| TC-CA-05 | Acceso autenticado sin restricción de perfil adicional | Sesión activa | El contenido se muestra |
 
-### Suite 4 — AuthProvider (Caja Blanca — Componente)
+### Suite 4 — Gestión de sesión
 
 | ID | Descripción | Resultado esperado |
 | :--- | :--- | :--- |
-| TC-AP-01 | `useAuth` lanza error fuera del provider | `Error: "AuthProvider is required"` |
-| TC-AP-02 | `loading` es `true` antes de que `getSession` resuelva | Estado inicial `loading: true` |
-| TC-AP-03 | Sin sesión activa, `isAuthenticated` es `false` | `user: null`, `isAuthenticated: false` |
-| TC-AP-04 | Con sesión activa, `user` se hidrata y `isAuthenticated` es `true` | `user` con datos del mock, `isAuthenticated: true` |
-| TC-AP-05 | `signIn` exitoso actualiza `user` y retorna `true` | `user` actualizado, retorna `true` |
-| TC-AP-06 | `signIn` fallido setea `error` y retorna `false` | `error` con mensaje, retorna `false` |
-| TC-AP-07 | `signOut` limpia `user` y setea `isAuthenticated: false` | `user: null`, `isAuthenticated: false` |
-| TC-AP-08 | `hasRole('admin')` retorna `true` para usuario con rol admin | `true` |
-| TC-AP-09 | `hasRole('admin')` retorna `false` para usuario con rol employee | `false` |
+| TC-GS-01 | El sistema exige estar dentro del flujo de autenticación | Se informa el uso incorrecto si se consulta fuera del contexto esperado |
+| TC-GS-02 | Mientras se valida la sesión, el estado inicial es de espera | El sistema se mantiene en estado de carga |
+| TC-GS-03 | Sin sesión activa, el usuario queda como no autenticado | No hay usuario autenticado |
+| TC-GS-04 | Con sesión válida, el usuario queda autenticado | Se conservan los datos de la sesión |
+| TC-GS-05 | Inicio de sesión exitoso actualiza el estado del usuario | El usuario queda autenticado |
+| TC-GS-06 | Inicio de sesión fallido conserva el estado no autenticado | Se informa el error correspondiente |
+| TC-GS-07 | Cierre de sesión limpia el acceso activo | El usuario vuelve al estado no autenticado |
+| TC-GS-08 | Validación de perfil correcto | El sistema reconoce el perfil esperado |
+| TC-GS-09 | Validación de perfil incorrecto | El sistema niega el perfil no correspondiente |
 
-### Suite 5 — HttpAuthAdapter (Caja Negra — Integración)
+### Suite 5 — Integración con el servicio de autenticación
 
-| ID | Descripción | Mock de red | Resultado esperado |
+| ID | Descripción | Situación | Resultado esperado |
 | :--- | :--- | :--- | :--- |
-| TC-HA-01 | `signIn` exitoso almacena cookie y mapea usuario | `{ success: true, token: "jwt", usuario: {...} }` | Cookie seteada, retorna `AuthResult` con `user` mapeado |
-| TC-HA-02 | `signIn` fallido no almacena cookie | `{ success: false, message: "Credenciales inválidas" }` | Cookie no seteada, `success: false` |
-| TC-HA-03 | `signIn` con error de red retorna mensaje de error | `fetch` rechaza con `Error` | `{ success: false, message: "Error en login" }` |
-| TC-HA-04 | `signUp` envía payload con campo `nombre` y `rol` en español | — | `httpPost` llamado con `{ nombre, rol: "empleado" }` |
-| TC-HA-05 | `signUp` no setea cookie aunque la respuesta tenga token | `{ success: true, token: "jwt" }` | `setAuthCookie` no es llamado |
-| TC-HA-06 | `getSession` llama a `/auth/me` con header `Authorization` | Cookie presente, respuesta válida | Retorna `User` mapeado desde `BackendUser` |
-| TC-HA-07 | `getSession` sin cookie retorna `null` | Sin cookie | `null` sin llamar a red |
-| TC-HA-08 | `signOut` llama a `/auth/signOut` y elimina la cookie | — | `removeAuthCookie` llamado |
-| TC-HA-09 | Rol `empleado` del backend se mapea a `employee` en dominio | `{ rol: "empleado" }` | `user.role === "employee"` |
-| TC-HA-10 | Rol `admin` del backend se mantiene como `admin` en dominio | `{ rol: "admin" }` | `user.role === "admin"` |
+| TC-SA-01 | Inicio de sesión exitoso conserva la sesión y devuelve los datos del usuario | Respuesta exitosa del servicio | El usuario queda autenticado y sus datos son consistentes |
+| TC-SA-02 | Inicio de sesión fallido no conserva sesión | Respuesta de rechazo | El sistema informa el error y no deja sesión activa |
+| TC-SA-03 | Falla de comunicación durante el inicio de sesión | Error del servicio | El sistema informa un error de acceso |
+| TC-SA-04 | Registro envía la información esperada | Solicitud de registro | El servicio recibe nombre, correo, contraseña y perfil según negocio |
+| TC-SA-05 | El registro exitoso no inicia sesión automáticamente | Respuesta exitosa de registro | El usuario debe ingresar después de crear su cuenta |
+| TC-SA-06 | Restauración de sesión con sesión existente | Existe sesión válida | El sistema recupera los datos del usuario |
+| TC-SA-07 | Restauración de sesión sin sesión existente | No existe sesión activa | El sistema mantiene estado no autenticado |
+| TC-SA-08 | Cierre de sesión elimina la sesión activa | Usuario autenticado | La sesión deja de estar disponible |
+| TC-SA-09 | Perfil de empleado se interpreta correctamente | El servicio responde con perfil de empleado | El sistema reconoce al usuario como empleado |
+| TC-SA-10 | Perfil de administrador se interpreta correctamente | El servicio responde con perfil de administrador | El sistema reconoce al usuario como administrador |
 
-### Suite 6 — Creación de turno vía API (Gherkin — Caja Negra Declarativa)
+### Suite 6 — Creación de turno
 
-Ubicación: `backend/producer/test/acceptance/features/crear-turno.feature`
-
-Los escenarios siguen el **patrón Estado-Acción-Estado** exigido por la evaluación. Cada paso es declarativo y describe comportamiento de negocio, no implementación.
+Los siguientes escenarios describen el comportamiento esperado en lenguaje de negocio:
 
 ```gherkin
-Feature: Creación de turno médico vía API
+Feature: Creación de turno médico
 
   Scenario: Registrar turno con datos válidos y prioridad alta
     Given el sistema de turnos está disponible
     And no existe un turno previo para el paciente con cédula 123456789
     When el paciente "Juan Pérez" con cédula 123456789 solicita un turno con prioridad "alta"
-    Then el sistema acepta el turno para procesamiento asíncrono
+    Then el sistema acepta el turno para procesamiento
     And la respuesta contiene estado "accepted"
     And la respuesta contiene mensaje "Turno en proceso de asignación"
 
   Scenario: Registrar turno sin especificar prioridad asigna prioridad por defecto
     Given no existe un turno previo para el paciente con cédula 987654321
     When el paciente "María López" con cédula 987654321 solicita un turno sin prioridad
-    Then el sistema acepta el turno para procesamiento asíncrono
+    Then el sistema acepta el turno para procesamiento
 
   Scenario: Rechazar turno con datos incompletos
     When se envía una solicitud de turno sin nombre ni cédula
     Then el sistema rechaza la solicitud con error de validación
-    And el código de respuesta HTTP es 400
+    And la respuesta indica que faltan datos obligatorios
 ```
 
-| ID | Escenario Gherkin | Estado inicial (Given) | Acción (When) | Estado final (Then) |
+| ID | Escenario | Estado inicial | Acción | Estado final esperado |
 | :--- | :--- | :--- | :--- | :--- |
-| TC-GT-01 | Turno válido con prioridad alta | Sistema disponible, sin turno previo | Solicitar turno con datos completos | HTTP 202, status `accepted` |
-| TC-GT-02 | Turno sin prioridad | Sistema disponible, sin turno previo | Solicitar turno sin campo prioridad | HTTP 202, turno aceptado |
-| TC-GT-03 | Turno con datos incompletos | Sistema disponible | Enviar payload vacío | HTTP 400, error de validación |
+| TC-TU-01 | Turno válido con prioridad alta | Sistema disponible y sin turno previo | Solicitar turno con datos completos | Solicitud aceptada para procesamiento |
+| TC-TU-02 | Turno sin prioridad informada | Sistema disponible y sin turno previo | Solicitar turno sin prioridad | Solicitud aceptada con prioridad por defecto |
+| TC-TU-03 | Turno con datos incompletos | Sistema disponible | Enviar solicitud incompleta | Solicitud rechazada con mensaje de validación |
 
-### Suite 7 — Registro de usuario vía API (Gherkin — Caja Negra Declarativa)
+### Suite 7 — Registro e ingreso de usuario
 
-Ubicación: `backend/producer/test/acceptance/features/registro-usuario.feature`
+Los siguientes escenarios describen resultados esperados del proceso de registro y autenticación:
 
 ```gherkin
-Feature: Registro de usuario interno vía API
+Feature: Registro de usuario interno
 
   Scenario: Registrar un usuario nuevo con datos válidos
     Given el sistema de autenticación está disponible
@@ -232,35 +233,37 @@ Feature: Registro de usuario interno vía API
     When se registra un usuario con nombre "Carlos Medina", correo "nuevo@eps.com",
          contraseña "SecurePass1!" y rol "empleado"
     Then el registro es exitoso
-    And se obtiene un token de acceso válido
+    And se obtiene acceso válido al sistema
     And los datos del usuario contienen nombre "Carlos Medina" y rol "empleado"
 
   Scenario: Rechazar registro con correo ya existente
     Given existe un usuario registrado con correo "existente@eps.com"
     When se intenta registrar otro usuario con correo "existente@eps.com"
     Then el registro es rechazado
-    And el mensaje de error indica "Email already in use"
+    And el mensaje de error indica que el correo ya está en uso
 
   Scenario: Iniciar sesión después de un registro exitoso
     Given existe un usuario registrado con correo "login@eps.com" y contraseña "SecurePass1!"
     When el usuario inicia sesión con correo "login@eps.com" y contraseña "SecurePass1!"
     Then la autenticación es exitosa
-    And se obtiene un token de acceso válido
+    And se obtiene acceso válido al sistema
 ```
 
-| ID | Escenario Gherkin | Estado inicial (Given) | Acción (When) | Estado final (Then) |
+| ID | Escenario | Estado inicial | Acción | Estado final esperado |
 | :--- | :--- | :--- | :--- | :--- |
-| TC-GU-01 | Registro exitoso | Sistema listo, correo no existe | Registrar con datos válidos | Token válido, datos de usuario correctos |
-| TC-GU-02 | Correo duplicado | Usuario ya registrado con ese correo | Registrar otro con mismo correo | Registro rechazado, error "Email already in use" |
-| TC-GU-03 | Login post-registro | Usuario registrado previamente | Iniciar sesión con credenciales correctas | Autenticación exitosa, token válido |
+| TC-AU-01 | Registro exitoso | Correo no registrado | Registrar con datos válidos | Acceso válido y datos correctos |
+| TC-AU-02 | Correo duplicado | Usuario existente con ese correo | Intentar un nuevo registro con el mismo correo | Registro rechazado con mensaje claro |
+| TC-AU-03 | Inicio de sesión con usuario registrado | Usuario registrado previamente | Ingresar credenciales correctas | Autenticación exitosa |
 
-## 5. REQUERIMIENTOS
+---
 
-1. Node.js 20+ y dependencias instaladas (`npm install` en `frontend/`).
-2. Acceso al repositorio con permisos de lectura/escritura para el pipeline CI.
-3. Variables de entorno de prueba definidas (la URL del backend puede ser cualquier origen para pruebas de componente, ya que se mockea).
-4. Set de datos de prueba: al menos un usuario mock con rol `admin` y uno con rol `employee`.
-5. Acceso a GitHub Actions para verificar la ejecución del pipeline en verde.
+## 5. REQUERIMIENTOS PARA LA EJECUCIÓN
+
+1. Ambiente de pruebas disponible y estable.
+2. Datos de prueba definidos para usuarios con perfiles distintos.
+3. Casos y escenarios documentados antes de ejecutar la validación.
+4. Acceso a evidencias de prueba para registrar resultados, hallazgos y correcciones.
+5. Disponibilidad del equipo responsable para atender incidentes encontrados durante la ejecución.
 
 ---
 
@@ -268,25 +271,20 @@ Feature: Registro de usuario interno vía API
 
 | Historia de Usuario | Probabilidad | Impacto | Riesgo (P×I) | Mitigación |
 | :--- | :---: | :---: | :---: | :--- |
-| HU-AUTH-01: Registro de usuario | 2 | 3 | **6** | Validación exhaustiva de regex de contraseña en tests |
-| HU-AUTH-02: Inicio de sesión | 2 | 3 | **6** | Tests de toast, error y redirección aislados |
-| HU-AUTH-03: Protección de rutas | 3 | 3 | **9** | Tabla de decisiones cubre los 5 estados posibles |
-| HU-AUTH-04: Restauración de sesión | 3 | 3 | **9** | Tests de `HttpAuthAdapter.getSession` con y sin cookie |
-| Mapeo de roles backend↔dominio | 2 | 3 | **6** | TC-HA-09 y TC-HA-10 cubren ambas traducciones |
+| HU-AUTH-01: Registro de usuario | 2 | 3 | **6** | Validar reglas de contraseña, duplicidad de correo y limpieza de datos |
+| HU-AUTH-02: Inicio de sesión | 2 | 3 | **6** | Probar credenciales válidas, inválidas, mensajes y acceso al panel principal |
+| HU-AUTH-03: Protección de acceso | 3 | 3 | **9** | Cubrir decisiones según sesión activa, sesión ausente y perfil autorizado |
+| HU-AUTH-04: Restauración de sesión | 3 | 3 | **9** | Validar continuidad de sesión válida y tratamiento de sesión inexistente o vencida |
+| HU-TUR-01: Solicitud de turno | 2 | 3 | **6** | Probar solicitud completa, prioridad por defecto y validación de datos faltantes |
 
 *(Escala: 1 Bajo, 2 Medio, 3 Alto)*
 
-**Riesgo de entorno:** Las pruebas de componente usan `jsdom`, que no reproduce completamente el comportamiento del navegador (ej. cookies basadas en `document.cookie`). Los tests de `cookieUtils` deben ejecutarse con atención a las limitaciones de `jsdom` respecto al manejo de cookies `HttpOnly`.
+**Riesgo de negocio:** una falla en autenticación o control de acceso puede impedir el uso normal del sistema o permitir ingresos no autorizados. Una falla en la solicitud de turnos puede afectar la atención oportuna del paciente.
 
 ---
 
 ## 8. DISTINCIÓN TÉCNICA: CAJA BLANCA vs CAJA NEGRA vs GHERKIN DECLARATIVO
 
-**Pruebas de Caja Blanca (Suites 1–4)**  
-Se conoce la implementación interna. Los tests importan directamente los componentes y providers, inspeccionan el árbol del DOM resultante, verifican que se llamaron funciones específicas (ej. `router.push`, `sessionStorage.setItem`) y validan transiciones de estado interno. Las dependencias (`authService`, `useRouter`) son mocks controlados que permiten forzar cualquier escenario.
+Este plan se enfoca en el comportamiento funcional esperado del sistema, usando lenguaje orientado al negocio y a la validación del proyecto.
 
-**Pruebas de Caja Negra (Suite 5 — HttpAuthAdapter)**  
-Se valida el comportamiento observable del adaptador sin conocer cómo el servidor procesa la solicitud. El adaptador recibe una respuesta simulada del servidor (mock de `fetch`) y se verifica únicamente lo que produce hacia afuera: el `AuthResult` retornado, las cookies seteadas y los payloads enviados. No se accede a variables internas del adaptador ni se verifica su lógica de flujo de control; solo sus entradas y salidas.
-
-**Pruebas Gherkin Declarativas (Suites 6–7 — Aceptación)**  
-Elevan la Caja Negra al nivel de negocio. Los escenarios están escritos en lenguaje natural siguiendo el **patrón Estado-Acción-Estado** (Given/When/Then). Se ejecutan contra la API real del Producer vía HTTP (`supertest`), sin conocimiento de la implementación interna. Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs para garantizar determinismo, pero la capa HTTP, validación de DTOs (class-validator) y lógica de use cases se ejecutan de forma real —exactamente como en producción—. Esto las convierte en pruebas de Caja Negra de alto nivel donde **el lenguaje del test es el lenguaje del negocio**, no el del código.
+La evidencia de ejecución, los resultados detallados y los soportes de prueba se gestionan por separado.
