@@ -11,99 +11,280 @@ on:
 # Pipeline multinivel — Shift-Left Quality
 #
 # Flujo de ejecución:
-#   lint-and-typecheck
-#        ├──► component-tests  (Caja Blanca)
-#        └──► integration-tests (Caja Negra)
-#                    └──► docker-security-scan
+#   detect-changes
+#        ├──► lint-* / typecheck-*
+#        │          └──► component-tests-* / integration-tests-*
+#        │                               └──► acceptance-tests-producer
+#        └──────────────────────────────────────────► docker-security-scan-*
+#
+# Se ejecuta por dominio (frontend / producer / consumer) para reducir
+# tiempos y aislar fallos por componente.
 # ─────────────────────────────────────────────────────────────────────────────
 
 jobs:
 
-  # ── Job 1: Verificación estática ──────────────────────────────────────────
-  lint-and-typecheck:
-    name: Lint & Typecheck
+  # ── Job 1: Detección de cambios ───────────────────────────────────────────
+  detect-changes:
+    name: Detect changed areas
     runs-on: ubuntu-latest
+
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      producer: ${{ steps.filter.outputs.producer }}
+      consumer: ${{ steps.filter.outputs.consumer }}
+      shared: ${{ steps.filter.outputs.shared }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            shared:
+              - '.github/workflows/**'
+              - 'docker-compose.yml'
+            frontend:
+              - 'frontend/**'
+            producer:
+              - 'backend/producer/**'
+            consumer:
+              - 'backend/consumer/**'
+
+  # ── Job 2: Lint por dominio ───────────────────────────────────────────────
+  lint-frontend:
+    name: Lint frontend
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.shared == 'true' }}
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: |
-          bun install --cwd frontend
-          bun install --cwd backend/producer
-          bun install --cwd backend/consumer
+      - name: Install frontend dependencies
+        run: bun install --cwd frontend --frozen-lockfile
+
+      - name: Lint frontend
+        working-directory: frontend
+        run: bun run lint:ci
+
+  lint-producer:
+    name: Lint producer
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install producer dependencies
+        run: bun install --cwd backend/producer --frozen-lockfile
+
+      - name: Lint producer
+        working-directory: backend/producer
+        run: bun run lint:ci
+
+  lint-consumer:
+    name: Lint consumer
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.consumer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install consumer dependencies
+        run: bun install --cwd backend/consumer --frozen-lockfile
+
+      - name: Lint consumer
+        working-directory: backend/consumer
+        run: bun run lint:ci
+
+  # ── Job 3: Typecheck por dominio ──────────────────────────────────────────
+  typecheck-frontend:
+    name: Typecheck frontend
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        run: bun install --cwd frontend --frozen-lockfile
 
       - name: Typecheck frontend
         working-directory: frontend
         run: bun run typecheck
 
+  typecheck-producer:
+    name: Typecheck producer
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install producer dependencies
+        run: bun install --cwd backend/producer --frozen-lockfile
+
       - name: Typecheck producer
         working-directory: backend/producer
         run: bun run typecheck
+
+  typecheck-consumer:
+    name: Typecheck consumer
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.consumer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install consumer dependencies
+        run: bun install --cwd backend/consumer --frozen-lockfile
 
       - name: Typecheck consumer
         working-directory: backend/consumer
         run: bun run typecheck
 
-  # ── Job 2: Pruebas de Componente — Caja Blanca ────────────────────────────
-  component-tests:
-    name: Component Tests (White-Box)
+  # ── Job 4: Pruebas de componente — Caja Blanca ────────────────────────────
+  component-tests-frontend:
+    name: Component tests frontend
     runs-on: ubuntu-latest
-    needs: lint-and-typecheck
+    needs: [detect-changes, lint-frontend, typecheck-frontend]
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.shared == 'true' }}
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: |
-          bun install --cwd frontend
-          bun install --cwd backend/producer
-          bun install --cwd backend/consumer
+      - name: Install frontend dependencies
+        run: bun install --cwd frontend --frozen-lockfile
 
       - name: "[Frontend] Component tests — providers, components, hooks, app"
         working-directory: frontend
         run: bun run test -- --testPathPatterns="(components|providers|hooks|app)" --passWithNoTests
 
-      - name: "[Producer] Component tests — application, domain, presentation"
-        working-directory: backend/producer
-        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
-
-      - name: "[Consumer] Component tests — application, domain, presentation"
-        working-directory: backend/consumer
-        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
-
-  # ── Job 3: Pruebas de Integración — Caja Negra ───────────────────────────
-  integration-tests:
-    name: Integration Tests (Black-Box)
+  component-tests-producer:
+    name: Component tests producer
     runs-on: ubuntu-latest
-    needs: lint-and-typecheck
+    needs: [detect-changes, lint-producer, typecheck-producer]
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: |
-          bun install --cwd frontend
-          bun install --cwd backend/producer
-          bun install --cwd backend/consumer
+      - name: Install producer dependencies
+        run: bun install --cwd backend/producer --frozen-lockfile
+
+      - name: "[Producer] Component tests — application, domain, presentation"
+        working-directory: backend/producer
+        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+
+  component-tests-consumer:
+    name: Component tests consumer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint-consumer, typecheck-consumer]
+    if: ${{ needs.detect-changes.outputs.consumer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install consumer dependencies
+        run: bun install --cwd backend/consumer --frozen-lockfile
+
+      - name: "[Consumer] Component tests — application, domain, presentation"
+        working-directory: backend/consumer
+        run: bun run test -- --testPathPatterns="(application|domain|presentation)" --passWithNoTests
+
+  # ── Job 5: Pruebas de integración — Caja Negra ────────────────────────────
+  integration-tests-frontend:
+    name: Integration tests frontend
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint-frontend, typecheck-frontend]
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        run: bun install --cwd frontend --frozen-lockfile
 
       - name: "[Frontend] Integration tests — infrastructure adapters"
         working-directory: frontend
         run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
 
+  integration-tests-producer:
+    name: Integration tests producer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint-producer, typecheck-producer]
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install producer dependencies
+        run: bun install --cwd backend/producer --frozen-lockfile
+
       - name: "[Producer] Integration tests — infrastructure"
         working-directory: backend/producer
         run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
 
+  integration-tests-consumer:
+    name: Integration tests consumer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint-consumer, typecheck-consumer]
+    if: ${{ needs.detect-changes.outputs.consumer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install consumer dependencies
+        run: bun install --cwd backend/consumer --frozen-lockfile
+
       - name: "[Consumer] Integration tests — infrastructure"
         working-directory: backend/consumer
         run: bun run test -- --testPathPatterns="infrastructure" --passWithNoTests
+
+  acceptance-tests-producer:
+    name: Acceptance tests producer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint-producer, typecheck-producer, integration-tests-producer]
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install producer dependencies
+        run: bun install --cwd backend/producer --frozen-lockfile
 
       # ⚕️ HUMAN CHECK - Pruebas de Caja Negra con Gherkin (Given/When/Then)
       # Ejecutan escenarios declarativos contra la API usando cucumber-js
@@ -111,57 +292,75 @@ jobs:
         working-directory: backend/producer
         run: bun run test:acceptance
 
-  # ── Job 4: Build Docker + Escaneo de seguridad ───────────────────────────
-  docker-security-scan:
-    name: Docker Build & Security Scan
+  # ── Job 6: Build Docker + escaneo de seguridad por dominio ───────────────
+  docker-security-scan-frontend:
+    name: Docker build & scan frontend
     runs-on: ubuntu-latest
-    needs: [component-tests, integration-tests]
+    needs: [detect-changes, component-tests-frontend, integration-tests-frontend]
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.shared == 'true' }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Build frontend image
-        id: build_frontend
         run: docker build -t frontend:ci ./frontend
 
-      # ⚕️ HUMAN CHECK - El context del build es ./backend (no ./backend/producer)
-      # porque el Dockerfile usa COPY producer/package*.json desde la raíz del context
-      - name: Build producer image
-        id: build_producer
-        run: docker build -t producer:ci -f backend/producer/Dockerfile ./backend
-
-      - name: Build consumer image
-        id: build_consumer
-        run: docker build -t consumer:ci -f backend/consumer/Dockerfile ./backend
-
       - name: Install Trivy scanner
-        if: always()
-        id: install_trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
       # ⚕️ HUMAN CHECK - SAST Shift-Left: exit-code 1 en CRITICAL bloquea el merge
       # HIGH se reporta pero no bloquea (exit-code 0) para evitar falsos positivos
       - name: Scan frontend image (CRITICAL = block)
-        if: always() && steps.build_frontend.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 1 --severity CRITICAL --format table frontend:ci
 
       - name: Scan frontend image (HIGH = report)
-        if: always() && steps.build_frontend.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 0 --severity HIGH --format table frontend:ci
 
+  docker-security-scan-producer:
+    name: Docker build & scan producer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, component-tests-producer, integration-tests-producer, acceptance-tests-producer]
+    if: ${{ needs.detect-changes.outputs.producer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ⚕️ HUMAN CHECK - El context del build es ./backend (no ./backend/producer)
+      # porque el Dockerfile usa COPY producer/package*.json desde la raíz del context
+      - name: Build producer image
+        run: docker build -t producer:ci -f backend/producer/Dockerfile ./backend
+
+      - name: Install Trivy scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      # ⚕️ HUMAN CHECK - SAST Shift-Left: exit-code 1 en CRITICAL bloquea el merge
+      # HIGH se reporta pero no bloquea (exit-code 0) para evitar falsos positivos
       - name: Scan producer image (CRITICAL = block)
-        if: always() && steps.build_producer.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 1 --severity CRITICAL --format table producer:ci
 
       - name: Scan producer image (HIGH = report)
-        if: always() && steps.build_producer.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 0 --severity HIGH --format table producer:ci
 
+  docker-security-scan-consumer:
+    name: Docker build & scan consumer
+    runs-on: ubuntu-latest
+    needs: [detect-changes, component-tests-consumer, integration-tests-consumer]
+    if: ${{ needs.detect-changes.outputs.consumer == 'true' || needs.detect-changes.outputs.shared == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build consumer image
+        run: docker build -t consumer:ci -f backend/consumer/Dockerfile ./backend
+
+      - name: Install Trivy scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
       - name: Scan consumer image (CRITICAL = block)
-        if: always() && steps.build_consumer.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 1 --severity CRITICAL --format table consumer:ci
 
       - name: Scan consumer image (HIGH = report)
-        if: always() && steps.build_consumer.outcome == 'success' && steps.install_trivy.outcome == 'success'
         run: trivy image --exit-code 0 --severity HIGH --format table consumer:ci
