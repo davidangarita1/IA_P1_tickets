@@ -25,8 +25,8 @@ Como **sistema**, quiero proteger automáticamente las secciones internas para q
 
 ## Reglas de negocio
 
-- Las secciones protegidas son: el **panel principal** y el **módulo de registro de turnos**.
-- Las secciones públicas son: la **pantalla de turnos en espera**, el **registro de cuenta** y el **inicio de sesión**.
+- Las secciones protegidas son: el **panel principal** (dashboard).
+- Las secciones públicas son: la **pantalla de turnos en espera**, la **solicitud y consulta de turnos**, el **formulario de registro de cuenta** y el **inicio de sesión**.
 - Ambos perfiles (administrador y empleado) tienen acceso a las mismas secciones protegidas en esta versión del sistema.
 - La verificación de acceso ocurre tanto al intentar ingresar directamente por URL como al navegar dentro de la aplicación.
 
