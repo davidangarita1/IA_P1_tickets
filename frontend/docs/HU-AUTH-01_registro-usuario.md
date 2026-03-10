@@ -78,14 +78,3 @@ Como **empleado**, quiero registrar nuevas cuentas de empleados a través de un 
 | CA-AUTH-01-10 | Servicio no disponible al enviar el formulario | Se informa el fallo y el formulario conserva los datos ingresados |
 
 ---
-
-## Preguntas resueltas en refinamiento
-
-| # | Pregunta | Decisión |
-| :--- | :--- | :--- |
-| 1 | ¿Cómo se asignan los perfiles al registrarse? | Ambos perfiles (administrador y empleado) son seleccionables libremente por el usuario; no requieren aprobación en esta versión |
-| 2 | ¿Qué reglas aplican al saneamiento de datos? | El correo debe tener "@" y dominio válido; el nombre solo admite letras, espacios y tildes |
-| 3 | ¿Qué dice el mensaje de confirmación? | "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión." |
-| 4 | ¿Se requiere protección contra bots? | Sí; el sistema detecta intentos masivos y bloquea temporalmente el origen con un aviso al usuario |
-| 5 | ¿Qué ocurre si el servicio falla durante el registro? | Se informa el fallo y el formulario conserva los datos ingresados para reintento |
-| 6 | ¿Qué hacer cuando el correo ya está registrado? | Informar al usuario y ofrecer un enlace directo a la pantalla de inicio de sesión |
