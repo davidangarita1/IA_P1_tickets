@@ -9,16 +9,21 @@ import { NotificationsService } from './notifications.service';
             {
                 name: 'TURNOS_NOTIFICATIONS',
                 imports: [ConfigModule],
-                useFactory: async (configService: ConfigService) => ({
+                useFactory: async (configService: ConfigService) => {
+                    const rabbitUrl = configService.get<string>('RABBITMQ_URL');
+                    if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
+                    return {
                     transport: Transport.RMQ,
                     options: {
-                        urls: [configService.get<string>('RABBITMQ_URL') || 'amqp://guest:guest@localhost:5672'],
-                        queue: configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE') || 'turnos_notifications',
+                        // ⚕️ HUMAN CHECK - fail-fast: no hardcoded fallback URL
+                        urls: [rabbitUrl],
+                        queue: configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE', 'turnos_notifications'),
                         queueOptions: {
                             durable: true,
                         },
                     },
-                }),
+                };
+                },
                 inject: [ConfigService],
             },
         ]),

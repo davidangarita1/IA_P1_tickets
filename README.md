@@ -1,130 +1,147 @@
 # IA_P1 - Sistema de Turnos Médicos en Tiempo Real
 
-> Sistema de gestión de turnos médicos basado en **Microservicios**, **Event-Driven Architecture** y **WebSockets**.
+Sistema para gestionar turnos médicos en tiempo real usando microservicios, mensajería asíncrona y WebSockets.
 
-## 🚀 Arquitectura y Flujo
+## Objetivo del proyecto
 
-El sistema desacopla la recepción de turnos de su procesamiento para garantizar alta disponibilidad y escalabilidad.
+Permitir que un paciente registre su turno y reciba actualizaciones en tiempo real sobre su estado y asignación de consultorio.
 
-```mermaid
-sequenceDiagram
-    participant C as Cliente (Frontend)
-    participant P as Producer (API + WS)
-    participant Q as RabbitMQ
-    participant W as Consumer (Worker)
-    participant S as Scheduler (Consumer)
-    participant D as MongoDB
+## Alcance funcional (actual)
 
-    C->>P: 1. POST /turnos (HTTP)
-    P->>Q: 2. Publica 'crear_turno'
-    P-->>C: 202 Accepted
-    Q->>W: 3. Consume mensaje
-    W->>D: 4. Guarda turno (Estado: Espera)
-    
-    loop Cada 15s (Scheduler)
-        S->>D: 5. Busca turnos en espera
-        S->>D: 6. Asigna consultorio (Atomic Update)
-        S->>Q: 7. Publica 'turno_actualizado'
-    end
+- Registrar turnos de pacientes por API.
+- Procesar turnos de forma asíncrona.
+- Asignar consultorios automáticamente.
+- Notificar cambios de estado en tiempo real al frontend.
+- Consultar turnos por lista general o por cédula.
 
-    Q->>P: 8. Consume evento 'turno_actualizado'
-    P->>C: 9. Emite evento WebSocket (Real-time)
-```
+## Próxima feature en ideación: Login + Dashboard privado
 
-## 🧩 Servicios
+### Modelo de acceso
 
-| Servicio | Tecnología | Puerto | Responsabilidad |
-|---|---|---|---|
-| **Producer** | NestJS | `3000` | API Gateway, Validación de entrada, WebSocket Gateway,Swagger Documentation. |
-| **Consumer** | NestJS | — | Procesamiento asíncrono, Scheduler de asignación, Persistencia en DB. |
-| **Frontend** | Next.js | `3001` | Interfaz de usuario Reactiva, Cliente WebSocket, Diseño moderno. |
-| **RabbitMQ** | RabbitMQ 3 | `5672` | Broker de mensajería (Colas: `turnos_queue`, `turnos_notifications`). |
-| **MongoDB** | MongoDB 7 | `27017` | Base de datos NoSQL persistente. |
+- Guest (como hoy): puede registrar turno y ver su llamado en tiempo real.
+- Usuario autenticado: puede acceder al dashboard operativo (oculto para guest).
 
-## 🛠️ Instalación y Ejecución
+### Impacto en el negocio
 
-### Prerrequisitos
-- Docker Engine & Docker Compose
+- Mejora control de acceso a información operativa del sistema.
+- Reduce exposición de datos y vistas internas para usuarios no autorizados.
+- Permite diferenciar experiencia pública (paciente) y experiencia interna (staff).
+- Habilita trazabilidad por usuario para futuras auditorías y métricas de uso.
 
-### Pasos
+### Impacto en alcance
 
-1. **Clonar el repositorio**
+- Se mantiene el flujo principal para pacientes sin fricción (registro y seguimiento).
+- Se agrega autenticación/autorización para proteger el dashboard.
+- La experiencia guest no se elimina: queda como canal público de autoservicio.
+
+## Arquitectura (resumen)
+
+Flujo principal:
+
+1. Frontend envía `POST /turnos` al Producer.
+2. Producer publica evento en RabbitMQ y responde `202 Accepted`.
+3. Consumer consume el evento y guarda el turno en MongoDB (estado `espera`).
+4. Scheduler del Consumer asigna consultorio periódicamente.
+5. Consumer publica actualización en RabbitMQ.
+6. Producer emite actualización al frontend vía WebSocket.
+
+Servicios:
+
+- **Producer** (`:3000`): API HTTP + WebSocket.
+- **Consumer**: worker de procesamiento y scheduler.
+- **Frontend** (`:3001`): interfaz de registro y visualización.
+- **RabbitMQ**: broker de mensajería.
+- **MongoDB**: persistencia de turnos.
+
+## Stack tecnológico
+
+- NestJS (backend)
+- Next.js (frontend)
+- MongoDB
+- RabbitMQ
+- Docker + Docker Compose
+
+## Requisitos
+
+- Docker Engine
+- Docker Compose
+
+## Ejecución local
+
+1. Clonar repositorio:
+
    ```bash
    git clone https://github.com/Duver0/IA_P1.git
    cd IA_P1
    ```
 
-2. **Iniciar la infraestructura**
+2. Configurar entorno:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Levantar servicios:
+
    ```bash
    docker compose up -d --build
    ```
 
-3. **Acceder a la aplicación**
-   - **Frontend:** [http://localhost:3001](http://localhost:3001)
-   - **API Swagger:** [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
-   - **RabbitMQ Admin:** [http://localhost:15672](http://localhost:15672) (user: `guest`, pass: `guest`)
+4. Accesos:
 
-## ✨ Características Clave
+- Frontend: http://localhost:3001
+- API Docs: http://localhost:3000/api/docs
+- RabbitMQ Admin: http://localhost:15672
 
-- **Event-Driven**: Comunicación asíncrona entre servicios para mayor resiliencia.
-- **Real-Time**: Actualizaciones instantáneas en el frontend vía WebSockets (`socket.io`).
-- **Concurrency Safe**: Asignación de turnos atómica (`findOneAndUpdate`) para prevenir race conditions.
-- **Robustez**:
-  - Manejo de errores tipado (`TurnoEventPayload`).
-  - Validación de datos (DTOs + `class-validator`).
-  - Logs estructurados (`NestJS Logger`).
-- **Infraestructura como Código**: Entorno completamente dockerizado (`docker-compose.yml`).
+## Variables de entorno clave
 
-## 📡 API Endpoints (Producer)
+Configurar en `.env` (basado en `.env.example`):
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| `POST` | `/turnos` | Crear un nuevo turno (Async) |
-| `GET` | `/turnos` | Listar todos los turnos |
-| `GET` | `/turnos/:cedula` | Buscar turnos por cédula |
+- `PRODUCER_PORT`
+- `FRONTEND_PORT`
+- `NEXT_PUBLIC_API_BASE_URL`
+- `NEXT_PUBLIC_WS_URL`
+- `RABBITMQ_PORT`
+- `RABBITMQ_MGMT_PORT`
+- `RABBITMQ_USER`
+- `RABBITMQ_PASS`
+- `RABBITMQ_QUEUE`
+- `MONGODB_PORT`
+- `MONGO_USER`
+- `MONGO_PASS`
 
-## 🧪 Pruebas Manuales (cURL)
+## API principal (Producer)
 
-**Crear un turno:**
+- `POST /turnos`: crear turno (respuesta asíncrona `202 Accepted`).
+- `GET /turnos`: listar turnos.
+- `GET /turnos/:cedula`: consultar turnos por cédula.
+
+Ejemplo:
+
 ```bash
 curl -X POST http://localhost:3000/turnos \
   -H "Content-Type: application/json" \
-  -d '{"nombre": "Paciente Test", "cedula": 12345, "priority": "alta"}'
+  -d '{"nombre":"Paciente Test","cedula":12345,"priority":"alta"}'
 ```
 
-**Ver respuesta:**
-```json
-{
-  "status": "accepted",
-  "message": "Turno en proceso de asignación"
-}
+## Testing
+
+Backend (producer):
+
+```bash
+cd backend/producer
+npm test
+npm run test:cov
 ```
 
-## 📂 Estructura del Proyecto
+Frontend:
 
-```
-IA_P1/
-├── backend/
-│   ├── producer/        # API Gateway & WebSocket Server
-│   │   ├── src/events/  # Controladores de eventos (RabbitMQ -> WS)
-│   │   └── src/turnos/  # Lógica de negocio HTTP
-│   └── consumer/        # Worker Service
-│       ├── src/scheduler/ # Lógica de asignación automática
-│       └── src/turnos/    # Persistencia MongoDB
-├── frontend/            # Next.js App Router
-│   ├── src/hooks/       # Custom Hooks (useTurnosWebSocket)
-│   └── src/domain/      # Modelos compartidos
-├── docker-compose.yml   # Orquestación de contenedores
-└── README.md            # Documentación
+```bash
+cd frontend
+npm test
+npm run test:coverage
 ```
 
-## 📝 Notas de Auditoría (Fixes recientes)
+## Estado del proyecto
 
-- **Type Safety**: Se eliminaron los tipos `any` mediante interfaces compartidas (`TurnoEventPayload`).
-- **Race Conditions**: Se corrigió la lógica del scheduler para garantizar asignaciones únicas.
-- **Frontend Sync**: Se ajustaron los tipos (`cedula: number`) para coincidir con el backend.
-- **Docker Networking**: Configuración corregida para que el cliente navegador use `localhost`.
-- **Scheduler configurable**: El intervalo del scheduler del consumer ahora se lee de `SCHEDULER_INTERVAL_MS` (default 15000 ms, alineado con la documentación).
-- **Validación en eventos**: El microservicio RMQ aplica `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform` para validar `CreateTurnoDto` en eventos.
-- **Ack/Nack explícitos**: El consumer confirma mensajes en éxito y diferencia `nack` sin requeue para errores de validación vs requeue en errores transitorios para evitar bloqueo con `prefetch=1`.
-- **Robustez**: Estas mejoras fortalecen el entorno de desarrollo; aún faltan políticas de reintentos, DLQ y hardening para un entorno productivo.
+Sistema funcional en desarrollo continuo, con enfoque en robustecer arquitectura hexagonal y calidad para producción.

@@ -11,9 +11,10 @@ async function bootstrap(): Promise<void> {
     const appContext = await NestFactory.createApplicationContext(AppModule);
     const configService = appContext.get(ConfigService);
 
-    // ⚕️ HUMAN CHECK - Reemplazado || por ?? (null-safe)
-    const rabbitUrl = configService.get<string>('RABBITMQ_URL') ?? 'amqp://guest:guest@localhost:5672';
-    const queueName = configService.get<string>('RABBITMQ_QUEUE') ?? 'turnos_queue';
+    // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+    const rabbitUrl = configService.get<string>('RABBITMQ_URL');
+    if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
+    const queueName = configService.get<string>('RABBITMQ_QUEUE', 'turnos_queue');
 
     // ⚕️ HUMAN CHECK - Cerrar appContext antes de crear el microservicio
     // Evita doble inicialización de módulos (memory leak potencial)

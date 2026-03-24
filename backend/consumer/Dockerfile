@@ -1,42 +1,42 @@
-# ⚕️ HUMAN CHECK - Dockerfile del Consumer
-# Asegurarse de usar una versión LTS de Node.js compartida con el Producer
-
 # --- Stage: development ---
-# ⚕️ HUMAN CHECK - Stage de desarrollo para uso con docker-compose (hot-reload)
-FROM node:20-slim AS development
+FROM oven/bun:latest AS development
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install
 
-COPY . .
+# Copiar código fuente (en dev, volumes sobreescriben esto)
+COPY consumer/ .
 
-CMD ["npm", "run", "start:dev"]
+CMD ["bun", "run", "start:dev"]
 
 # --- Stage: build ---
-FROM node:20-slim AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install
 
-COPY . .
-RUN npm run build
+COPY consumer/ .
+RUN bun run build
 
 # --- Stage: production ---
-FROM node:20-slim AS production
+FROM oven/bun:latest AS production
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --only=production
+COPY consumer/bun.lock ./
+COPY consumer/package.json ./
+RUN bun install --production
 
 COPY --from=build /app/dist ./dist
 
-# ⚕️ HUMAN CHECK - Variables de Entorno
-# El Consumer no expone puerto HTTP necesariamente, pero se puede monitorear
-# EXPOSE 3000
+# ⚕️ HUMAN CHECK - Ejecutar como usuario no-root (requerimiento de inmutabilidad)
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
+USER appuser
 
-CMD ["node", "dist/main.js"]
+CMD ["bun", "run", "start:prod"]

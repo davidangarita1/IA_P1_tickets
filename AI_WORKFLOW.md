@@ -1,53 +1,148 @@
+# AI_WORKFLOW.md — Guía simple para IA
 
-# AI Workflow - AI Interaction Strategy
+Este archivo define cómo debe trabajar la IA en este proyecto.
+Si hay conflicto entre estilos, priorizar: **arquitectura + seguridad + no romper flujo actual**.
 
-## AI-First Methodology
+---
 
-This project uses an **AI-First** methodology where the AI acts as a "Junior Developer" generating initial code that is then reviewed and refined by the team.
+## 1) Resumen del sistema (actual)
 
-## Tools Used
+Proyecto: sistema de turnos médicos en tiempo real.
 
-- **GitHub Copilot**: Code generation and intelligent autocompletion.
-- **Cursor**: AI-assisted code review and refactoring.
+Flujo principal:
+1. Frontend envía `POST /turnos` al Producer.
+2. Producer publica evento en RabbitMQ y responde `202 Accepted`.
+3. Consumer guarda el turno en MongoDB (`espera`).
+4. Scheduler asigna consultorio.
+5. Consumer publica actualización.
+6. Producer emite actualización por WebSocket al frontend.
 
-## Interaction Process
+---
 
-1. **Initial generation**: The AI generates the base project structure, including Docker configurations, microservices (Producer and Consumer), and frontend components.
-2. **Human review**: The team reviews the generated code, paying special attention to areas marked with `// ⚕️ HUMAN CHECK`.
-3. **Refinement**: The code is adjusted according to best practices and project-specific requirements.
-4. **Validation**: Tests are run and the correct functioning of the system is verified.
+## 2) Stack permitido
 
-## Sentinel Comments
+- Backend: NestJS
+- Frontend: Next.js
+- DB: MongoDB + Mongoose
+- Broker: RabbitMQ
+- Real-time: socket.io
+- Infra: Docker Compose
+- Estilos frontend: CSS Modules
 
-`// ⚕️ HUMAN CHECK` comments are used in the following critical areas:
+---
 
-- Docker Compose configuration (ports, networks, volumes)
-- Dockerfiles (base image versions)
-- Environment variables (credentials and sensitive configuration)
-- RabbitMQ configuration (queues, exchanges, credentials)
-- API endpoints (validation and security)
+## 3) Restricciones (NO hacer)
 
-## What the AI Got Wrong
+- No reemplazar NestJS, MongoDB/Mongoose ni RabbitMQ.
+- No agregar frameworks CSS externos.
+- No hardcodear secretos, credenciales o URLs sensibles.
+- No acoplar casos de uso a infraestructura concreta.
 
-- The AI tends to generate configurations with default credentials (e.g., `guest/guest` in RabbitMQ) that must be changed in production.
-- In some cases, the AI does not include adequate input validations in the endpoints.
-- The Docker configurations initially generated do not always optimize the use of cache layers.
-- The AI may generate dependencies with outdated or mutually incompatible versions.
+---
 
-## CSS Guidelines
+## 4) Arquitectura obligatoria
 
-- **No external CSS frameworks**: Use only the existing `page.module.css` file.
-- Avoid installing Tailwind, Bootstrap, or any external CSS library.
-- All styles must be added to the existing CSS modules in the project.
+Patrón: **Hexagonal + SOLID**
 
-## Interaction Dynamics
+Capas:
+- Domain: entidades + puertos
+- Application: casos de uso
+- Infrastructure: adaptadores
+- Presentation: controladores HTTP / gateways WS
 
-- **Boilerplate**: The AI generates the entire initial project structure without manual code writing.
-- **Peer review**: Each PR is reviewed by at least one team member before merging.
-- **Continuous iteration**: The team iterates on the generated code, progressively improving quality.
+Dependencias válidas:
+- `Presentation -> Application -> Domain`
+- `Infrastructure -> Domain`
 
-## Mandatory Correction Protocol
+Regla crítica:
+- Usar puertos/interfaces + tokens de inyección.
+- No inyectar `@InjectModel` o `ClientProxy` directo en use cases.
 
-Every time a fix or correction is applied, the following comment format must be used:
-`// ⚕️ HUMAN CHECK - <Correction Description>`
-This rule must be followed in every iteration where code is corrected.
+---
+
+## 5) Reglas de generación (DO)
+
+La IA debe:
+1. Entregar código completo (sin TODO vacíos).
+2. Mantener responsabilidades únicas por clase/método.
+3. Usar `ConfigService` + `.env` para configuración.
+4. Implementar cleanup (`OnModuleDestroy`) cuando aplique.
+5. Manejar `ack/nack` explícito en consumidores RabbitMQ.
+6. Mantener tipos explícitos (evitar `any`).
+7. Actualizar módulos/providers cuando agregue dependencias.
+8. No romper comportamiento existente.
+
+---
+
+## 6) Alcance funcional vigente
+
+- Registro de turnos.
+- Procesamiento asíncrono.
+- Asignación de consultorio.
+- Notificación en tiempo real.
+- Consulta por listado y por cédula.
+
+Feature en ideación:
+- Login para ocultar dashboard a guest.
+- Guest mantiene registro + seguimiento de llamado.
+
+---
+
+## 7) Checklist antes de entregar cambios
+
+- Compila sin errores.
+- Respeta arquitectura hexagonal.
+- No expone secretos.
+- Ajusta pruebas si el cambio lo requiere.
+- Mantiene flujo de turnos funcionando.
+- Documenta archivos tocados y cambios de DI.
+
+---
+
+## 8) Formato de prompt recomendado para IA
+
+Usar esta plantilla:
+
+```txt
+Contexto: AI_WORKFLOW.md adjunto
+
+Objetivo: [qué construir/corregir]
+Servicio: [Producer | Consumer | Frontend]
+Capa: [Domain | Application | Infrastructure | Presentation]
+
+Reglas:
+- Hexagonal + SOLID
+- Sin hardcodear secretos
+- No romper flujo actual
+
+Salida esperada:
+- Código completo
+- Archivos modificados
+- Cambios en módulos/providers
+- Validación (test/build)
+```
+
+---
+
+## 9) Anti-patrones prohibidos
+
+- Controladores con lógica de negocio.
+- Use cases con acceso directo a DB o broker.
+- Adaptadores con métodos `Not implemented` en producción.
+- Credenciales dentro del código.
+- Cambios grandes fuera del alcance pedido.
+
+---
+
+## 10) Referencias rápidas
+
+- `README.md`: visión general y ejecución.
+- `backend/producer`: API y WebSocket.
+- `backend/consumer`: worker, scheduler, persistencia.
+- `frontend`: experiencia de usuario.
+- `docker-compose.yml`: entorno local.
+
+---
+
+Versión: 2.1 (IA-friendly)
+Última actualización: Febrero 2026

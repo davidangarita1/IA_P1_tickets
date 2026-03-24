@@ -4,12 +4,12 @@ services:
   producer:
     container_name: backend-producer
     build:
-      context: ./backend/producer
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: producer/Dockerfile
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run start:dev
+    command: bun run start:dev
     # ⚕️ HUMAN CHECK - Puertos Expuestos
     # Verificar que el puerto mapeado no entre en conflicto con otros servicios del host
     ports:
@@ -20,7 +20,6 @@ services:
     volumes:
       - ./backend/producer:/app
       - /app/node_modules
-      - /app/dist
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -42,19 +41,18 @@ services:
   consumer:
     container_name: backend-consumer
     build:
-      context: ./backend/consumer
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: consumer/Dockerfile
       target: development
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run start:dev
+    command: bun run start:dev
     # ⚕️ HUMAN CHECK - Volúmenes de Desarrollo (Hot-Reload)
     # Estos volúmenes montan el código fuente local para desarrollo con hot-reload.
     # En producción, eliminar estos volúmenes y usar la imagen construida.
     volumes:
       - ./backend/consumer:/app
       - /app/node_modules
-      - /app/dist
     environment:
       - NODE_ENV=development
       # ⚕️ HUMAN CHECK - Credenciales de conexión RabbitMQ
@@ -64,7 +62,7 @@ services:
       # ⚕️ HUMAN CHECK - Cola de notificaciones (WebSocket bridge)
       - RABBITMQ_NOTIFICATIONS_QUEUE=${RABBITMQ_NOTIFICATIONS_QUEUE:-turnos_notifications}
       # ⚕️ HUMAN CHECK - Configuración del Scheduler
-      - SCHEDULER_INTERVAL=1000
+      - SCHEDULER_INTERVAL_MS=${SCHEDULER_INTERVAL_MS:-15000}
       - CONSULTORIOS_TOTAL=5
       # ⚕️ HUMAN CHECK - Credenciales de conexión MongoDB
       # No usar credenciales por defecto en producción.
@@ -81,9 +79,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
+      # ⚕️ HUMAN CHECK - Build args para variables públicas de Next.js
+      # Required en tiempo de build para que Next.js las compile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000}
+        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-http://localhost:3000}
     # ⚕️ HUMAN CHECK - Comando de desarrollo
     # En producción, eliminar este command para usar el CMD del Dockerfile
-    command: npm run dev -- -p 3001 -H 0.0.0.0
+    command: bun run dev -- -p 3001 -H 0.0.0.0
     ports:
       - "${FRONTEND_PORT:-3001}:3001"
     volumes:
@@ -94,9 +98,9 @@ services:
       # ⚕️ HUMAN CHECK - NEXT_PUBLIC_* se ejecutan en el NAVEGADOR del usuario, no en Docker
       # Por eso usan localhost (no el hostname interno 'producer')
       # Para probar en red local, cambia 'localhost' por tu IP local (ej. http://192.168.1.50:3000)
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000}
       # ⚕️ HUMAN CHECK - URL del WebSocket
-      - NEXT_PUBLIC_WS_URL=http://localhost:3000
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-http://localhost:3000}
     depends_on:
       - producer
     networks:

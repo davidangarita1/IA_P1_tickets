@@ -1,180 +1,239 @@
-# Frontend — Sistema de Gestión de Turnos
+# Frontend — Ticket Management System
 
-Frontend desarrollado con **Next.js (App Router)** para la visualización en tiempo real y registro de turnos.  
-Este proyecto implementa una arquitectura limpia, resiliente y preparada para escalar hacia tiempo real (SSE / WebSocket).
+Frontend built with **Next.js 16 (App Router)** for real-time visualization and registration of medical tickets, with full authentication (signUp / signIn / signOut) and role-based route protection.
 
-## Objetivo
+## Stack
 
-Proveer una interfaz ligera, segura y resiliente para:
-
-- Visualizar turnos en pantalla en tiempo real (polling optimizado)
-- Registrar nuevos turnos desde formulario
-- Garantizar estabilidad ante fallos del backend
-- Mantener arquitectura desacoplada y mantenible
-
-## Stack Tecnológico
-
-| Tecnología | Uso |
-|----------|-----|
-| Next.js 16 | Framework principal |
+| Technology | Usage |
+|---|---|
+| Next.js 16 | Framework (App Router) |
 | React 19 | UI |
-| TypeScript | Tipado estático |
-| App Router | Arquitectura moderna |
-| CSS Modules | Estilos encapsulados |
-| Fetch API | Cliente HTTP |
-| ESLint | Calidad de código |
+| TypeScript 5 | Static typing |
+| Socket.IO Client | Real-time WebSocket |
+| CSS Modules | Scoped styles |
 
-## Características Técnicas
+## Architecture
 
-### Arquitectura
-
-- Clean Architecture (capas desacopladas)
-- Repository Pattern
-- Separación dominio / infraestructura / UI
-- Servicios desacoplados (AudioService)
-- Hooks especializados
-
-### Resiliencia
-
-- Cliente HTTP centralizado
-- Retry automático
-- Timeout configurable
-- Circuit Breaker
-- Manejo de errores tipificado
-- Protección contra doble submit
-- Prevención de memory leaks
-
-### Seguridad
-
-- Sanitización de input
-- Rate limit en middleware
-- Security headers
-- CSP compatible con Next.js
-- Bloqueo de métodos no permitidos
-
-### Tiempo real (Polling optimizado)
-
-- Evita re-render innecesario
-- Evita loops duplicados
-- Evita fugas de memoria
-- Preparado para migrar a SSE / WebSocket
-
-### Audio desacoplado
-
-- Servicio independiente
-- No bloquea render
-- Activación por interacción del usuario
-
-## Estructura del Proyecto
-
-El proyecto sigue una arquitectura desacoplada y organizada por responsabilidades:
-
-```bash
-
-- app/**          → Rutas y páginas del App Router
-- components/**   → Componentes UI reutilizables
-- domain/**       → Modelos y contratos del negocio
-- repositories/** → Acceso a datos mediante Repository Pattern
-- hooks/**        → Lógica de negocio encapsulada en hooks
-- lib/**          → Infraestructura compartida
-- services/**     → Servicios desacoplados
-- config/**       → Variables y configuración de entorno
-- security/**     → Sanitización y protecciones básicas
-- styles/**       → Estilos globales
-- proxi.ts**      → Middleware
+The project follows **Hexagonal Architecture (Ports & Adapters)** with Dependency Injection via React Context.
 
 ```
+src/
+├── domain/                  ← Entities and ports (interfaces)
+│   ├── Ticket.ts
+│   ├── CreateTicket.ts
+│   ├── User.ts              ← User entity + UserRole type
+│   ├── AuthCredentials.ts   ← AuthCredentials, SignUpData, AuthResult DTOs
+│   └── ports/
+│       ├── TicketWriter.ts
+│       ├── TicketReader.ts
+│       ├── RealTimeProvider.ts
+│       ├── AudioNotifier.ts
+│       ├── InputSanitizer.ts
+│       └── AuthService.ts   ← Authentication port (interface)
+│
+├── infrastructure/          ← Adapters (concrete implementations)
+│   ├── adapters/
+│   │   ├── HttpTicketAdapter.ts
+│   │   ├── SocketIOAdapter.ts
+│   │   ├── BrowserAudioAdapter.ts
+│   │   ├── HtmlSanitizer.ts
+│   │   ├── HttpAuthAdapter.ts   ← Active adapter: calls backend REST auth endpoints
+│   │   └── NoopAuthAdapter.ts   ← Stub adapter for tests and contexts without auth
+│   ├── http/
+│   │   ├── CircuitBreaker.ts
+│   │   └── httpClient.ts
+│   ├── mappers/
+│   │   ├── ticketMapper.ts
+│   │   └── authMapper.ts        ← ACL: backend response → domain User/AuthResult
+│   └── cookies/
+│       └── cookieUtils.ts       ← set/get/remove auth token cookie
+│
+├── providers/               ← Dependency injection + auth context
+│   ├── DependencyProvider.tsx       ← Includes AuthService in dependencies
+│   ├── AuthProvider.tsx             ← Auth context (user, loading, error, actions)
+│   └── ConnectedAuthProvider.tsx    ← Wires AuthService from DependencyProvider into AuthProvider
+│
+├── hooks/                   ← Use cases
+│   ├── useCreateTicket.ts
+│   ├── useTicketsWebSocket.ts
+│   └── useAudioNotification.ts
+│
+├── components/              ← UI components
+├── components/              ← UI components
+│   ├── AppointmentRegistrationForm/
+│   ├── CreateTicketForm/
+│   ├── Navbar/              ← Conditionally rendered (authenticated users only)
+│   ├── SignInForm/          ← Login form (email + password)
+│   ├── SignUpForm/          ← Registration form (name + email + password)
+│   ├── SignOutButton/       ← Logout button in Navbar
+│   └── AuthGuard/           ← Route protection wrapper (redirects if not authenticated)
+│
+├── app/                     ← Pages (App Router)
+│   ├── layout.tsx
+│   ├── page.tsx             ← Public: tickets screen
+│   ├── signin/page.tsx      ← Public: login page
+│   ├── signup/page.tsx      ← Public: registration page
+│   ├── register/page.tsx    ← Public: ticket registration form
+│   └── dashboard/page.tsx   ← Protected (AuthGuard): served history
+│
+├── config/env.ts            ← Environment variables
+├── proxy.ts                 ← Security headers + route protection middleware
+└── styles/                  ← CSS Modules (including SignInForm, SignUpForm)
+```
 
-Arquitectura preparada para escalar hacia tiempo real, backend productivo y mayor seguridad sin refactor mayor.
+## Authentication
 
-## Variables de Entorno
+Authentication follows the same hexagonal pattern as the rest of the codebase — the UI depends on the `AuthService` port, never on a concrete adapter.
 
-Crear archivo `.env.local`:
+### Flow
+
+```
+/signup  →  SignUpForm  →  useAuth().signUp()  →  AuthProvider  →  AuthService port
+/signin  →  SignInForm  →  useAuth().signIn()  →  AuthProvider  →  AuthService port
+Navbar   →  SignOutButton  →  useAuth().signOut()
+```
+
+### Roles
+
+| Role | How assigned | Access |
+|---|---|---|
+| `employee` | Default on signup (all new users) | Dashboard, Register |
+| `admin` | Assigned directly in the database | Dashboard, Register |
+
+New users created via `/signup` are always registered as `employee`. The `admin` role can only be granted at the database level.
+
+> **Alcance de esta HU:** La ruta `/signup` permanece **pública** (sin autenticación requerida) para permitir el auto-registro de empleados. En un ciclo posterior se evaluará restringir el acceso al formulario de registro (por ejemplo, exigiendo un token de invitación o limitando el registro a administradores).
+
+### Route Protection
+
+- **`AuthGuard` component** — wraps the `dashboard` page only; redirects to `/signin` if not authenticated.
+- `/register` is **public** — any visitor (authenticated or not) can submit a ticket. No login is required to use the queue.
+- **`proxy.ts` middleware (current)** — applies security headers and HTTP method filtering only; it does **not** yet perform auth cookie validation or redirects. Edge-level auth checks are planned for a future iteration.
+
+### Current Adapter
+
+`HttpAuthAdapter` connects to the backend REST endpoints (`/auth/signIn`, `/auth/signUp`, `/auth/signOut`, `/auth/me`). `NoopAuthAdapter` is kept as a stub for testing and environments without an auth backend.
+
+### Business Rule Validations
+
+The following rules are enforced client-side with full `[Validar]` test coverage:
+
+| Rule | Location | Error message |
+|---|---|---|
+| **Strong password** | `SignUpForm` (pre-submit) | "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial." |
+| **Duplicate email** | `AuthProvider` → backend error passed through | "El correo ya está registrado." |
+| **Duplicate active ticket** | `useCreateTicket` hook (pre-submit) | "Ya existe un turno activo para esta cédula." |
+| **Protected routes** | `AuthGuard` component | Redirect to `/signin` |
+| **Role-based redirect** | `AuthGuard` component | Redirect to `/` when role insufficient |
+
+### SignUp Success Toast
+
+After successful registration, a **4-second success toast** is displayed on the `/signin` page via `sessionStorage`. This survives the route transition so the user sees the confirmation even after being redirected.
+
+### AuthContext Interface
+
+```typescript
+interface AuthContextValue {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  signIn: (credentials: AuthCredentials) => Promise<boolean>;
+  signUp: (data: SignUpData) => Promise<boolean>;
+  signOut: () => Promise<void>;
+  isAuthenticated: boolean;
+  hasRole: (role: UserRole) => boolean;
+}
+```
+
+## SOLID Principles
+
+- **SRP:** Each hook, adapter, and component has a single responsibility
+- **OCP:** New auth providers (Firebase, Auth0) are added by creating adapters without modifying hooks or components
+- **LSP:** All adapters fulfill their port contracts (`NoopAuthAdapter` and future `HttpAuthAdapter` are interchangeable)
+- **ISP:** `TicketWriter`/`TicketReader` segregated; `AuthService` only exposes the 4 needed methods
+- **DIP:** Hooks and components depend on ports (abstractions), not concrete implementations
+
+## HTTP Resilience
+
+The `httpClient` includes:
+- **Circuit Breaker** — Fail-fast when backend is down
+- **Retry with exponential backoff** — Intelligent retries
+- **Timeout with AbortController** — Protection against hanging requests
+
+## Anti-Corruption Layer
+
+Two mappers translate between the Spanish backend API contract and the English domain model:
+
+- `ticketMapper.ts` — `nombre`, `cedula`, `estado` → `name`, `documentId`, `status`
+- `authMapper.ts` — `nombre`, `rol`, `usuario` → `name`, `role`, `user` (also maps `"empleado"` → `"employee"`);
+  includes `translateAuthMessage()` to convert known English backend error messages to Spanish (e.g. `"Email already in use"` → `"El correo ya está registrado."`)
+
+## Campo Cédula — Validación
+
+El campo **Cédula** del formulario de registro de turno acepta **únicamente valores numéricos**, ya que está diseñado exclusivamente para la **cédula de ciudadanía colombiana**, que es un identificador numérico de 6 a 10 dígitos emitido por la Registraduría Nacional del Estado Civil.
+
+- ✅ Válido: `12345678`, `1023456789`
+- ❌ Inválido: `abc`, `PE123456`, `12-34` (caracteres no numéricos)
+
+Si se ingresan caracteres no numéricos, el campo muestra el mensaje de error:
+> **"La cédula solo puede contener números"**
+
+El botón **Registrar turno** permanece deshabilitado hasta que el formulario sea válido (nombre no vacío y cédula con solo dígitos).
+
+## Environment Variables
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/mock
-NEXT_PUBLIC_POLLING_INTERVAL=3000
-````
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+NEXT_PUBLIC_WS_URL=http://localhost:3001
+NEXT_PUBLIC_AUTH_COOKIE_NAME=auth_token          # name of the session cookie (client-accessible)
+NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE=86400            # cookie lifetime in seconds (24h, client-accessible)
+```
 
-## Instalación
+## Run
 
 ```bash
 npm install
-```
-
-## Ejecución en Desarrollo
-
-```bash
 npm run dev
 ```
 
-Aplicación disponible en:
+## Testing
 
-```
-http://localhost:3000
-```
+Comprehensive test suite with **285 tests** across 29 suites using Jest + React Testing Library.
 
-## Build Producción
+**Coverage:** 100% statements · 100% lines · 100% branches · 100% functions
 
-```bash
-npm run build
-npm start
-```
-
-## API Mock Incluida
-
-El proyecto incluye un endpoint mock:
-
-```
-GET  /api/mock/turnos
-POST /api/mock/turnos
-```
-
-Esto permite ejecutar el frontend sin backend real.
-
-## Decisiones Técnicas
-
-* No se utiliza estado global (no necesario para el dominio actual)
-* Polling en lugar de WebSocket para simplicidad del MVP, escalable a SSE / WebSocket
-* CSS Modules para evitar colisiones de estilos
-* Cliente HTTP centralizado para resiliencia
-* Arquitectura preparada para escalar sin refactor complejo
-
-## Preparado para Escalar
-
-El proyecto está diseñado para evolucionar hacia:
-
-* WebSocket / SSE
-* Backend real con colas (RabbitMQ)
-* Observabilidad (si se requiere)
-* Testing automatizado
-* Despliegue en contenedores
-* Multi-pantalla en tiempo real
-
-## Calidad de Código
-
-* Sin memory leaks
-* Sin loops duplicados
-* Sin re-render innecesario
-* Manejo de errores controlado
-* Sanitización de inputs
-* Código documentado
-* Separación de responsabilidades
-
-## Scripts
+### Test Commands
 
 ```bash
-npm run dev      # Desarrollo
-npm run build    # Build producción
-npm start        # Ejecutar build
-npm run lint     # Lint
+# Run all tests
+npm test
+
+# Watch mode (auto-rerun on changes)
+npm run test:watch
+
+# Coverage report
+npm run test:coverage
 ```
 
-## Requisitos
+### Test Structure
 
-* Node.js 20+
-* NPM 9+
+Tests mirror the hexagonal architecture of `src/` exactly:
 
-## Estado del Proyecto
+```
+src/__tests__/
+├── infrastructure/
+│   ├── adapters/    ← BrowserAudioAdapter, HtmlSanitizer, HttpTicketAdapter,
+│   │                  SocketIOAdapter, NoopAuthAdapter
+│   ├── http/        ← CircuitBreaker, httpClient
+│   ├── mappers/     ← ticketMapper, authMapper
+│   └── cookies/     ← cookieUtils
+├── hooks/           ← useCreateTicket, useTicketsWebSocket, useAudioNotification, useAuth
+├── providers/       ← DependencyProvider, AuthProvider, ConnectedAuthProvider
+├── components/      ← CreateTicketForm, Navbar, SignInForm, SignUpForm,
+│                      SignOutButton, AuthGuard
+├── app/             ← page, dashboard/page, register/page, signin/page, signup/page
+└── mocks/           ← factories.ts (shared mock builders including mockAuthService, buildUser)
+```
 
-**MVP funcional — estable — preparado para evolución.**
+All tests use fully isolated mock objects via `src/__tests__/mocks/factories.ts` — no real network calls, no real server required.
+
