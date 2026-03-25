@@ -14,3 +14,7 @@ Al analizar las propuestas, decidí tomar la segunda solución mejorándola seg�
 Usando los principios de INVEST, generé historias de usuario para la nueva funcionalidad, basado en el articulo de referencia en medium https://medium.com/somos-codeicus/m%C3%A9todo-invest-f8491c1422e7
 
 Para refinar las ideas con las historias de usuario, utilicé la herramienta [SKAI](https://ai.sofka.com.co/chat) con la instrucción de "diagnosticar historias de  usuario" y generar posibles criterios de aceptación, sin embargo la herramienta no logró generar criterios de aceptación relevantes para las historias de usuario, por lo que decidí escribirlos manualmente basándome en el contexto del negocio y las necesidades de los usuarios.
+
+**Estructura de criterios de aceptación**
+
+Para generar los criterios de aceptación, me basé en el artículo de referencia en media publicado por Thiga https://www.media.thiga.co/es/gherkin
