@@ -36,3 +36,7 @@ También me basé en el artículo de Justinmind sobre microinteracciones: https:
 Para mejorar la redacción de las historias de usuario, me basé en el artículo de referencia
 de Pradeep Kadarla sobre mejores prácticas para el refinamiento de historias de usuario:
 https://medium.com/@kadarla.pradeep4/user-story-refinement-best-practices-1156548879e4
+
+**Definición de historias de usuario con BDD**
+
+Para definir las historias de usuario con BDD, me basé en el artículo de referencia de Cucumber sobre BDD: https://cucumber.io/docs/bdd/ enfocando la creación y mejora de historias de usuario al comportamiento esperado del sistema y la experiencia del usuario, sin necesidad de dividir las historias en tareas técnicas, sino enfocándome en el valor que cada historia aporta al usuario final y al negocio. Esto me permitió mantener un enfoque centrado en el usuario y asegurar que cada historia de usuario esté alineada con los objetivos del negocio y las necesidades de los usuarios.
