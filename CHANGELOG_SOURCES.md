@@ -30,3 +30,9 @@ Para asegurar una buena experiencia de usuario, implementé validaciones en los 
 Para desarrollar la edición y eliminación de médicos y que fuera intuitiva, me basé en el artículo de referencia de Nielsen Norman Group sobre microinteracciones: https://www.nngroup.com/articles/microinteractions/
 
 También me basé en el artículo de Justinmind sobre microinteracciones: https://www.justinmind.com/es/diseno-web/microinteracciones
+
+**Refinamiento de historias de usuario**
+
+Para mejorar la redacción de las historias de usuario, me basé en el artículo de referencia
+de Pradeep Kadarla sobre mejores prácticas para el refinamiento de historias de usuario:
+https://medium.com/@kadarla.pradeep4/user-story-refinement-best-practices-1156548879e4
