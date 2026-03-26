@@ -18,3 +18,9 @@ Para refinar las ideas con las historias de usuario, utilicé la herramienta [SK
 **Estructura de criterios de aceptación**
 
 Para generar los criterios de aceptación, me basé en el artículo de referencia en media publicado por Thiga https://www.media.thiga.co/es/gherkin
+
+**Validación de campos en el formulario**
+
+Para asegurar una buena experiencia de usuario, implementé validaciones en los criterios de aceptación para el formulario de creación de médicos basandome en esta fuente de referencia:
+
+* Guía de Mejores Prácticas para Campos Obligatorios en Formularios Web de teacup lab: https://www.teacuplab.com/es/blog/campos-obligatorios-mejores-practicas/
