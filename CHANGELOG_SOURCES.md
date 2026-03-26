@@ -24,3 +24,9 @@ Para generar los criterios de aceptación, me basé en el artículo de referenci
 Para asegurar una buena experiencia de usuario, implementé validaciones en los criterios de aceptación para el formulario de creación de médicos basandome en esta fuente de referencia:
 
 * Guía de Mejores Prácticas para Campos Obligatorios en Formularios Web de teacup lab: https://www.teacuplab.com/es/blog/campos-obligatorios-mejores-practicas/
+
+**Microinteracciones para mejorar la experiencia de usuario**
+
+Para desarrollar la edición y eliminación de médicos y que fuera intuitiva, me basé en el artículo de referencia de Nielsen Norman Group sobre microinteracciones: https://www.nngroup.com/articles/microinteractions/
+
+También me basé en el artículo de Justinmind sobre microinteracciones: https://www.justinmind.com/es/diseno-web/microinteracciones
