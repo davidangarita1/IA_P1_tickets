@@ -40,3 +40,9 @@ https://medium.com/@kadarla.pradeep4/user-story-refinement-best-practices-115654
 **Definición de historias de usuario con BDD**
 
 Para definir las historias de usuario con BDD, me basé en el artículo de referencia de Cucumber sobre BDD: https://cucumber.io/docs/bdd/ enfocando la creación y mejora de historias de usuario al comportamiento esperado del sistema y la experiencia del usuario, sin necesidad de dividir las historias en tareas técnicas, sino enfocándome en el valor que cada historia aporta al usuario final y al negocio. Esto me permitió mantener un enfoque centrado en el usuario y asegurar que cada historia de usuario esté alineada con los objetivos del negocio y las necesidades de los usuarios.
+
+## Definición tecnica**
+
+**Patrones de diseño**
+
+Para la implementación de la nueva funcionalidad, consulte la web de Refactoring Guru para elegir los patrones de diseño más adecuados para la gestión de médicos y consultorios en este enlace: https://refactoring.guru/es/design-patterns
