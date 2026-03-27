@@ -50,3 +50,8 @@ Para la estimación de las historias de usuario, decidi utilizar estimación con
 **Patrones de diseño**
 
 Para la implementación de la nueva funcionalidad, consulte la web de Refactoring Guru para elegir los patrones de diseño más adecuados para la gestión de médicos y consultorios en este enlace: https://refactoring.guru/es/design-patterns
+
+
+**Diagrama de secuencia**
+
+Para la creación de diagramas de secuencia, me basé en el artículo de referencia de Lucidchart sobre diagramas de secuencia: https://www.lucidchart.com/pages/es/diagrama-de-secuencia y use la herramienta de https://www.drawio.com/ para crearlo.
