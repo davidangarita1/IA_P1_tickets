@@ -55,3 +55,8 @@ Para la implementación de la nueva funcionalidad, consulte la web de Refactorin
 **Diagrama de secuencia**
 
 Para la creación de diagramas de secuencia, me basé en el artículo de referencia de Lucidchart sobre diagramas de secuencia: https://www.lucidchart.com/pages/es/diagrama-de-secuencia y use la herramienta de https://www.drawio.com/ para crearlo.
+
+
+**Diagrama de arquitectura**
+
+Para la creación de diagramas de arquitectura, me basé en el artículo de referencia de C4 model: https://c4model.com/ para representar la arquitectura del sistema y cómo se integrará la nueva funcionalidad de gestión de médicos y use la herramienta de https://www.drawio.com/ para crearlo.
