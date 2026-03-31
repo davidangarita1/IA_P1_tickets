@@ -1,5 +1,5 @@
 ---
-name: agent-tdd
+name: tdd-agent
 description: TDD agent for NestJS/Next.js in TypeScript (invoke with $agent-tdd)
 ---
 
