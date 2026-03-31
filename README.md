@@ -106,15 +106,30 @@ Configurar en `.env` (basado en `.env.example`):
 - `RABBITMQ_USER`
 - `RABBITMQ_PASS`
 - `RABBITMQ_QUEUE`
+- `RABBITMQ_NOTIFICATIONS_QUEUE`
 - `MONGODB_PORT`
 - `MONGO_USER`
 - `MONGO_PASS`
+- `MONGODB_URI`
+- `SCHEDULER_INTERVAL_MS` (default: 15000 ms)
+- `CONSULTORIOS_TOTAL` (default: 5)
+- `AUTH_TOKEN_SECRET` (clave HMAC para tokens de autenticación)
 
 ## API principal (Producer)
+
+### Turnos
 
 - `POST /turnos`: crear turno (respuesta asíncrona `202 Accepted`).
 - `GET /turnos`: listar turnos.
 - `GET /turnos/:cedula`: consultar turnos por cédula.
+
+### Autenticación (`/auth`)
+
+- `POST /auth/signUp`: registrar nuevo usuario (`{ email, password, nombre, rol }`).
+- `POST /auth/signIn`: iniciar sesión (`{ email, password }`), devuelve token.
+- `POST /auth/signOut`: cerrar sesión (stateless, limpieza server-side).
+- `GET /auth/me`: obtener usuario actual a partir del Bearer token (protegido).
+- `GET /auth/dashboard-history`: historial de turnos para el dashboard (protegido).
 
 Ejemplo:
 
@@ -130,6 +145,16 @@ Backend (producer):
 
 ```bash
 cd backend/producer
+npm test
+npm run test:cov
+# Pruebas de aceptación (Cucumber/BDD)
+npm run test:acceptance
+```
+
+Backend (consumer):
+
+```bash
+cd backend/consumer
 npm test
 npm run test:cov
 ```
