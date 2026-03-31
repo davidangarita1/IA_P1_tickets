@@ -81,10 +81,9 @@ La IA debe:
 - Asignación de consultorio.
 - Notificación en tiempo real.
 - Consulta por listado y por cédula.
-
-Feature en ideación:
-- Login para ocultar dashboard a guest.
-- Guest mantiene registro + seguimiento de llamado.
+- Autenticación de usuarios (signUp / signIn / signOut) con roles `employee` y `admin`.
+- Protección de rutas privadas (dashboard) via `AuthGuard` y middleware.
+- Dashboard operativo restringido a usuarios autenticados.
 
 ---
 
