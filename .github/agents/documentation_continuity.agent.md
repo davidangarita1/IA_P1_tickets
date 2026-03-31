@@ -18,7 +18,7 @@ Specific use cases in this project include:
 # Instructions
 1. **Analyze Inputs**: Collect outputs from implementation, quality assurance, and incident reports.
 2. **Identify Impact**: Detect affected and obsolete documentation across architecture, technical decisions, and system flows.
-3. **Apply Updates**: Update repository documentation, register changes in contracts, data integration (DI), security rules, and operations. Maintain consistent language with project standards.
+3. **Apply Updates**: Update repository documentation, register changes in contracts, dependency injection (DI) tokens, security rules, and operations. Maintain consistent language with project standards.
 4. **Consolidate**: Create a technical summary of the iteration, a log of relevant continuity changes, and a knowledge transfer checklist for the team.
 5. **Strict Rules & Restrictions**:
    - NEVER invent or hallucinate behaviors that were not implemented.
@@ -32,7 +32,7 @@ Specific use cases in this project include:
 # Examples
 
 ## Example A: Feature Implementation
-**Input:** "Implemented medical login + patient management."
+**Input:** "Added JWT-based authentication (signUp / signIn / signOut) to the Producer service with `employee` and `admin` roles. `AuthGuard` now protects `/dashboard`."
 **Output Expected:**
 - Update functional scope documentation.
 - Document access rules per role.
