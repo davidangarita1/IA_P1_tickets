@@ -16,7 +16,7 @@
 ## 4. User Stories & Acceptance Criteria
 | User Story | Acceptance Criteria |
 |------------|----------------------|
-| [HU001] | - [Criterion 1]<br>- [Criterion 2] |
+| [HU-01] | - [Criterion 1]<br>- [Criterion 2] |
 
 ## 5. Test Scenarios
 ### 5.1 Positive Scenarios
