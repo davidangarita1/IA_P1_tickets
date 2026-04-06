@@ -146,6 +146,14 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Entonces aparece el mensaje “El nombre completo debe tener al menos 3 caracteres” debajo del campo
   Y el botón “Guardar” permanece deshabilitado
 
+- **Escenario:** No se puede guardar un médico con consultorio asignado pero sin franja horaria seleccionada
+  Dado que el modal de creación está abierto
+  Y el usuario "Empleado/Administrador" selecciona el Consultorio "2" en el primer desplegable
+  Y el segundo desplegable tiene franjas disponibles
+  Pero el usuario no selecciona ninguna franja horaria
+  Entonces el botón "Guardar" permanece deshabilitado
+  Y aparece el mensaje "La franja horaria es obligatoria cuando se asigna un consultorio" debajo del campo
+
 - **Escenario:** No se puede crear un médico con un número de cédula que ya existe
   Dado que el modal de creación está abierto
   Y ya existe un médico con el Número de cédula “12345678”

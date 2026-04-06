@@ -49,11 +49,16 @@ export default function DoctorFormModal({
         ? "La cédula debe tener entre 7 y 10 dígitos"
         : null;
 
-  const isFormValid = name.length >= 3 && documentId.length >= 7 && documentId.length <= 10;
-
   const officeSelected = office !== "";
   const noShiftsAvailable = officeSelected && !shiftsLoading && shifts.length === 0;
   const shiftDisabled = !officeSelected || shiftsLoading || noShiftsAvailable;
+  const shiftRequiredError = officeSelected && !shiftDisabled && shift === "";
+
+  const isFormValid =
+    name.length >= 3 &&
+    documentId.length >= 7 &&
+    documentId.length <= 10 &&
+    !(officeSelected && shift === "");
 
   const handleOfficeChange = useCallback(
     (value: string) => {
@@ -175,6 +180,11 @@ export default function DoctorFormModal({
           {noShiftsAvailable && (
             <span className={styles.error}>
               No hay franjas disponibles para este consultorio
+            </span>
+          )}
+          {shiftRequiredError && (
+            <span className={styles.error}>
+              La franja horaria es obligatoria cuando se asigna un consultorio
             </span>
           )}
         </div>

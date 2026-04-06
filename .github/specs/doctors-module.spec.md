@@ -389,7 +389,7 @@ Status:      FUERA DE ALCANCE — Fase siguiente
 
 6. **Campos Opcionales:** 
    - Consultorio: se puede dejar vacío
-   - Franja Horaria: se puede dejar vacío (pero si se asigna Consultorio, debe haber Franja disponible)
+   - Franja Horaria: se puede dejar vacío, **pero si se asigna Consultorio, la Franja Horaria pasa a ser obligatoria**. No se puede guardar un médico con consultorio asignado y sin franja horaria.
 
 7. **Bloqueo de Eliminación:** Un médico no puede eliminarse si tiene un turno en estado "llamado" o "atendido" en el momento de la solicitud de baja.
 
@@ -835,6 +835,7 @@ frontend/src/
 - [x] Validación de cédula: solo números, 7-10 dígitos, obligatoria, única
 - [x] Validación de franjaHoraria: solo valores "06:00-14:00" o "14:00-22:00"
 - [x] Validación de consultorio: puede ser null, pero si se asigna franja debe ser válida
+- [x] Validación cruzada: si se asigna consultorio, la franja horaria es obligatoria (400 si consultorio presente y franja ausente)
 - [x] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
 - [ ] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
 - [ ] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors

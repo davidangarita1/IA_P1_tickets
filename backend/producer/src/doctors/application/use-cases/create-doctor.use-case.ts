@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
 import { IDoctorRepository } from '../../domain/ports/doctor.repository';
 import { DOCTOR_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
 import { Doctor, Shift } from '../../domain/entities/doctor.entity';
@@ -17,6 +17,10 @@ export class CreateDoctorUseCase {
     ) {}
 
     async execute(data: CreateDoctorData): Promise<Doctor> {
+        if (data.office && !data.shift) {
+            throw new BadRequestException('La franja horaria es obligatoria cuando se asigna un consultorio');
+        }
+
         const existing = await this.doctorRepository.findByDocumentId(data.documentId);
         if (existing) {
             throw new ConflictException('Ya existe un médico registrado con ese número de cédula');
