@@ -842,30 +842,30 @@ frontend/src/
 
 ### Backend — Tests
 
-- [ ] `test_doctor_entity_creation_with_complete_data` — entity instancia correctamente
-- [ ] `test_doctor_entity_creation_with_minimal_data` — entity instancia sin consultorio/franja
-- [ ] `test_create_doctor_use_case_success` — happy path creación
-- [ ] `test_create_doctor_use_case_cedula_duplicate_throws_conflict` — cedula duplicada
-- [ ] `test_create_doctor_use_case_shift_occupied_throws_conflict` — franja ocupada
-- [ ] `test_create_doctor_use_case_invalid_name_throws_validation_error` — nombre < 3 chars
-- [ ] `test_create_doctor_use_case_invalid_cedula_throws_validation_error` — cedula inválida
+- [x] `test_doctor_entity_creation_with_complete_data` — entity instancia correctamente
+- [x] `test_doctor_entity_creation_with_minimal_data` — entity instancia sin consultorio/franja
+- [x] `test_create_doctor_use_case_success` — happy path creación
+- [x] `test_create_doctor_use_case_cedula_duplicate_throws_conflict` — cedula duplicada
+- [x] `test_create_doctor_use_case_shift_occupied_throws_conflict` — franja ocupada
+- [x] `test_create_doctor_use_case_invalid_name_throws_validation_error` — nombre < 3 chars
+- [x] `test_create_doctor_use_case_invalid_cedula_throws_validation_error` — cedula inválida
 - [ ] `test_update_doctor_use_case_changes_shift` — libera franja anterior
 - [ ] `test_update_doctor_use_case_cedula_immutable` — no actualiza cedula
 - [ ] `test_delete_doctor_use_case_success_no_active_turnos` — soft delete exitoso
 - [ ] `test_delete_doctor_use_case_blocked_active_turno` — bloqueo por turno activo
-- [ ] `test_doctor_mongoose_adapter_insert_creates_document` — adapter persiste
-- [ ] `test_doctor_mongoose_adapter_find_by_cedula_returns_doctor` — búsqueda por cedula
-- [ ] `test_doctor_mongoose_adapter_find_available_shifts` — franjas libres
-- [ ] `test_doctor_controller_post_returns_201` — endpoint crea y retorna 201
-- [ ] `test_doctor_controller_post_returns_409_duplicate_cedula` — conflicto cedula
-- [ ] `test_doctor_controller_post_returns_401_no_token` — sin autenticación
-- [ ] `test_doctor_controller_get_returns_200` — listado retorna 200
+- [x] `test_doctor_mongoose_adapter_insert_creates_document` — adapter persiste
+- [x] `test_doctor_mongoose_adapter_find_by_cedula_returns_doctor` — búsqueda por cedula
+- [x] `test_doctor_mongoose_adapter_find_available_shifts` — franjas libres
+- [x] `test_doctor_controller_post_returns_201` — endpoint crea y retorna 201
+- [x] `test_doctor_controller_post_returns_409_duplicate_cedula` — conflicto cedula
+- [x] `test_doctor_controller_post_returns_401_no_token` — sin autenticación
+- [x] `test_doctor_controller_get_returns_200` — listado retorna 200
 - [ ] `test_doctor_controller_delete_returns_204` — eliminación retorna 204
 - [ ] `test_doctor_controller_delete_returns_409_active_turno` — bloqueo activo
 
 ### Frontend — Página y Componentes
 
-- [ ] Crear `DoctorsPage` (app/doctors/page.tsx) con ProtectedRoute
+- [x] Crear `DoctorsPage` (app/doctors/page.tsx) con ProtectedRoute
 - [ ] Crear `DoctorTable` componente que:
   - [ ] Renderiza tabla con columnas: Nombre (Dr. Nombre), Cédula, Consultorio, Franja, Acciones
   - [ ] Muestra "No hay médicos creados" cuando lista vacía
@@ -873,66 +873,66 @@ frontend/src/
   - [ ] Tiene ícono de eliminación (basura) en cada fila
   - [ ] State loading/error con skeleton o spinner
   - [ ] Botón "Crear médico" en superior derecha
-- [ ] Crear `DoctorFormModal` que:
-  - [ ] Modo create: campos vacíos, botones "Cerrar" y "Guardar"
+- [x] Crear `DoctorFormModal` que:
+  - [x] Modo create: campos vacíos, botones "Cerrar" y "Guardar"
   - [ ] Modo edit: campos precargados con datos del médico, mismos botones
-  - [ ] Campo nombre: validación mín. 3 caracteres en tiempo real, mensaje de error
-  - [ ] Campo cédula: acepta solo números 7-10 dígitos, validación en tiempo real
-  - [ ] Desplegable consultorio: solo consultorios válidos
-  - [ ] Desplegable franja: solo franjas libres para el consultorio seleccionado (fetch en tiempo real)
-  - [ ] Si consultorio sin franjas libres: desactiva desplegable y muestra mensaje
-  - [ ] Botón "Guardar" deshabilitado hasta que datos sean válidos
-  - [ ] Manejo de loading durante request (spinner en botón)
-  - [ ] Cierre del modal con "Cerrar" sin guardar
-  - [ ] Prevención de cierre accidental (clic fuera NO cierra, Escape NO cierra)
+  - [x] Campo nombre: validación mín. 3 caracteres en tiempo real, mensaje de error
+  - [x] Campo cédula: acepta solo números 7-10 dígitos, validación en tiempo real
+  - [x] Desplegable consultorio: solo consultorios válidos
+  - [x] Desplegable franja: solo franjas libres para el consultorio seleccionado (fetch en tiempo real)
+  - [x] Si consultorio sin franjas libres: desactiva desplegable y muestra mensaje
+  - [x] Botón "Guardar" deshabilitado hasta que datos sean válidos
+  - [x] Manejo de loading durante request (spinner en botón)
+  - [x] Cierre del modal con "Cerrar" sin guardar
+  - [x] Prevención de cierre accidental (clic fuera NO cierra, Escape NO cierra)
 - [ ] Crear `ConfirmDeleteModal` que:
   - [ ] Muestra nombre del médico: "¿Desea eliminar al médico Dr. {nombre}?"
   - [ ] Botones "Cancelar" y "Aceptar"
   - [ ] "Aceptar" dispara eliminación, muestra spinner
   - [ ] "Cancelar" cierra modal sin eliminar
-- [ ] Crear/actualizar `Toast/Notification` componente para mensajes flotantes:
-  - [ ] Soporta tipos: success, error, info
-  - [ ] Auto-desaparece tras duración especificada (default 5s)
-  - [ ] Puede ser cerrado manualmente
-- [ ] Actualizar `Navbar.tsx`:
-  - [ ] Agregar botón "Gestión Médicos"
-  - [ ] Visible solo para usuarios autenticados
-  - [ ] Navega a `/doctors`
-  - [ ] Posicionado en barra de navegación principal
-- [ ] Actualizar `App.tsx` o router config:
-  - [ ] Registrar ruta `/doctors` → `<ProtectedRoute><DoctorsPage /></ProtectedRoute>`
+- [x] Crear/actualizar `Toast/Notification` componente para mensajes flotantes:
+  - [x] Soporta tipos: success, error, info
+  - [x] Auto-desaparece tras duración especificada (default 5s)
+  - [x] Puede ser cerrado manualmente
+- [x] Actualizar `Navbar.tsx`:
+  - [x] Agregar botón "Gestión Médicos"
+  - [x] Visible solo para usuarios autenticados
+  - [x] Navega a `/doctors`
+  - [x] Posicionado en barra de navegación principal
+- [x] Actualizar `App.tsx` o router config:
+  - [x] Registrar ruta `/doctors` → `<ProtectedRoute><DoctorsPage /></ProtectedRoute>`
 
 ### Frontend — Lógica (Hooks y Services)
 
-- [ ] Crear `services/doctorService.ts` con funciones:
-  - [ ] `getAllDoctors(token, page?, limit?)` — GET /api/v1/doctors
-  - [ ] `createDoctor(data, token)` — POST /api/v1/doctors
+- [x] Crear `services/doctorService.ts` con funciones:
+  - [x] `getAllDoctors(token, page?, limit?)` — GET /api/v1/doctors
+  - [x] `createDoctor(data, token)` — POST /api/v1/doctors
   - [ ] `updateDoctor(doctorId, data, token)` — PUT /api/v1/doctors/{id}
   - [ ] `deleteDoctor(doctorId, token)` — DELETE /api/v1/doctors/{id}
-  - [ ] `getAvailableShifts(consultorio, excludeDoctorId?, token)` — GET /api/v1/doctors/available-shifts
-  - [ ] Manejo de errores: lanzar excepciones descriptivas
-  - [ ] Headers: `Authorization: Bearer {token}`
-- [ ] Crear `hooks/useDoctors.ts` que:
-  - [ ] Estado: `doctors[]`, `loading`, `error`
-  - [ ] Métodos: `create()`, `update()`, `delete()`, `refresh()`
-  - [ ] useEffect en mount: carga doctors del backend
-  - [ ] Consume token desde `useAuth()`
-  - [ ] Manejo de errores: guarda en state, no lanza
+  - [x] `getAvailableShifts(consultorio, excludeDoctorId?, token)` — GET /api/v1/doctors/available-shifts
+  - [x] Manejo de errores: lanzar excepciones descriptivas
+  - [x] Headers: `Authorization: Bearer {token}`
+- [x] Crear `hooks/useDoctors.ts` que:
+  - [x] Estado: `doctors[]`, `loading`, `error`
+  - [x] Métodos: `create()`, `update()`, `delete()`, `refresh()`
+  - [x] useEffect en mount: carga doctors del backend
+  - [x] Consume token desde `useAuth()`
+  - [x] Manejo de errores: guarda en state, no lanza
   - [ ] Paginación opcional (page, limit)
-- [ ] Crear `hooks/useAvailableShifts.ts` que:
-  - [ ] Estado: `shifts[]`, `loading`, `error`
-  - [ ] Método: `fetchShifts(consultorio, excludeDoctorId?)`
+- [x] Crear `hooks/useAvailableShifts.ts` que:
+  - [x] Estado: `shifts[]`, `loading`, `error`
+  - [x] Método: `fetchShifts(consultorio, excludeDoctorId?)`
   - [ ] Cachés resultados si consultorio igual (prevé calls innecesarias)
-  - [ ] Retorna franjas disponibles como array
-- [ ] Crear `domain/Doctor.ts` (TypeScript interface/tipo):
-  - [ ] `_id: string`
-  - [ ] `nombre: string`
-  - [ ] `cedula: string`
-  - [ ] `consultorio: string | null`
-  - [ ] `franjaHoraria: "06:00-14:00" | "14:00-22:00" | null`
-  - [ ] `status: "Activo" | "Inactivo"`
-  - [ ] `created_at: string (ISO)`
-  - [ ] `updated_at: string (ISO)`
+  - [x] Retorna franjas disponibles como array
+- [x] Crear `domain/Doctor.ts` (TypeScript interface/tipo):
+  - [x] `_id: string`
+  - [x] `nombre: string`
+  - [x] `cedula: string`
+  - [x] `consultorio: string | null`
+  - [x] `franjaHoraria: "06:00-14:00" | "14:00-22:00" | null`
+  - [x] `status: "Activo" | "Inactivo"`
+  - [x] `created_at: string (ISO)`
+  - [x] `updated_at: string (ISO)`
 
 ### Frontend — Tests
 
@@ -940,20 +940,20 @@ frontend/src/
 - [ ] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
 - [ ] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
 - [ ] `test_DoctorTable_delete_icon_opens_confirm_modal` — ícono eliminación abre confirm
-- [ ] `test_DoctorFormModal_mode_create_shows_empty_fields` — modal create campos vacíos
+- [x] `test_DoctorFormModal_mode_create_shows_empty_fields` — modal create campos vacíos
 - [ ] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
-- [ ] `test_DoctorFormModal_cedula_field_only_accepts_numbers` — validación cedula
-- [ ] `test_DoctorFormModal_nombre_field_min_3_chars` — validación nombre
-- [ ] `test_DoctorFormModal_submit_success_shows_toast` — submit exitoso muestra toast
-- [ ] `test_DoctorFormModal_submit_error_shows_error_message` — error muestra mensaje
-- [ ] `test_DoctorFormModal_close_without_save` — cerrar sin guardar
+- [x] `test_DoctorFormModal_cedula_field_only_accepts_numbers` — validación cedula
+- [x] `test_DoctorFormModal_nombre_field_min_3_chars` — validación nombre
+- [x] `test_DoctorFormModal_submit_success_shows_toast` — submit exitoso muestra toast
+- [x] `test_DoctorFormModal_submit_error_shows_error_message` — error muestra mensaje
+- [x] `test_DoctorFormModal_close_without_save` — cerrar sin guardar
 - [ ] `test_ConfirmDeleteModal_confirm_deletes_doctor` — confirmar elimina
 - [ ] `test_ConfirmDeleteModal_cancel_closes_modal` — cancelar cierra
 - [ ] `test_Navbar_button_visible_when_authenticated` — botón visible autenticado
 - [ ] `test_Navbar_button_hidden_when_not_authenticated` — botón oculto no autenticado
 - [ ] `test_Navbar_button_navigates_to_doctors_page` — botón navega a /doctors
-- [ ] `test_useDoctors_hook_loads_data_on_mount` — hook carga doctors
-- [ ] `test_useDoctors_hook_create_sends_post_request` — hook crea
+- [x] `test_useDoctors_hook_loads_data_on_mount` — hook carga doctors
+- [x] `test_useDoctors_hook_create_sends_post_request` — hook crea
 - [ ] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
 - [ ] `test_useDoctors_hook_delete_sends_delete_request` — hook elimina
 
