@@ -105,7 +105,7 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-EM-09 | Cédula duplicada en edición muestra alerta | Otro médico con cédula "99999999" | Cambiar cédula a "99999999" y perder foco o intentar guardar | "Guardar" deshabilitado, mensaje flotante rojo "Ya existe un médico registrado con ese número de cédula", modal abierto |
 | TC-EM-10 | Franja horaria se precarga correctamente en modal de edición | Médico con consultorio "2" y franja "06:00-14:00" | Clic en ícono de lápiz | El desplegable de franja muestra "06:00-14:00" seleccionada y las franjas disponibles del consultorio |
 | TC-EM-11 | Guardar edición envía el ID correcto del médico (regresión: CastError undefined) | Médico existente con _id válido | Abrir modal de edición, modificar nombre, clic en "Guardar" | PUT /api/v1/doctors/:id se ejecuta con el ID real del médico (no "undefined"), respuesta 200 |
-| TC-EM-12 | La entidad Doctor incluye _id en serialización JSON (regresión) | Médico creado en BD | GET /api/v1/doctors | Cada objeto doctor en la respuesta contiene `_id` e `id` con el mismo valor |
+| TC-EM-12 | La entidad Doctor incluye _id en serialización JSON (regresión) | Médico creado en BD | GET /api/v1/doctors | Cada objeto doctor en la respuesta contiene la propiedad `_id` con su ID. No existe propiedad `id` duplicada en el JSON |
 
 ### Suite 4 — Baja de médico (HU-04)
 
@@ -277,7 +277,7 @@ Verifican escenarios completos en lenguaje Gherkin, enfocados en el resultado es
 | Baja de médico con turno en curso no bloqueada | HU-04 | 2 | 3 | **6** | Probar baja mientras el médico tiene un turno activo en franjas activas |
 | Eliminación física en lugar de lógica | HU-04 | 1 | 3 | **3** | Verificar que el registro persista en BD con estado "Inactivo" tras la baja |
 | Combinación consultorio/franja no liberada tras baja | HU-04 | 2 | 3 | **6** | Tras dar de baja, intentar asignar la misma combinación a otro médico |
-| Serialización de _id ausente en respuesta JSON del backend | HU-03 | 2 | 3 | **6** | Test de regresión (TC-EM-12) verifica que `_id` esté presente en JSON.stringify de Doctor; usar propiedades de instancia, no getters de clase |
+| Serialización de _id ausente en respuesta JSON del backend | HU-03 | 2 | 3 | **6** | Test de regresión (TC-EM-12) verifica que `_id` esté presente y que no exista `id` duplicado en JSON.stringify de Doctor; usar propiedad de instancia única `_id`, no getters ni duplicados |
 | Franja horaria no precargada en modal de edición por _id undefined | HU-03 | 2 | 2 | **4** | Test de regresión (TC-EM-10) verifica que el desplegable de franja muestre la selección actual al abrir el modal |
 
 *(Escala: 1 Bajo, 2 Medio, 3 Alto)*
