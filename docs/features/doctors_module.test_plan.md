@@ -105,7 +105,7 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-EM-09 | Cédula duplicada en edición muestra alerta | Otro médico con cédula "99999999" | Cambiar cédula a "99999999" y perder foco o intentar guardar | "Guardar" deshabilitado, mensaje flotante rojo "Ya existe un médico registrado con ese número de cédula", modal abierto |
 | TC-EM-10 | Franja horaria se precarga correctamente en modal de edición | Médico con consultorio "2" y franja "06:00-14:00" | Clic en ícono de lápiz | El desplegable de franja muestra "06:00-14:00" seleccionada y las franjas disponibles del consultorio |
 | TC-EM-11 | Guardar edición envía el ID correcto del médico (regresión: CastError undefined) | Médico existente con _id válido | Abrir modal de edición, modificar nombre, clic en "Guardar" | PUT /api/v1/doctors/:id se ejecuta con el ID real del médico (no "undefined"), respuesta 200 |
-| TC-EM-12 | La entidad Doctor incluye _id en serialización JSON (regresión) | Médico creado en BD | GET /api/v1/doctors | Cada objeto doctor en la respuesta contiene la propiedad `_id` con su ID. No existe propiedad `id` duplicada en el JSON |
+| TC-EM-12 | La entidad Doctor incluye _id en serialización JSON (regresión) | Médico creado en BD | GET /api/v1/doctors | Cada objeto doctor en la respuesta contiene la propiedad `_id` con su ID.
 
 ### Suite 4 — Baja de médico (HU-04)
 
