@@ -167,6 +167,29 @@ npm test
 npm run test:coverage
 ```
 
+## 📋 Documentación de Calidad y Auditoría
+
+Para entender el estado técnico del proyecto, disponible en [`docs/quality-audits/`](docs/quality-audits/):
+
+| Documento | Propósito |
+|-----------|----------|
+| **AUDIT_REPORT.md** | Auditoría técnica completa: arquitectura, seguridad, transparencia de IA (🟠 Aceptable con Riesgos Críticos) |
+| **DEBT_REPORT_BACKEND.md** | Análisis de deuda técnica: backend producer + consumer (13 items pendientes) |
+| **DEBT_REPORT_FRONT.md** | Análisis de deuda técnica: frontend (🔴 Crítico — 0 tests) |
+| **AI_WORKFLOW.md** | Flujo de trabajo AI-First: orquestación de agentes y generación de código |
+| **CHANGELOG_SOURCES.md** | Decisiones humanas vs propuestas de IA en módulo de médicos |
+| **TEST_PLAN.md** | Plan de pruebas v3.1: procesos validados (registro, login, turnos) |
+| **TESTING_STRATEGY.md** | Estrategia de QA: verificar vs validar, roadmap de TDD |
+
+**Hallazgos críticos resumidos:**
+- ⚠️ Frontend sin framework de testing (0 tests instalados)
+- ⚠️ Seguridad: middleware mal nombrado, no se ejecuta en producción
+- ⚠️ Falta trazabilidad de prompts y correcciones de IA
+
+Ver detalles completos en [`docs/quality-audits/README.md`](docs/quality-audits/README.md).
+
+---
+
 ## Estado del proyecto
 
 Sistema funcional en desarrollo continuo, con enfoque en robustecer arquitectura hexagonal y calidad para producción.
