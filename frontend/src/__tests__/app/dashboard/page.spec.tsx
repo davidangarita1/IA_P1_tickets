@@ -9,6 +9,7 @@ import {
   mockTicketReader,
   mockSanitizer,
   mockAuthService,
+  mockDoctorService,
 } from "@/__tests__/mocks/factories";
 
 const mockPush = jest.fn();
@@ -62,6 +63,7 @@ function setupMocks(options: {
     audio: mockAudioNotifier(),
     sanitizer: mockSanitizer(),
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseTicketsWebSocket.mockReturnValue({
@@ -236,6 +238,7 @@ describe("ServedDashboard", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
@@ -282,6 +285,7 @@ describe("ServedDashboard", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({

@@ -16,7 +16,7 @@ jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
 }));
 
-import { mockSanitizer } from "@/__tests__/mocks/factories";
+import { mockSanitizer, mockDoctorService } from "@/__tests__/mocks/factories";
 import { useAuth } from "@/providers/AuthProvider";
 import { useDeps } from "@/providers/DependencyProvider";
 
@@ -37,6 +37,7 @@ function setupMocks(options: {
     audio: { init: jest.fn(), unlock: jest.fn(), play: jest.fn(), isEnabled: jest.fn() },
     sanitizer,
     authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
+    doctorService: mockDoctorService(),
   });
 
   mockUseAuth.mockReturnValue({

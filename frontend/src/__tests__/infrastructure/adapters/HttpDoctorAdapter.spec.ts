@@ -128,7 +128,7 @@ describe("HttpDoctorAdapter", () => {
       const response = {
         consultorio: "1",
         available_shifts: ["06:00-14:00" as const],
-        occupied_shifts: [] as const[],
+        occupied_shifts: [] as ("06:00-14:00" | "14:00-22:00")[],
       };
       mockFetch.mockResolvedValueOnce(mockResponse(200, response));
 

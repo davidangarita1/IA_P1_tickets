@@ -23,6 +23,7 @@ import { InMemoryUserRepository } from './infrastructure/adapters/in-memory-user
 import { ScryptPasswordHasherAdapter } from './infrastructure/adapters/scrypt-password-hasher.adapter';
 import { HmacTokenService } from './infrastructure/adapters/hmac-token.service';
 import { AuthGuard } from './presentation/auth.guard';
+import { DoctorsModule } from './doctors/doctors.module';
 
 @Module({
     imports: [

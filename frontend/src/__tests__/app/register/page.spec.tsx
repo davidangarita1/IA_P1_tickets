@@ -17,6 +17,7 @@ jest.mock("@/hooks/useCreateTicket", () => ({
 
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useDeps } from "@/providers/DependencyProvider";
+import { mockDoctorService } from "@/__tests__/mocks/factories";
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseCreateTicket = useCreateTicket as jest.MockedFunction<
@@ -42,6 +43,7 @@ beforeEach(() => {
     },
     sanitizer: { sanitize: jest.fn((s: string) => s) },
     authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
+    doctorService: mockDoctorService(),
   });
 
   mockUseCreateTicket.mockReturnValue({

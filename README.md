@@ -13,7 +13,8 @@ Permitir que un paciente registre su turno y reciba actualizaciones en tiempo re
 - Asignar consultorios automáticamente.
 - Notificar cambios de estado en tiempo real al frontend.
 - Consultar turnos por lista general o por cédula.
-- Gestión de médicos: visualización del catálogo de médicos activos con consultorios y franjas horarias (módulo accesible para usuarios autenticados).
+- Gestionar usuarios: registro, inicio y cierre de sesión con autenticación HMAC.
+- Gestión de médicos: crear médicos con nombre, cédula, consultorio y franja horaria; visualizar el catálogo de médicos activos. La franja horaria disponible se consulta en tiempo real antes de guardar, garantizando que no dos médicos activos compartan consultorio y franja. Módulo accesible solo para usuarios autenticados.
 
 ## Próxima feature en ideación: Login + Dashboard privado
 
@@ -132,6 +133,14 @@ Configurar en `.env` (basado en `.env.example`):
 - `GET /auth/me`: obtener usuario actual a partir del Bearer token (protegido).
 - `GET /auth/dashboard-history`: historial de turnos para el dashboard (protegido).
 
+### Médicos (`/api/v1/doctors`)
+
+Todos los endpoints requieren `Authorization: Bearer <token>`.
+
+- `POST /api/v1/doctors`: crear médico (`{ nombre, cedula, consultorio?, franjaHoraria? }`). Responde `201` con el médico creado. Devuelve `409` si la cédula ya existe o si el consultorio+franja ya está asignado a otro médico activo.
+- `GET /api/v1/doctors`: listar médicos activos.
+- `GET /api/v1/doctors/available-shifts?consultorio=<n>`: consultar franjas disponibles para un consultorio dado.
+
 Ejemplo:
 
 ```bash
@@ -140,33 +149,51 @@ curl -X POST http://localhost:3000/turnos \
   -d '{"nombre":"Paciente Test","cedula":12345,"priority":"alta"}'
 ```
 
+## Rutas del frontend
+
+| Ruta | Descripción | Acceso |
+|------|-------------|--------|
+| `/` | Pantalla principal: registro de turno y seguimiento en tiempo real | Público |
+| `/signin` | Inicio de sesión | Público |
+| `/signup` | Registro de usuario | Público |
+| `/register` | Registro de turno alternativo | Público |
+| `/dashboard` | Dashboard operativo: turnos en tiempo real | Autenticado |
+| `/doctors` | Gestión de médicos: listado y creación | Autenticado |
+
 ## Testing
 
 Backend (producer):
 
 ```bash
 cd backend/producer
-npm test
-npm run test:cov
+bun run test
+bun run test:cov
 # Pruebas de aceptación (Cucumber/BDD)
-npm run test:acceptance
+bun run test:acceptance
 ```
 
 Backend (consumer):
 
 ```bash
 cd backend/consumer
-npm test
-npm run test:cov
+bun run test
+bun run test:cov
 ```
 
 Frontend:
 
 ```bash
 cd frontend
-npm test
-npm run test:coverage
+bun run test
+bun run test:coverage
 ```
+
+### Cobertura actual
+
+| Módulo | Tests | Cobertura |
+|--------|-------|-----------|
+| Backend producer | 92 | >95% en todos los archivos de doctors |
+| Frontend | 374 | >98% en componentes y hooks de doctors |
 
 ## 📋 Documentación de Calidad y Auditoría
 

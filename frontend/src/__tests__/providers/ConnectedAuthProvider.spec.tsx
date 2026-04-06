@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import ConnectedAuthProvider from "@/providers/ConnectedAuthProvider";
-import { mockAuthService } from "@/__tests__/mocks/factories";
+import { mockAuthService, mockDoctorService } from "@/__tests__/mocks/factories";
 
 jest.mock("@/providers/DependencyProvider", () => ({
   useDeps: jest.fn(),
@@ -31,6 +31,7 @@ describe("ConnectedAuthProvider", () => {
       audio: { init: jest.fn(), unlock: jest.fn(), play: jest.fn(), isEnabled: jest.fn() },
       sanitizer: { sanitize: jest.fn((s: string) => s) },
       authService: fakeAuthService,
+      doctorService: mockDoctorService(),
     });
   });
 

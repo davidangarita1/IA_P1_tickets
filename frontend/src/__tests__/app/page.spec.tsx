@@ -9,6 +9,7 @@ import {
   mockTicketReader,
   mockSanitizer,
   mockAuthService,
+  mockDoctorService,
 } from "@/__tests__/mocks/factories";
 
 jest.mock("@/providers/DependencyProvider", () => ({
@@ -50,6 +51,7 @@ function setupMocks(options: {
     audio: mockAudioNotifier(),
     sanitizer: mockSanitizer(),
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseTicketsWebSocket.mockReturnValue({
@@ -183,6 +185,7 @@ describe("TicketsScreen", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
@@ -229,6 +232,7 @@ describe("TicketsScreen", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
