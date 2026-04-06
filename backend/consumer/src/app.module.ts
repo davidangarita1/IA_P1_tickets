@@ -18,9 +18,9 @@ import { AssignRoomUseCase } from './application/use-cases/assign-room.use-case'
             isGlobal: true,
             envFilePath: '.env',
         }),
-        // ⚕️ HUMAN CHECK - Módulo de Schedule
+
         ScheduleModule.forRoot(),
-        // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => {
@@ -35,7 +35,7 @@ import { AssignRoomUseCase } from './application/use-cases/assign-room.use-case'
         TurnosModule,
     ],
     controllers: [ConsumerController],
-    // ⚕️ HUMAN CHECK - DIP: ConsumerController usa CreateTurnoUseCase, puertos registrados con tokens
+
     providers: [
         CreateTurnoUseCase,
         AssignRoomUseCase,

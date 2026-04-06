@@ -9,7 +9,6 @@ import { SignupDto } from './dto/signup.dto';
 import { AuthGuard } from './auth.guard';
 import { Request } from 'express';
 
-// Respuesta estándar para el frontend (BackendAuthResponse).
 interface BackendAuthResponse {
   success: boolean;
   message: string;
@@ -26,7 +25,6 @@ export class AuthController {
     private readonly getAllTurnosUseCase: GetAllTurnosUseCase,
   ) {}
 
-  // POST /auth/signUp — el front envía { email, password, nombre, rol }.
   @Post('signUp')
   @ApiOperation({ summary: 'Registrar usuario interno' })
   @ApiBody({ type: SignupDto })
@@ -40,7 +38,6 @@ export class AuthController {
     }
   }
 
-  // POST /auth/signIn — el front envía { email, password }.
   @Post('signIn')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
@@ -54,7 +51,6 @@ export class AuthController {
     }
   }
 
-  // POST /auth/signOut — cierra sesión (stateless, no-op server-side).
   @Post('signOut')
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({ status: 201, description: 'Sesión cerrada' })
@@ -62,7 +58,6 @@ export class AuthController {
     return { success: true, message: 'Sesión cerrada' };
   }
 
-  // GET /auth/me — devuelve el usuario actual a partir del Bearer token.
   @Get('me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -78,7 +73,6 @@ export class AuthController {
     };
   }
 
-  // Endpoint privado para historial del dashboard, protegido por Bearer token.
   @Get('dashboard-history')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

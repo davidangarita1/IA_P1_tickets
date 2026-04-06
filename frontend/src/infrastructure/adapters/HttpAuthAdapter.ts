@@ -5,7 +5,6 @@ import { httpPost } from "@/infrastructure/http/httpClient";
 import { toAuthResult, toUser } from "@/infrastructure/mappers/authMapper";
 import { setAuthCookie, getAuthCookie, removeAuthCookie } from "@/infrastructure/cookies/cookieUtils";
 
-// Mapa inverso: dominio inglés → backend español
 const ROLE_TO_BACKEND: Record<UserRole, string> = {
   admin: "admin",
   employee: "empleado",
@@ -25,7 +24,6 @@ interface BackendUser {
   rol: string;
 }
 
-// Adaptador HTTP real que conecta con los endpoints del backend producer.
 export class HttpAuthAdapter implements AuthService {
   constructor(private readonly baseUrl: string) {}
 
@@ -55,7 +53,7 @@ export class HttpAuthAdapter implements AuthService {
           rol: ROLE_TO_BACKEND[data.role] ?? "empleado",
         },
       );
-      // No se setea cookie en signup; el user se redirige a signIn.
+
       return toAuthResult(raw);
     } catch (err: unknown) {
       return { success: false, message: err instanceof Error ? err.message : "Error en registro" };
@@ -66,7 +64,7 @@ export class HttpAuthAdapter implements AuthService {
     try {
       await httpPost(`${this.baseUrl}/auth/signOut`, {});
     } catch {
-      // Ignorar — la cookie se limpia igual
+
     }
     removeAuthCookie();
   }

@@ -4,12 +4,6 @@ import { ITurnoRepository } from '../../domain/ports/ITurnoRepository';
 import { IEventPublisher } from '../../domain/ports/IEventPublisher';
 import { TURNO_REPOSITORY_TOKEN, EVENT_PUBLISHER_TOKEN } from '../../domain/ports/tokens';
 
-/**
- * Use Case: Asignar un consultorio libre a un paciente en espera.
- *
- * ⚕️ HUMAN CHECK - SRP: una sola responsabilidad — encontrar un consultorio libre
- * y asignarlo atómicamente al primer paciente en espera (por prioridad + timestamp).
- */
 @Injectable()
 export class AssignRoomUseCase {
     private readonly logger = new Logger(AssignRoomUseCase.name);
@@ -19,16 +13,12 @@ export class AssignRoomUseCase {
         @Inject(EVENT_PUBLISHER_TOKEN) private readonly eventPublisher: IEventPublisher,
     ) {}
 
-    /**
-     * @param totalConsultorios Número total de consultorios disponibles
-     * @returns El turno actualizado si se asignó, null si no había pacientes o consultorios libres
-     */
+
     async execute(totalConsultorios: number): Promise<Turno | null> {
-        // 1. Obtener consultorios ocupados
+
         const ocupados = await this.turnoRepository.getConsultoriosOcupados();
         this.logger.debug(`Consultorios ocupados: [${ocupados.join(', ')}]`);
 
-        // 2. Calcular consultorios libres
         const todosConsultorios = Array.from(
             { length: totalConsultorios },
             (_, i) => String(i + 1),
@@ -40,7 +30,6 @@ export class AssignRoomUseCase {
             return null;
         }
 
-        // 3. Obtener pacientes en espera (ordenados por prioridad + timestamp)
         const enEspera = await this.turnoRepository.findPacientesEnEspera();
 
         if (enEspera.length === 0) {
@@ -48,7 +37,6 @@ export class AssignRoomUseCase {
             return null;
         }
 
-        // 4. Asignación atómica del primer consultorio libre al primer paciente
         const paciente = enEspera[0];
         const consultorio = libres[0];
 
@@ -67,9 +55,6 @@ export class AssignRoomUseCase {
         return turnoActualizado;
     }
 
-    /**
-     * Asigna turnos hasta agotar consultorios libres o pacientes en espera.
-     */
     async executeAll(totalConsultorios: number): Promise<Turno[]> {
         const asignados: Turno[] = [];
 

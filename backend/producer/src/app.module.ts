@@ -31,7 +31,7 @@ import { DoctorsModule } from './doctors/doctors.module';
             isGlobal: true,
             envFilePath: '.env',
         }),
-        // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => {
@@ -51,7 +51,7 @@ import { DoctorsModule } from './doctors/doctors.module';
                     return {
                     transport: Transport.RMQ,
                     options: {
-                        // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+
                         urls: [rabbitUrl],
                         queue: configService.get<string>('RABBITMQ_QUEUE', 'turnos_queue'),
                         queueOptions: {
@@ -64,12 +64,12 @@ import { DoctorsModule } from './doctors/doctors.module';
             },
         ]),
         TurnosModule,
-        // ⚕️ HUMAN CHECK - Módulo de Eventos (WebSocket + RabbitMQ listener)
+
         EventsModule,
         DoctorsModule,
     ],
     controllers: [ProducerController, AuthController],
-    // ⚕️ HUMAN CHECK - DIP: Use Cases inyectan puertos, registrados con tokens
+
     providers: [
         CreateTurnoUseCase,
         GetAllTurnosUseCase,

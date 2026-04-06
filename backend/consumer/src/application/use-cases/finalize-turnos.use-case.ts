@@ -4,12 +4,6 @@ import { ITurnoRepository } from '../../domain/ports/ITurnoRepository';
 import { IEventPublisher } from '../../domain/ports/IEventPublisher';
 import { TURNO_REPOSITORY_TOKEN, EVENT_PUBLISHER_TOKEN } from '../../domain/ports/tokens';
 
-/**
- * Use Case: Finalizar turnos cuyo tiempo de atención ha expirado.
- *
- * ⚕️ HUMAN CHECK - SRP: una sola responsabilidad — transicionar turnos 'llamado' → 'atendido'
- * cuando su finAtencionAt ha vencido, y publicar los eventos correspondientes.
- */
 @Injectable()
 export class FinalizeTurnosUseCase {
     private readonly logger = new Logger(FinalizeTurnosUseCase.name);

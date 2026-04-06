@@ -10,9 +10,6 @@ import { ITurnoRepository } from '../domain/ports/ITurnoRepository';
 import { TURNO_REPOSITORY_TOKEN } from '../domain/ports/tokens';
 import { TurnoEventPayload } from '../domain/entities/turno.entity';
 
-// ⚕️ HUMAN CHECK - WebSocket Gateway
-// cors: true permite conexiones de cualquier origen (solo para desarrollo)
-// En producción, restringir a los dominios permitidos
 @WebSocketGateway({
     namespace: '/ws/turnos',
     cors: {
@@ -25,13 +22,10 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
-    // ⚕️ HUMAN CHECK - DIP: inyecta ITurnoRepository (puerto), no TurnosService (concreto)
     constructor(
         @Inject(TURNO_REPOSITORY_TOKEN) private readonly turnoRepository: ITurnoRepository,
     ) { }
 
-    // ⚕️ HUMAN CHECK - Conexión de cliente
-    // Al conectarse, envía un snapshot de todos los turnos actuales
     async handleConnection(client: Socket): Promise<void> {
         this.logger.log(`Cliente conectado: ${client.id}`);
 
@@ -56,8 +50,6 @@ export class TurnosGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(`Cliente desconectado: ${client.id}`);
     }
 
-    // ⚕️ HUMAN CHECK - Broadcast de actualización
-    // Se llama desde el EventsController cuando llega un evento de RabbitMQ
     broadcastTurnoActualizado(turno: TurnoEventPayload): void {
         this.server.emit('TURNO_ACTUALIZADO', {
             type: 'TURNO_ACTUALIZADO',

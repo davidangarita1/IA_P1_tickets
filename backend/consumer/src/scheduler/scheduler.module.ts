@@ -13,7 +13,7 @@ import { AssignRoomUseCase } from '../application/use-cases/assign-room.use-case
         SchedulerService,
         FinalizeTurnosUseCase,
         AssignRoomUseCase,
-        // ⚕️ HUMAN CHECK - DIP: Use Cases inyectan IEventPublisher, no ClientProxy
+
         {
             provide: EVENT_PUBLISHER_TOKEN,
             useClass: RabbitMQEventPublisher,
