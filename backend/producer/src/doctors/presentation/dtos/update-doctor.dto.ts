@@ -1,4 +1,4 @@
-import { IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateIf } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Shift } from '../../domain/entities/doctor.entity';
 
@@ -16,18 +16,20 @@ export class UpdateDoctorDto {
     @Matches(/^\d{7,10}$/, { message: 'La cédula debe tener entre 7 y 10 números' })
     documentId?: string;
 
-    @ApiPropertyOptional({ description: 'Office number (1-10)', example: '2' })
+    @ApiPropertyOptional({ description: 'Office number (1-10) or null to unassign', example: '2' })
     @IsOptional()
+    @ValidateIf((o) => o.office !== null)
     @IsString()
     @IsIn(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
     office?: string | null;
 
     @ApiPropertyOptional({
-        description: 'Assigned time shift',
+        description: 'Assigned time shift, or null to unassign',
         example: '06:00-14:00',
         enum: ['06:00-14:00', '14:00-22:00'],
     })
     @IsOptional()
+    @ValidateIf((o) => o.shift !== null)
     @IsString()
     @IsIn(['06:00-14:00', '14:00-22:00'])
     shift?: Shift | null;

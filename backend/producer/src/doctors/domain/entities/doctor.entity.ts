@@ -30,4 +30,8 @@ export class Doctor {
         this.createdAt = props.createdAt;
         this.updatedAt = props.updatedAt;
     }
+
+    get _id(): string {
+        return this.id;
+    }
 }
