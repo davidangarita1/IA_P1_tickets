@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { CreateDoctorUseCase } from '../../src/doctors/application/use-cases/create-doctor.use-case';
 import { IDoctorRepository } from '../../src/doctors/domain/ports/doctor.repository';
 import { Doctor } from '../../src/doctors/domain/entities/doctor.entity';
@@ -7,9 +7,11 @@ describe('CreateDoctorUseCase (Application)', () => {
     const mockRepository: jest.Mocked<IDoctorRepository> = {
         create: jest.fn(),
         findAll: jest.fn(),
+        findById: jest.fn(),
         findByDocumentId: jest.fn(),
         findByOfficeAndShift: jest.fn(),
         findAvailableShifts: jest.fn(),
+        update: jest.fn(),
     };
 
     let useCase: CreateDoctorUseCase;
@@ -101,28 +103,18 @@ describe('CreateDoctorUseCase (Application)', () => {
         expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('skips shift conflict check when only office is provided without shift', async () => {
+    it('throws BadRequestException when office is provided without shift', async () => {
         mockRepository.findByDocumentId.mockResolvedValue(null);
-        const created = new Doctor({
-            id: 'doc-3',
-            name: 'Ana Torres',
-            documentId: '55566677',
-            office: '3',
-            shift: null,
-            status: 'active',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        mockRepository.create.mockResolvedValue(created);
 
-        const result = await useCase.execute({
-            name: 'Ana Torres',
-            documentId: '55566677',
-            office: '3',
-            shift: null,
-        });
+        await expect(
+            useCase.execute({
+                name: 'Ana Torres',
+                documentId: '55566677',
+                office: '3',
+                shift: null,
+            }),
+        ).rejects.toThrow(BadRequestException);
 
-        expect(result).toEqual(created);
-        expect(mockRepository.findByOfficeAndShift).not.toHaveBeenCalled();
+        expect(mockRepository.create).not.toHaveBeenCalled();
     });
 });

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DoctorSchemaClass, DoctorDocument } from '../schemas/doctor.schema';
-import { IDoctorRepository, CreateDoctorData, AvailableShiftsResult } from '../../domain/ports/doctor.repository';
+import { IDoctorRepository, CreateDoctorData, UpdateDoctorData, AvailableShiftsResult } from '../../domain/ports/doctor.repository';
 import { Doctor, Shift } from '../../domain/entities/doctor.entity';
 
 const ALL_SHIFTS: Shift[] = ['06:00-14:00', '14:00-22:00'];
@@ -51,6 +51,19 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
         const availableShifts = ALL_SHIFTS.filter(s => !occupiedShifts.includes(s));
 
         return { availableShifts, occupiedShifts };
+    }
+
+    async findById(id: string): Promise<Doctor | null> {
+        const doc = await this.doctorModel.findById(id).exec();
+        return doc ? this.toDomain(doc) : null;
+    }
+
+    async update(id: string, data: UpdateDoctorData): Promise<Doctor> {
+        const doc = await this.doctorModel.findByIdAndUpdate(id, data, { new: true }).exec();
+        if (!doc) {
+            throw new NotFoundException('Médico no encontrado');
+        }
+        return this.toDomain(doc);
     }
 
     private toDomain(doc: DoctorDocument): Doctor {

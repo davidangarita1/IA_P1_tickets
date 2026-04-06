@@ -5,9 +5,11 @@ describe('GetAvailableShiftsUseCase (Application)', () => {
     const mockRepository: jest.Mocked<IDoctorRepository> = {
         create: jest.fn(),
         findAll: jest.fn(),
+        findById: jest.fn(),
         findByDocumentId: jest.fn(),
         findByOfficeAndShift: jest.fn(),
         findAvailableShifts: jest.fn(),
+        update: jest.fn(),
     };
 
     let useCase: GetAvailableShiftsUseCase;
