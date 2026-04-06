@@ -798,44 +798,44 @@ frontend/src/
 
 ### Backend — Implementación
 
-- [ ] Crear entidad `Doctor` en `domain/entities/doctor.entity.ts` con propiedades y métodos core
+- [x] Crear entidad `Doctor` en `domain/entities/doctor.entity.ts` con propiedades y métodos core
 - [ ] Crear Value Object `DoctorShift` para franjas horarias (`06:00-14:00`, `14:00-22:00`)
-- [ ] Crear interfaz `IDoctorRepository` en `domain/ports/doctor.repository.ts`
-- [ ] Crear token de inyección `DOCTOR_REPOSITORY_TOKEN` en `domain/ports/tokens.ts`
+- [x] Crear interfaz `IDoctorRepository` en `domain/ports/doctor.repository.ts`
+- [x] Crear token de inyección `DOCTOR_REPOSITORY_TOKEN` en `domain/ports/tokens.ts`
 - [ ] Crear eventos de dominio: `DoctorCreatedEvent`, `DoctorUpdatedEvent`, `DoctorDeletedEvent`
-- [ ] Crear schema Mongoose `DoctorSchema` en `infrastructure/schemas/doctor.schema.ts` con índices (único en cedula, único en consultorio+franja, índice en status)
-- [ ] Crear adapter `DoctorMongooseAdapter` en `infrastructure/adapters/doctor-mongoose.adapter.ts` implementando `IDoctorRepository`
-- [ ] Crear DTOs en `presentation/dtos/`: `CreateDoctorDto`, `UpdateDoctorDto`, `DoctorResponseDto`
-- [ ] Crear use-cases:
-  - [ ] `CreateDoctorUseCase` — validar unicidad cedula / consultorio+franja, persistir
+- [x] Crear schema Mongoose `DoctorSchema` en `infrastructure/schemas/doctor.schema.ts` con índices (único en cedula, único en consultorio+franja, índice en status)
+- [x] Crear adapter `DoctorMongooseAdapter` en `infrastructure/adapters/doctor-mongoose.adapter.ts` implementando `IDoctorRepository`
+- [x] Crear DTOs en `presentation/dtos/`: `CreateDoctorDto`, `UpdateDoctorDto`, `DoctorResponseDto`
+- [x] Crear use-cases:
+  - [x] `CreateDoctorUseCase` — validar unicidad cedula / consultorio+franja, persistir
   - [ ] `UpdateDoctorUseCase` — validar opciones, evitar cambios de cedula, liberar franja anterior
   - [ ] `DeleteDoctorUseCase` — verificar sin turnos activos, soft delete
-  - [ ] `GetAllDoctorsUseCase` — listar activos con paginación
-  - [ ] `GetAvailableShiftsUseCase` — retornar franjas libres por consultorio
-- [ ] Crear controller REST `DoctorController` en `presentation/controllers/doctor.controller.ts` con endpoints:
-  - [ ] `POST /api/v1/doctors` — create
-  - [ ] `GET /api/v1/doctors` — list con paginación
+  - [x] `GetAllDoctorsUseCase` — listar activos con paginación
+  - [x] `GetAvailableShiftsUseCase` — retornar franjas libres por consultorio
+- [x] Crear controller REST `DoctorController` en `presentation/controllers/doctor.controller.ts` con endpoints:
+  - [x] `POST /api/v1/doctors` — create
+  - [x] `GET /api/v1/doctors` — list con paginación
   - [ ] `GET /api/v1/doctors/{id}` — detail
   - [ ] `PUT /api/v1/doctors/{id}` — update
   - [ ] `DELETE /api/v1/doctors/{id}` — soft delete
-  - [ ] `GET /api/v1/doctors/available-shifts` — franjas libres
-- [ ] Crear módulo NestJS `DoctorsModule` en `doctors/doctors.module.ts` con wiring:
-  - [ ] Importar `MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }])`
-  - [ ] Registrar adapter con token de inyección
-  - [ ] Registrar use-cases
-  - [ ] Registrar controller
-  - [ ] Exportar `DOCTOR_REPOSITORY_TOKEN` para tests
-- [ ] Registrar `DoctorsModule` en `app.module.ts`
+  - [x] `GET /api/v1/doctors/available-shifts` — franjas libres
+- [x] Crear módulo NestJS `DoctorsModule` en `doctors/doctors.module.ts` con wiring:
+  - [x] Importar `MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }])`
+  - [x] Registrar adapter con token de inyección
+  - [x] Registrar use-cases
+  - [x] Registrar controller
+  - [x] Exportar `DOCTOR_REPOSITORY_TOKEN` para tests
+- [x] Registrar `DoctorsModule` en `app.module.ts`
 - [ ] Agregar tag "Doctors" en Swagger de `main.ts`
 - [ ] Validar que todos los endpoints aparecen en OpenAPI
 
 ### Backend — Validaciones y Reglas
 
-- [ ] Validación de nombre: mínimo 3 caracteres, máximo 100, obligatorio
-- [ ] Validación de cédula: solo números, 7-10 dígitos, obligatoria, única
-- [ ] Validación de franjaHoraria: solo valores "06:00-14:00" o "14:00-22:00"
-- [ ] Validación de consultorio: puede ser null, pero si se asigna franja debe ser válida
-- [ ] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
+- [x] Validación de nombre: mínimo 3 caracteres, máximo 100, obligatorio
+- [x] Validación de cédula: solo números, 7-10 dígitos, obligatoria, única
+- [x] Validación de franjaHoraria: solo valores "06:00-14:00" o "14:00-22:00"
+- [x] Validación de consultorio: puede ser null, pero si se asigna franja debe ser válida
+- [x] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
 - [ ] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
 - [ ] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors
 - [ ] Auditoría: `created_at`, `updated_at`, `created_by`, `updated_by` se registran automáticamente
