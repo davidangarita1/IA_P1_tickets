@@ -9,6 +9,7 @@ import styles from "@/styles/Navbar.module.css";
 const NAV_ITEMS = [
   { href: "/", label: "Turnos" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/doctors", label: "Gestión Médicos" },
   { href: "/register", label: "Registro" },
 ];
 

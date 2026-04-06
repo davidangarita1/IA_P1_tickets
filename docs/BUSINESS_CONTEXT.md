@@ -21,6 +21,7 @@
   - Control de áreas restringidas: protección automática de las secciones internas para que solo el personal autorizado pueda acceder.
   - Menú de navegación condicional: el menú principal solo aparece cuando el usuario ha iniciado sesión.
   - Gestión de turnos: solicitud y visualización de turnos con actualización inmediata en pantalla.
+  - Gestión de médicos: acceso al módulo de administración de médicos desde la barra de navegación, con tabla de médicos activos y sus consultorios/franjas horarias asignadas.
 
 ---
 
@@ -45,7 +46,7 @@
 
 - **Perfiles o Roles de Usuario en el Sistema:**
   - **Administrador:** Personal con responsabilidades de gestión. Puede ingresar al **dashboard** y a los demás módulos internos, ver el estado de la operación y administrar las solicitudes.
-  - **Empleado:** Personal operativo de la EPS. Puede ingresar al **dashboard** y a los demás módulos para registrar y consultar turnos.
+  - **Empleado:** Personal operativo de la EPS. Puede ingresar al **dashboard**, al módulo de gestión de médicos y a los demás módulos para registrar y consultar turnos.
   - **Visitante (sin sesión):** Cualquier persona que accede al sitio sin haber iniciado sesión. Solo puede ver la pantalla pública de turnos o registrar turnos.
 
 - **Permisos y Limitaciones de Cada Perfil:**
