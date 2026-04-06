@@ -2,6 +2,7 @@ export type DoctorStatus = 'active' | 'inactive';
 export type Shift = '06:00-14:00' | '14:00-22:00';
 
 export class Doctor {
+    readonly _id: string;
     readonly id: string;
     readonly name: string;
     readonly documentId: string;
@@ -21,6 +22,7 @@ export class Doctor {
         createdAt: Date;
         updatedAt: Date;
     }) {
+        this._id = props.id;
         this.id = props.id;
         this.name = props.name;
         this.documentId = props.documentId;
@@ -29,9 +31,5 @@ export class Doctor {
         this.status = props.status;
         this.createdAt = props.createdAt;
         this.updatedAt = props.updatedAt;
-    }
-
-    get _id(): string {
-        return this.id;
     }
 }

@@ -53,4 +53,22 @@ describe('Doctor (Domain)', () => {
 
         expect(doctor.status).toBe('inactive');
     });
+
+    it('includes _id in JSON serialization (regression: CastError undefined)', () => {
+        const doctor = new Doctor({
+            id: 'doc-json',
+            name: 'Test Serialization',
+            documentId: '99999999',
+            office: '1',
+            shift: '06:00-14:00',
+            status: 'active',
+            createdAt: new Date('2026-01-01'),
+            updatedAt: new Date('2026-01-01'),
+        });
+
+        const serialized = JSON.parse(JSON.stringify(doctor));
+        expect(serialized._id).toBe('doc-json');
+        expect(serialized.id).toBe('doc-json');
+        expect(serialized._id).toBe(serialized.id);
+    });
 });
