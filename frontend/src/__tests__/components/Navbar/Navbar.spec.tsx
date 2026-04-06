@@ -160,4 +160,34 @@ describe("Navbar", () => {
 
     expect(screen.queryByRole("link", { name: /iniciar sesión/i })).not.toBeInTheDocument();
   });
+
+  it("renders 'Gestión Médicos' link for authenticated users", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    const link = screen.getByRole("link", { name: /gestión médicos/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", "/doctors");
+  });
+
+  it("does not render 'Gestión Médicos' link for unauthenticated users", () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue("/");
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole("link", { name: /gestión médicos/i })).not.toBeInTheDocument();
+  });
+
+  it("applies active class to 'Gestión Médicos' when on /doctors", () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue("/doctors");
+
+    render(<Navbar />);
+
+    const link = screen.getByRole("link", { name: /gestión médicos/i });
+    expect(link.className).toBe("linkActive");
+  });
 });
