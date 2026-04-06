@@ -186,6 +186,16 @@ Para entender el estado técnico del proyecto, disponible en [`docs/quality-audi
 - ⚠️ Seguridad: middleware mal nombrado, no se ejecuta en producción
 - ⚠️ Falta trazabilidad de prompts y correcciones de IA
 
+## 💬 Feedback de Revisores
+
+Disponible en [`docs/feedback/`](docs/feedback/):
+
+| Archivo | Revisor | Área |
+|---------|---------|------|
+| **FEEDBACK_BACKEND_ALEXIS.MD** | Alexis | Backend |
+| **FEEDBACK_ESTEBAN_RODRIGUEZ.md** | Esteban Rodríguez | General |
+| **Feedback_German_QA.MD** | Germán | QA |
+
 ---
 
 ## Estado del proyecto
