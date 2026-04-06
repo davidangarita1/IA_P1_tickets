@@ -19,6 +19,13 @@ export interface CreateDoctorData {
   shift?: Shift | null;
 }
 
+export interface UpdateDoctorData {
+  name?: string;
+  documentId?: string;
+  office?: string | null;
+  shift?: Shift | null;
+}
+
 export interface AvailableShiftsResponse {
   office: string;
   availableShifts: Shift[];

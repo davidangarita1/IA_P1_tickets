@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import type { Doctor, CreateDoctorData } from "@/domain/Doctor";
+import type { Doctor, CreateDoctorData, UpdateDoctorData } from "@/domain/Doctor";
 import type { DoctorService } from "@/domain/ports/DoctorService";
 
 function mapError(err: unknown): string {
@@ -40,9 +40,16 @@ export function useDoctors(doctorService: DoctorService) {
     [doctorService]
   );
 
+  const update = useCallback(
+    async (id: string, data: UpdateDoctorData): Promise<Doctor> => {
+      return doctorService.update(id, data);
+    },
+    [doctorService]
+  );
+
   const refresh = useCallback(async () => {
     await loadDoctors();
   }, [loadDoctors]);
 
-  return { doctors, loading, error, create, refresh };
+  return { doctors, loading, error, create, update, refresh };
 }

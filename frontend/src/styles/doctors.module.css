@@ -93,6 +93,20 @@
   padding: 16px 0;
 }
 
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.editButton:hover {
+  background: #f1f5f9;
+}
+
 @media (prefers-color-scheme: dark) {
   .container {
     background: linear-gradient(180deg, #0a0a0a, #111111);

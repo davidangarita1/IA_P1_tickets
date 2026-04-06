@@ -82,7 +82,7 @@ describe("DoctorEditModal", () => {
   it("renders Cerrar, Guardar buttons and X icon", () => {
     renderModal();
 
-    expect(screen.getByRole("button", { name: /cerrar/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^cerrar$/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /guardar/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/cerrar modal/i)).toBeInTheDocument();
   });
@@ -90,7 +90,7 @@ describe("DoctorEditModal", () => {
   it("calls onClose when Cerrar button is clicked", () => {
     const { onClose } = renderModal();
 
-    fireEvent.click(screen.getByRole("button", { name: /cerrar/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^cerrar$/i }));
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
