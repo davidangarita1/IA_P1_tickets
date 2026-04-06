@@ -8,6 +8,8 @@ import type { CreateTicketResponse } from "@/domain/CreateTicket";
 import type { User, UserRole } from "@/domain/User";
 import type { AuthResult } from "@/domain/AuthCredentials";
 import type { AuthService } from "@/domain/ports/AuthService";
+import type { Doctor } from "@/domain/Doctor";
+import type { DoctorService } from "@/domain/ports/DoctorService";
 
 let idCounter = 0;
 
@@ -118,5 +120,33 @@ export function mockAuthService(
     signUp: jest.fn().mockResolvedValue(signUpResult),
     signOut: jest.fn().mockResolvedValue(undefined),
     getSession: jest.fn().mockResolvedValue(null),
+  };
+}
+
+export function buildDoctor(overrides: Partial<Doctor> = {}): Doctor {
+  return {
+    _id: "doc-1",
+    nombre: "Juan García",
+    cedula: "12345678",
+    consultorio: "2",
+    franjaHoraria: "06:00-14:00",
+    status: "Activo",
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-01-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+export function mockDoctorService(
+  doctors: Doctor[] = []
+): jest.Mocked<DoctorService> {
+  return {
+    getAll: jest.fn().mockResolvedValue(doctors),
+    create: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
+    getAvailableShifts: jest.fn().mockResolvedValue({
+      consultorio: "1",
+      available_shifts: ["06:00-14:00", "14:00-22:00"],
+      occupied_shifts: [],
+    }),
   };
 }

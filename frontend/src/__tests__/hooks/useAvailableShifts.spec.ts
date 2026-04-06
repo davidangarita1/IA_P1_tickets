@@ -1,0 +1,104 @@
+import { renderHook, act } from "@testing-library/react";
+import { useAvailableShifts } from "@/hooks/useAvailableShifts";
+import { mockDoctorService } from "../mocks/factories";
+
+describe("useAvailableShifts", () => {
+  it("starts with empty shifts and loading false", () => {
+    const service = mockDoctorService();
+
+    const { result } = renderHook(() => useAvailableShifts(service));
+
+    expect(result.current.shifts).toEqual([]);
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("sets loading to true while fetching", async () => {
+    let resolve!: (val: Awaited<ReturnType<typeof service.getAvailableShifts>>) => void;
+    const service = mockDoctorService();
+    service.getAvailableShifts.mockReturnValueOnce(
+      new Promise((res) => {
+        resolve = res;
+      })
+    );
+
+    const { result } = renderHook(() => useAvailableShifts(service));
+
+    const fetchPromise = act(async () => {
+      result.current.fetchShifts("1");
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      resolve({
+        consultorio: "1",
+        available_shifts: [],
+        occupied_shifts: [],
+      });
+      await fetchPromise;
+    });
+
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("populates shifts after fetchShifts succeeds", async () => {
+    const service = mockDoctorService();
+    service.getAvailableShifts.mockResolvedValueOnce({
+      consultorio: "1",
+      available_shifts: ["06:00-14:00", "14:00-22:00"],
+      occupied_shifts: [],
+    });
+
+    const { result } = renderHook(() => useAvailableShifts(service));
+
+    await act(async () => {
+      await result.current.fetchShifts("1");
+    });
+
+    expect(result.current.shifts).toEqual(["06:00-14:00", "14:00-22:00"]);
+    expect(result.current.loading).toBe(false);
+    expect(service.getAvailableShifts).toHaveBeenCalledWith("1", undefined);
+  });
+
+  it("passes excludeDoctorId to the service", async () => {
+    const service = mockDoctorService();
+    service.getAvailableShifts.mockResolvedValueOnce({
+      consultorio: "2",
+      available_shifts: ["06:00-14:00"],
+      occupied_shifts: ["14:00-22:00"],
+    });
+
+    const { result } = renderHook(() => useAvailableShifts(service));
+
+    await act(async () => {
+      await result.current.fetchShifts("2", "doc-123");
+    });
+
+    expect(service.getAvailableShifts).toHaveBeenCalledWith("2", "doc-123");
+  });
+
+  it("resets shifts to empty array when fetchShifts fails", async () => {
+    const service = mockDoctorService();
+    service.getAvailableShifts.mockResolvedValueOnce({
+      consultorio: "1",
+      available_shifts: ["06:00-14:00"],
+      occupied_shifts: [],
+    });
+
+    const { result } = renderHook(() => useAvailableShifts(service));
+
+    await act(async () => {
+      await result.current.fetchShifts("1");
+    });
+    expect(result.current.shifts).toHaveLength(1);
+
+    service.getAvailableShifts.mockRejectedValueOnce(new Error("API Error"));
+
+    await act(async () => {
+      await result.current.fetchShifts("1");
+    });
+
+    expect(result.current.shifts).toEqual([]);
+    expect(result.current.loading).toBe(false);
+  });
+});
