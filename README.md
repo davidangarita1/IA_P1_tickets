@@ -13,6 +13,7 @@ Permitir que un paciente registre su turno y reciba actualizaciones en tiempo re
 - Asignar consultorios automáticamente.
 - Notificar cambios de estado en tiempo real al frontend.
 - Consultar turnos por lista general o por cédula.
+- Gestión de médicos: visualización del catálogo de médicos activos con consultorios y franjas horarias (módulo accesible para usuarios autenticados).
 
 ## Próxima feature en ideación: Login + Dashboard privado
 
