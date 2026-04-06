@@ -79,6 +79,20 @@
   font-style: italic;
 }
 
+.loadingText {
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+.errorText {
+  text-align: center;
+  color: #dc2626;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
 @media (prefers-color-scheme: dark) {
   .container {
     background: linear-gradient(180deg, #0a0a0a, #111111);

@@ -1,6 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import AuthGuard from "@/components/AuthGuard/AuthGuard";
+import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
+import Toast from "@/components/Toast/Toast";
+import { useDoctors } from "@/hooks/useDoctors";
+import { useToast } from "@/hooks/useToast";
+import { useDeps } from "@/providers/DependencyProvider";
 import styles from "@/styles/doctors.module.css";
 
 const TABLE_HEADERS = [
@@ -20,14 +26,46 @@ export default function DoctorsPage() {
 }
 
 function DoctorsContent() {
+  const { doctorService } = useDeps();
+  const { doctors, loading, error, refresh } = useDoctors(doctorService);
+  const toast = useToast();
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <main className={styles.container}>
       <h1 className={styles.title}>Gestión de Médicos</h1>
+
+      <Toast
+        message={toast.message ?? ""}
+        type={toast.type}
+        visible={toast.visible}
+        onHide={toast.hide}
+      />
+
       <div className={styles.toolbar}>
-        <button className={styles.createButton} disabled>
+        <button
+          className={styles.createButton}
+          onClick={() => setShowModal(true)}
+        >
           Crear médico
         </button>
       </div>
+
+      {loading && <p className={styles.loadingText}>Cargando médicos...</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
+
+      {showModal && (
+        <DoctorFormModal
+          onClose={() => setShowModal(false)}
+          onSuccess={() => {
+            setShowModal(false);
+            refresh();
+          }}
+          doctorService={doctorService}
+          showToast={toast.show}
+        />
+      )}
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -37,9 +75,20 @@ function DoctorsContent() {
           </tr>
         </thead>
         <tbody>
-          <tr className={styles.emptyRow}>
-            <td colSpan={TABLE_HEADERS.length}>No hay médicos creados</td>
-          </tr>
+          {!loading && doctors.length === 0 && (
+            <tr className={styles.emptyRow}>
+              <td colSpan={TABLE_HEADERS.length}>No hay médicos creados</td>
+            </tr>
+          )}
+          {doctors.map((doctor) => (
+            <tr key={doctor._id}>
+              <td>Dr. {doctor.nombre}</td>
+              <td>{doctor.cedula}</td>
+              <td>{doctor.consultorio ?? "Sin asignar"}</td>
+              <td>{doctor.franjaHoraria ?? "Sin asignar"}</td>
+              <td></td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </main>

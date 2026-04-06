@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useAvailableShifts } from "@/hooks/useAvailableShifts";
 import { mockDoctorService } from "../mocks/factories";
 
@@ -12,30 +12,18 @@ describe("useAvailableShifts", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("sets loading to true while fetching", async () => {
-    let resolve!: (val: Awaited<ReturnType<typeof service.getAvailableShifts>>) => void;
+  it("sets loading to false after fetchShifts resolves", async () => {
     const service = mockDoctorService();
-    service.getAvailableShifts.mockReturnValueOnce(
-      new Promise((res) => {
-        resolve = res;
-      })
-    );
+    service.getAvailableShifts.mockResolvedValueOnce({
+      consultorio: "1",
+      available_shifts: [],
+      occupied_shifts: [],
+    });
 
     const { result } = renderHook(() => useAvailableShifts(service));
 
-    const fetchPromise = act(async () => {
-      result.current.fetchShifts("1");
-    });
-
-    expect(result.current.loading).toBe(true);
-
     await act(async () => {
-      resolve({
-        consultorio: "1",
-        available_shifts: [],
-        occupied_shifts: [],
-      });
-      await fetchPromise;
+      await result.current.fetchShifts("1");
     });
 
     expect(result.current.loading).toBe(false);

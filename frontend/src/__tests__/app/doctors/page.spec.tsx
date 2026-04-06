@@ -27,12 +27,14 @@ jest.mock("@/hooks/useToast", () => ({
 }));
 
 jest.mock("@/components/Toast/Toast", () => ({
+  __esModule: true,
   default: function MockToast() {
     return null;
   },
 }));
 
 jest.mock("@/components/DoctorFormModal/DoctorFormModal", () => ({
+  __esModule: true,
   default: function MockDoctorFormModal({
     onClose,
   }: {
