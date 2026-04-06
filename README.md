@@ -186,8 +186,6 @@ Para entender el estado técnico del proyecto, disponible en [`docs/quality-audi
 - ⚠️ Seguridad: middleware mal nombrado, no se ejecuta en producción
 - ⚠️ Falta trazabilidad de prompts y correcciones de IA
 
-Ver detalles completos en [`docs/quality-audits/README.md`](docs/quality-audits/README.md).
-
 ---
 
 ## Estado del proyecto
