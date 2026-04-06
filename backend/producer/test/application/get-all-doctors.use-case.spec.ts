@@ -6,8 +6,8 @@ describe('GetAllDoctorsUseCase (Application)', () => {
     const mockRepository: jest.Mocked<IDoctorRepository> = {
         create: jest.fn(),
         findAll: jest.fn(),
-        findByCedula: jest.fn(),
-        findByConsultorioAndFranja: jest.fn(),
+        findByDocumentId: jest.fn(),
+        findByOfficeAndShift: jest.fn(),
         findAvailableShifts: jest.fn(),
     };
 
@@ -22,21 +22,21 @@ describe('GetAllDoctorsUseCase (Application)', () => {
         const doctors = [
             new Doctor({
                 id: '1',
-                nombre: 'Juan García',
-                cedula: '1234567',
-                consultorio: '1',
-                franjaHoraria: '06:00-14:00',
-                status: 'Activo',
+                name: 'Juan García',
+                documentId: '1234567',
+                office: '1',
+                shift: '06:00-14:00',
+                status: 'active',
                 createdAt: new Date(),
                 updatedAt: new Date(),
             }),
             new Doctor({
                 id: '2',
-                nombre: 'Ana Torres',
-                cedula: '7654321',
-                consultorio: null,
-                franjaHoraria: null,
-                status: 'Activo',
+                name: 'Ana Torres',
+                documentId: '7654321',
+                office: null,
+                shift: null,
+                status: 'active',
                 createdAt: new Date(),
                 updatedAt: new Date(),
             }),

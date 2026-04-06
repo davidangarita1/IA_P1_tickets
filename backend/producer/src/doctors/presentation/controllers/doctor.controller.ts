@@ -37,14 +37,14 @@ export class DoctorController {
     }
 
     @Get('available-shifts')
-    @ApiOperation({ summary: 'Consultar franjas disponibles para un consultorio' })
-    @ApiQuery({ name: 'consultorio', required: true, description: 'Número de consultorio' })
-    @ApiQuery({ name: 'exclude_doctor_id', required: false, description: 'ID del médico a excluir' })
-    @ApiResponse({ status: 200, description: 'Franjas disponibles y ocupadas' })
+    @ApiOperation({ summary: 'Get available shifts for an office' })
+    @ApiQuery({ name: 'office', required: true, description: 'Office number' })
+    @ApiQuery({ name: 'exclude_doctor_id', required: false, description: 'Doctor ID to exclude' })
+    @ApiResponse({ status: 200, description: 'Available and occupied shifts' })
     async getAvailableShifts(
-        @Query('consultorio') consultorio: string,
+        @Query('office') office: string,
         @Query('exclude_doctor_id') excludeDoctorId?: string,
     ): Promise<AvailableShiftsResponse> {
-        return this.getAvailableShiftsUseCase.execute({ consultorio, excludeDoctorId });
+        return this.getAvailableShiftsUseCase.execute({ office, excludeDoctorId });
     }
 }

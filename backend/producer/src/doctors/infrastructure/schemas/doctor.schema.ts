@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { DoctorStatus, FranjaHoraria } from '../../domain/entities/doctor.entity';
+import { DoctorStatus, Shift } from '../../domain/entities/doctor.entity';
 
 export type DoctorDocument = HydratedDocument<DoctorSchemaClass> & {
     createdAt: Date;
@@ -10,31 +10,31 @@ export type DoctorDocument = HydratedDocument<DoctorSchemaClass> & {
 @Schema({ timestamps: true, collection: 'doctors' })
 export class DoctorSchemaClass {
     @Prop({ required: true })
-    nombre: string;
+    name: string;
 
     @Prop({ required: true, unique: true })
-    cedula: string;
+    documentId: string;
 
     @Prop({ default: null })
-    consultorio: string | null;
+    office: string | null;
 
     @Prop({ default: null, enum: ['06:00-14:00', '14:00-22:00', null] })
-    franjaHoraria: FranjaHoraria | null;
+    shift: Shift | null;
 
-    @Prop({ default: 'Activo', enum: ['Activo', 'Inactivo'] })
+    @Prop({ default: 'active', enum: ['active', 'inactive'] })
     status: DoctorStatus;
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(DoctorSchemaClass);
 
 DoctorSchema.index(
-    { consultorio: 1, franjaHoraria: 1 },
+    { office: 1, shift: 1 },
     {
         unique: true,
         partialFilterExpression: {
-            consultorio: { $ne: null },
-            franjaHoraria: { $ne: null },
-            status: 'Activo',
+            office: { $ne: null },
+            shift: { $ne: null },
+            status: 'active',
         },
     },
 );

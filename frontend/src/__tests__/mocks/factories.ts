@@ -126,11 +126,11 @@ export function mockAuthService(
 export function buildDoctor(overrides: Partial<Doctor> = {}): Doctor {
   return {
     _id: "doc-1",
-    nombre: "Juan García",
-    cedula: "12345678",
-    consultorio: "2",
-    franjaHoraria: "06:00-14:00",
-    status: "Activo",
+    name: "Juan García",
+    documentId: "12345678",
+    office: "2",
+    shift: "06:00-14:00",
+    status: "active",
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
     ...overrides,
@@ -144,9 +144,9 @@ export function mockDoctorService(
     getAll: jest.fn().mockResolvedValue(doctors),
     create: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     getAvailableShifts: jest.fn().mockResolvedValue({
-      consultorio: "1",
-      available_shifts: ["06:00-14:00", "14:00-22:00"],
-      occupied_shifts: [],
+      office: "1",
+      availableShifts: ["06:00-14:00", "14:00-22:00"],
+      occupiedShifts: [],
     }),
   };
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
 import { mockDoctorService, buildDoctor } from "@/__tests__/mocks/factories";
-import type { FranjaHoraria } from "@/domain/Doctor";
+import type { Shift } from "@/domain/Doctor";
 
 jest.mock("@/hooks/useAvailableShifts", () => ({
   useAvailableShifts: jest.fn(),
@@ -15,7 +15,7 @@ const mockUseAvailableShifts = useAvailableShifts as jest.MockedFunction<
 >;
 
 function setupShifts(
-  shifts: FranjaHoraria[] = ["06:00-14:00", "14:00-22:00"],
+  shifts: Shift[] = ["06:00-14:00", "14:00-22:00"],
   loading = false
 ) {
   mockUseAvailableShifts.mockReturnValue({

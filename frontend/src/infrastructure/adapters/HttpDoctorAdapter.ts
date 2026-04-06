@@ -41,10 +41,10 @@ export class HttpDoctorAdapter implements DoctorService {
   }
 
   async getAvailableShifts(
-    consultorio: string,
+    office: string,
     excludeDoctorId?: string
   ): Promise<AvailableShiftsResponse> {
-    const params = new URLSearchParams({ consultorio });
+    const params = new URLSearchParams({ office });
     if (excludeDoctorId) params.set("exclude_doctor_id", excludeDoctorId);
 
     const res = await fetch(

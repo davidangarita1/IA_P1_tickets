@@ -14,11 +14,11 @@ describe('DoctorController (Presentation)', () => {
     const makeDoctor = (): Doctor =>
         new Doctor({
             id: 'doc-1',
-            nombre: 'Juan García',
-            cedula: '12345678',
-            consultorio: '2',
-            franjaHoraria: '06:00-14:00',
-            status: 'Activo',
+            name: 'Juan García',
+            documentId: '12345678',
+            office: '2',
+            shift: '06:00-14:00',
+            status: 'active',
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -36,10 +36,10 @@ describe('DoctorController (Presentation)', () => {
         const doctor = makeDoctor();
         (createDoctorUseCase.execute as jest.Mock).mockResolvedValue(doctor);
         const dto = {
-            nombre: 'Juan García',
-            cedula: '12345678',
-            consultorio: '2',
-            franjaHoraria: '06:00-14:00' as const,
+            name: 'Juan García',
+            documentId: '12345678',
+            office: '2',
+            shift: '06:00-14:00' as const,
         };
 
         const result = await controller.createDoctor(dto);
@@ -58,18 +58,18 @@ describe('DoctorController (Presentation)', () => {
         expect(result).toEqual(doctors);
     });
 
-    it('returns available shifts for a consultorio', async () => {
+    it('returns available shifts for an office', async () => {
         const shiftsResult = {
-            consultorio: '3',
-            available_shifts: ['14:00-22:00'],
-            occupied_shifts: ['06:00-14:00'],
+            office: '3',
+            availableShifts: ['14:00-22:00'],
+            occupiedShifts: ['06:00-14:00'],
         };
         (getAvailableShiftsUseCase.execute as jest.Mock).mockResolvedValue(shiftsResult);
 
         const result = await controller.getAvailableShifts('3', undefined);
 
         expect(getAvailableShiftsUseCase.execute).toHaveBeenCalledWith({
-            consultorio: '3',
+            office: '3',
             excludeDoctorId: undefined,
         });
         expect(result).toEqual(shiftsResult);
@@ -77,16 +77,16 @@ describe('DoctorController (Presentation)', () => {
 
     it('passes excludeDoctorId query param to use case', async () => {
         const shiftsResult = {
-            consultorio: '1',
-            available_shifts: ['06:00-14:00'],
-            occupied_shifts: ['14:00-22:00'],
+            office: '1',
+            availableShifts: ['06:00-14:00'],
+            occupiedShifts: ['14:00-22:00'],
         };
         (getAvailableShiftsUseCase.execute as jest.Mock).mockResolvedValue(shiftsResult);
 
         const result = await controller.getAvailableShifts('1', 'doc-id-to-exclude');
 
         expect(getAvailableShiftsUseCase.execute).toHaveBeenCalledWith({
-            consultorio: '1',
+            office: '1',
             excludeDoctorId: 'doc-id-to-exclude',
         });
         expect(result).toEqual(shiftsResult);

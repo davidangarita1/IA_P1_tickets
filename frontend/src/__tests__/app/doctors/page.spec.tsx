@@ -181,7 +181,7 @@ describe("DoctorsPage", () => {
   });
 
   it("shows doctor names with 'Dr.' prefix in table rows", () => {
-    const doctor = buildDoctor({ nombre: "Juan García", cedula: "12345678" });
+    const doctor = buildDoctor({ name: "Juan García", documentId: "12345678" });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
@@ -190,8 +190,8 @@ describe("DoctorsPage", () => {
     expect(screen.getByText("12345678")).toBeInTheDocument();
   });
 
-  it("shows consultorio value when it is not null", () => {
-    const doctor = buildDoctor({ consultorio: "5" });
+  it("shows office value when it is not null", () => {
+    const doctor = buildDoctor({ office: "5" });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
@@ -199,8 +199,8 @@ describe("DoctorsPage", () => {
     expect(screen.getByText("5")).toBeInTheDocument();
   });
 
-  it("shows 'Sin asignar' when consultorio is null", () => {
-    const doctor = buildDoctor({ consultorio: null });
+  it("shows 'Sin asignar' when office is null", () => {
+    const doctor = buildDoctor({ office: null });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
@@ -208,8 +208,8 @@ describe("DoctorsPage", () => {
     expect(screen.getAllByText("Sin asignar").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("shows 'Sin asignar' when franjaHoraria is null", () => {
-    const doctor = buildDoctor({ franjaHoraria: null });
+  it("shows 'Sin asignar' when shift is null", () => {
+    const doctor = buildDoctor({ shift: null });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);

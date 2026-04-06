@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IDoctorRepository } from '../../domain/ports/doctor.repository';
 import { DOCTOR_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
-import { FranjaHoraria } from '../../domain/entities/doctor.entity';
+import { Shift } from '../../domain/entities/doctor.entity';
 
 export interface GetAvailableShiftsData {
-    consultorio: string;
+    office: string;
     excludeDoctorId?: string;
 }
 
 export interface AvailableShiftsResponse {
-    consultorio: string;
-    available_shifts: FranjaHoraria[];
-    occupied_shifts: FranjaHoraria[];
+    office: string;
+    availableShifts: Shift[];
+    occupiedShifts: Shift[];
 }
 
 @Injectable()
@@ -22,14 +22,14 @@ export class GetAvailableShiftsUseCase {
 
     async execute(data: GetAvailableShiftsData): Promise<AvailableShiftsResponse> {
         const result = await this.doctorRepository.findAvailableShifts(
-            data.consultorio,
+            data.office,
             data.excludeDoctorId,
         );
 
         return {
-            consultorio: data.consultorio,
-            available_shifts: result.availableShifts,
-            occupied_shifts: result.occupiedShifts,
+            office: data.office,
+            availableShifts: result.availableShifts,
+            occupiedShifts: result.occupiedShifts,
         };
     }
 }

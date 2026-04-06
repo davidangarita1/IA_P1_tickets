@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DoctorSchemaClass, DoctorDocument } from '../schemas/doctor.schema';
 import { IDoctorRepository, CreateDoctorData, AvailableShiftsResult } from '../../domain/ports/doctor.repository';
-import { Doctor, FranjaHoraria } from '../../domain/entities/doctor.entity';
+import { Doctor, Shift } from '../../domain/entities/doctor.entity';
 
-const ALL_SHIFTS: FranjaHoraria[] = ['06:00-14:00', '14:00-22:00'];
+const ALL_SHIFTS: Shift[] = ['06:00-14:00', '14:00-22:00'];
 
 @Injectable()
 export class DoctorMongooseAdapter implements IDoctorRepository {
@@ -19,27 +19,27 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
     }
 
     async findAll(): Promise<Doctor[]> {
-        const docs = await this.doctorModel.find({ status: 'Activo' }).exec();
+        const docs = await this.doctorModel.find({ status: 'active' }).exec();
         return docs.map(doc => this.toDomain(doc));
     }
 
-    async findByCedula(cedula: string): Promise<Doctor | null> {
-        const doc = await this.doctorModel.findOne({ cedula }).exec();
+    async findByDocumentId(documentId: string): Promise<Doctor | null> {
+        const doc = await this.doctorModel.findOne({ documentId }).exec();
         return doc ? this.toDomain(doc) : null;
     }
 
-    async findByConsultorioAndFranja(consultorio: string, franjaHoraria: FranjaHoraria): Promise<Doctor | null> {
+    async findByOfficeAndShift(office: string, shift: Shift): Promise<Doctor | null> {
         const doc = await this.doctorModel
-            .findOne({ consultorio, franjaHoraria, status: 'Activo' })
+            .findOne({ office, shift, status: 'active' })
             .exec();
         return doc ? this.toDomain(doc) : null;
     }
 
-    async findAvailableShifts(consultorio: string, excludeDoctorId?: string): Promise<AvailableShiftsResult> {
+    async findAvailableShifts(office: string, excludeDoctorId?: string): Promise<AvailableShiftsResult> {
         const query: Record<string, unknown> = {
-            consultorio,
-            status: 'Activo',
-            franjaHoraria: { $ne: null },
+            office,
+            status: 'active',
+            shift: { $ne: null },
         };
 
         if (excludeDoctorId) {
@@ -47,8 +47,8 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
         }
 
         const docs = await this.doctorModel.find(query).exec();
-        const occupiedShifts = docs.map(doc => doc.franjaHoraria as FranjaHoraria);
-        const availableShifts = ALL_SHIFTS.filter(shift => !occupiedShifts.includes(shift));
+        const occupiedShifts = docs.map(doc => doc.shift as Shift);
+        const availableShifts = ALL_SHIFTS.filter(s => !occupiedShifts.includes(s));
 
         return { availableShifts, occupiedShifts };
     }
@@ -56,10 +56,10 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
     private toDomain(doc: DoctorDocument): Doctor {
         return new Doctor({
             id: String(doc._id),
-            nombre: doc.nombre,
-            cedula: doc.cedula,
-            consultorio: doc.consultorio,
-            franjaHoraria: doc.franjaHoraria,
+            name: doc.name,
+            documentId: doc.documentId,
+            office: doc.office,
+            shift: doc.shift,
             status: doc.status,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,

@@ -15,9 +15,9 @@ describe("useAvailableShifts", () => {
   it("sets loading to false after fetchShifts resolves", async () => {
     const service = mockDoctorService();
     service.getAvailableShifts.mockResolvedValueOnce({
-      consultorio: "1",
-      available_shifts: [],
-      occupied_shifts: [],
+      office: "1",
+      availableShifts: [],
+      occupiedShifts: [],
     });
 
     const { result } = renderHook(() => useAvailableShifts(service));
@@ -32,9 +32,9 @@ describe("useAvailableShifts", () => {
   it("populates shifts after fetchShifts succeeds", async () => {
     const service = mockDoctorService();
     service.getAvailableShifts.mockResolvedValueOnce({
-      consultorio: "1",
-      available_shifts: ["06:00-14:00", "14:00-22:00"],
-      occupied_shifts: [],
+      office: "1",
+      availableShifts: ["06:00-14:00", "14:00-22:00"],
+      occupiedShifts: [],
     });
 
     const { result } = renderHook(() => useAvailableShifts(service));
@@ -51,9 +51,9 @@ describe("useAvailableShifts", () => {
   it("passes excludeDoctorId to the service", async () => {
     const service = mockDoctorService();
     service.getAvailableShifts.mockResolvedValueOnce({
-      consultorio: "2",
-      available_shifts: ["06:00-14:00"],
-      occupied_shifts: ["14:00-22:00"],
+      office: "2",
+      availableShifts: ["06:00-14:00"],
+      occupiedShifts: ["14:00-22:00"],
     });
 
     const { result } = renderHook(() => useAvailableShifts(service));
@@ -68,9 +68,9 @@ describe("useAvailableShifts", () => {
   it("resets shifts to empty array when fetchShifts fails", async () => {
     const service = mockDoctorService();
     service.getAvailableShifts.mockResolvedValueOnce({
-      consultorio: "1",
-      available_shifts: ["06:00-14:00"],
-      occupied_shifts: [],
+      office: "1",
+      availableShifts: ["06:00-14:00"],
+      occupiedShifts: [],
     });
 
     const { result } = renderHook(() => useAvailableShifts(service));

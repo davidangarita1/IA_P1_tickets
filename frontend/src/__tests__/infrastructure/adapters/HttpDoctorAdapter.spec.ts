@@ -68,8 +68,8 @@ describe("HttpDoctorAdapter", () => {
 
   describe("create()", () => {
     const data: CreateDoctorData = {
-      nombre: "Dr. Test",
-      cedula: "12345678",
+      name: "Dr. Test",
+      documentId: "12345678",
     };
 
     it("creates a doctor and returns the created doctor", async () => {
@@ -126,16 +126,16 @@ describe("HttpDoctorAdapter", () => {
   describe("getAvailableShifts()", () => {
     it("fetches available shifts with consultorio param", async () => {
       const response = {
-        consultorio: "1",
-        available_shifts: ["06:00-14:00" as const],
-        occupied_shifts: [] as ("06:00-14:00" | "14:00-22:00")[],
+        office: "1",
+        availableShifts: ["06:00-14:00" as const],
+        occupiedShifts: [] as ("06:00-14:00" | "14:00-22:00")[],
       };
       mockFetch.mockResolvedValueOnce(mockResponse(200, response));
 
       const result = await adapter.getAvailableShifts("1");
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${BASE}/api/v1/doctors/available-shifts?consultorio=1`,
+        `${BASE}/api/v1/doctors/available-shifts?office=1`,
         { headers: { Authorization: "Bearer test-token" } }
       );
       expect(result).toEqual(response);
@@ -153,7 +153,7 @@ describe("HttpDoctorAdapter", () => {
       await adapter.getAvailableShifts("1", "doc-123");
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${BASE}/api/v1/doctors/available-shifts?consultorio=1&exclude_doctor_id=doc-123`,
+        `${BASE}/api/v1/doctors/available-shifts?office=1&exclude_doctor_id=doc-123`,
         expect.any(Object)
       );
     });
@@ -170,9 +170,9 @@ describe("HttpDoctorAdapter", () => {
       mockedGetAuthCookie.mockReturnValue(null);
       mockFetch.mockResolvedValueOnce(
         mockResponse(200, {
-          consultorio: "1",
-          available_shifts: [],
-          occupied_shifts: [],
+          office: "1",
+          availableShifts: [],
+          occupiedShifts: [],
         })
       );
 

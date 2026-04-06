@@ -2,11 +2,11 @@ import { DoctorMongooseAdapter } from '../../src/doctors/infrastructure/adapters
 
 const makeDoctorDoc = (overrides = {}) => ({
     _id: 'doc-id-1',
-    nombre: 'Juan García',
-    cedula: '12345678',
-    consultorio: '2',
-    franjaHoraria: '06:00-14:00',
-    status: 'Activo',
+    name: 'Juan García',
+    documentId: '12345678',
+    office: '2',
+    shift: '06:00-14:00',
+    status: 'active',
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
     ...overrides,
@@ -32,19 +32,19 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
             mockModel.create.mockResolvedValue(doc);
 
             const result = await adapter.create({
-                nombre: 'Juan García',
-                cedula: '12345678',
-                consultorio: '2',
-                franjaHoraria: '06:00-14:00',
-                status: 'Activo',
+                name: 'Juan García',
+                documentId: '12345678',
+                office: '2',
+                shift: '06:00-14:00',
+                status: 'active',
             });
 
             expect(result.id).toBe('doc-id-1');
-            expect(result.nombre).toBe('Juan García');
-            expect(result.cedula).toBe('12345678');
-            expect(result.consultorio).toBe('2');
-            expect(result.franjaHoraria).toBe('06:00-14:00');
-            expect(result.status).toBe('Activo');
+            expect(result.name).toBe('Juan García');
+            expect(result.documentId).toBe('12345678');
+            expect(result.office).toBe('2');
+            expect(result.shift).toBe('06:00-14:00');
+            expect(result.status).toBe('active');
         });
     });
 
@@ -58,7 +58,7 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
             const result = await adapter.findAll();
 
             expect(result).toHaveLength(2);
-            expect(mockModel.find).toHaveBeenCalledWith({ status: 'Activo' });
+            expect(mockModel.find).toHaveBeenCalledWith({ status: 'active' });
         });
 
         it('returns empty array when no active doctors exist', async () => {
@@ -72,18 +72,18 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
         });
     });
 
-    describe('findByCedula', () => {
+    describe('findByDocumentId', () => {
         it('returns a doctor when found', async () => {
             const doc = makeDoctorDoc();
             mockModel.findOne.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(doc),
             });
 
-            const result = await adapter.findByCedula('12345678');
+            const result = await adapter.findByDocumentId('12345678');
 
             expect(result).not.toBeNull();
-            expect(result?.cedula).toBe('12345678');
-            expect(mockModel.findOne).toHaveBeenCalledWith({ cedula: '12345678' });
+            expect(result?.documentId).toBe('12345678');
+            expect(mockModel.findOne).toHaveBeenCalledWith({ documentId: '12345678' });
         });
 
         it('returns null when doctor is not found', async () => {
@@ -91,26 +91,26 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
                 exec: jest.fn().mockResolvedValue(null),
             });
 
-            const result = await adapter.findByCedula('99999999');
+            const result = await adapter.findByDocumentId('99999999');
 
             expect(result).toBeNull();
         });
     });
 
-    describe('findByConsultorioAndFranja', () => {
-        it('returns a doctor when consultorio and franja match', async () => {
+    describe('findByOfficeAndShift', () => {
+        it('returns a doctor when office and shift match', async () => {
             const doc = makeDoctorDoc();
             mockModel.findOne.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(doc),
             });
 
-            const result = await adapter.findByConsultorioAndFranja('2', '06:00-14:00');
+            const result = await adapter.findByOfficeAndShift('2', '06:00-14:00');
 
             expect(result).not.toBeNull();
             expect(mockModel.findOne).toHaveBeenCalledWith({
-                consultorio: '2',
-                franjaHoraria: '06:00-14:00',
-                status: 'Activo',
+                office: '2',
+                shift: '06:00-14:00',
+                status: 'active',
             });
         });
 
@@ -119,15 +119,15 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
                 exec: jest.fn().mockResolvedValue(null),
             });
 
-            const result = await adapter.findByConsultorioAndFranja('5', '14:00-22:00');
+            const result = await adapter.findByOfficeAndShift('5', '14:00-22:00');
 
             expect(result).toBeNull();
         });
     });
 
     describe('findAvailableShifts', () => {
-        it('returns available and occupied shifts for a consultorio', async () => {
-            const docs = [makeDoctorDoc({ franjaHoraria: '06:00-14:00' })];
+        it('returns available and occupied shifts for an office', async () => {
+            const docs = [makeDoctorDoc({ shift: '06:00-14:00' })];
             mockModel.find.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(docs),
             });

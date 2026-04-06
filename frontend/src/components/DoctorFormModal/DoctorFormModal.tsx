@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAvailableShifts } from "@/hooks/useAvailableShifts";
 import type { DoctorService } from "@/domain/ports/DoctorService";
-import type { FranjaHoraria } from "@/domain/Doctor";
+import type { Shift } from "@/domain/Doctor";
 import styles from "./DoctorFormModal.module.css";
 
-const CONSULTORIOS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+const OFFICES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
 interface DoctorFormModalProps {
   onClose: () => void;
@@ -25,40 +25,40 @@ export default function DoctorFormModal({
   doctorService,
   showToast,
 }: DoctorFormModalProps) {
-  const [nombre, setNombre] = useState("");
-  const [cedula, setCedula] = useState("");
-  const [consultorio, setConsultorio] = useState("");
-  const [franjaHoraria, setFranjaHoraria] = useState("");
-  const [nombreTouched, setNombreTouched] = useState(false);
-  const [cedulaTouched, setCedulaTouched] = useState(false);
+  const [name, setName] = useState("");
+  const [documentId, setDocumentId] = useState("");
+  const [office, setOffice] = useState("");
+  const [shift, setShift] = useState("");
+  const [nameTouched, setNameTouched] = useState(false);
+  const [documentIdTouched, setDocumentIdTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const { shifts, loading: shiftsLoading, fetchShifts } = useAvailableShifts(doctorService);
 
-  const nombreError =
-    nombreTouched && nombre.length > 0 && nombre.length < 3
+  const nameError =
+    nameTouched && name.length > 0 && name.length < 3
       ? "El nombre debe tener mínimo 3 caracteres"
-      : nombreTouched && nombre.length === 0
+      : nameTouched && name.length === 0
         ? "El nombre completo es obligatorio"
         : null;
 
-  const cedulaError =
-    cedulaTouched && cedula.length === 0
+  const documentIdError =
+    documentIdTouched && documentId.length === 0
       ? "El número de cédula es obligatorio"
-      : cedulaTouched && (cedula.length < 7 || cedula.length > 10)
+      : documentIdTouched && (documentId.length < 7 || documentId.length > 10)
         ? "La cédula debe tener entre 7 y 10 dígitos"
         : null;
 
-  const isFormValid = nombre.length >= 3 && cedula.length >= 7 && cedula.length <= 10;
+  const isFormValid = name.length >= 3 && documentId.length >= 7 && documentId.length <= 10;
 
-  const consultorioSelected = consultorio !== "";
-  const noShiftsAvailable = consultorioSelected && !shiftsLoading && shifts.length === 0;
-  const franjaDisabled = !consultorioSelected || shiftsLoading || noShiftsAvailable;
+  const officeSelected = office !== "";
+  const noShiftsAvailable = officeSelected && !shiftsLoading && shifts.length === 0;
+  const shiftDisabled = !officeSelected || shiftsLoading || noShiftsAvailable;
 
-  const handleConsultorioChange = useCallback(
+  const handleOfficeChange = useCallback(
     (value: string) => {
-      setConsultorio(value);
-      setFranjaHoraria("");
+      setOffice(value);
+      setShift("");
       if (value) {
         fetchShifts(value);
       }
@@ -72,10 +72,10 @@ export default function DoctorFormModal({
     setSubmitting(true);
     try {
       await doctorService.create({
-        nombre,
-        cedula,
-        consultorio: consultorio || null,
-        franjaHoraria: (franjaHoraria as FranjaHoraria) || null,
+        name,
+        documentId,
+        office: office || null,
+        shift: (shift as Shift) || null,
       });
       showToast("Médico creado exitosamente", "success");
       onSuccess();
@@ -110,12 +110,12 @@ export default function DoctorFormModal({
             id="doctor-nombre"
             type="text"
             className={styles.input}
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            onBlur={() => setNombreTouched(true)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => setNameTouched(true)}
             placeholder="Nombre completo del médico"
           />
-          {nombreError && <span className={styles.error}>{nombreError}</span>}
+          {nameError && <span className={styles.error}>{nameError}</span>}
         </div>
 
         <div className={styles.field}>
@@ -126,13 +126,13 @@ export default function DoctorFormModal({
             id="doctor-cedula"
             type="text"
             className={styles.input}
-            value={cedula}
-            onChange={(e) => setCedula(stripNonNumeric(e.target.value))}
-            onBlur={() => setCedulaTouched(true)}
+            value={documentId}
+            onChange={(e) => setDocumentId(stripNonNumeric(e.target.value))}
+            onBlur={() => setDocumentIdTouched(true)}
             placeholder="Número de cédula"
             maxLength={10}
           />
-          {cedulaError && <span className={styles.error}>{cedulaError}</span>}
+          {documentIdError && <span className={styles.error}>{documentIdError}</span>}
         </div>
 
         <div className={styles.field}>
@@ -142,11 +142,11 @@ export default function DoctorFormModal({
           <select
             id="doctor-consultorio"
             className={styles.select}
-            value={consultorio}
-            onChange={(e) => handleConsultorioChange(e.target.value)}
+            value={office}
+            onChange={(e) => handleOfficeChange(e.target.value)}
           >
             <option value="">Seleccionar consultorio</option>
-            {CONSULTORIOS.map((c) => (
+            {OFFICES.map((c) => (
               <option key={c} value={c}>
                 Consultorio {c}
               </option>
@@ -161,9 +161,9 @@ export default function DoctorFormModal({
           <select
             id="doctor-franja"
             className={styles.select}
-            value={franjaHoraria}
-            onChange={(e) => setFranjaHoraria(e.target.value)}
-            disabled={franjaDisabled}
+            value={shift}
+            onChange={(e) => setShift(e.target.value)}
+            disabled={shiftDisabled}
           >
             <option value="">Seleccionar franja</option>
             {shifts.map((s) => (

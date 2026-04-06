@@ -99,7 +99,7 @@ describe("useDoctors", () => {
     const { result } = renderHook(() => useDoctors(service));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    const data = { nombre: "Test Doc", cedula: "12345678" };
+    const data = { name: "Test Doc", documentId: "12345678" };
     const created = await result.current.create(data);
 
     expect(service.create).toHaveBeenCalledWith(data);

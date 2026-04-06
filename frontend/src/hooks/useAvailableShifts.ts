@@ -1,22 +1,22 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { FranjaHoraria } from "@/domain/Doctor";
+import type { Shift } from "@/domain/Doctor";
 import type { DoctorService } from "@/domain/ports/DoctorService";
 
 export function useAvailableShifts(doctorService: DoctorService) {
-  const [shifts, setShifts] = useState<FranjaHoraria[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchShifts = useCallback(
-    async (consultorio: string, excludeDoctorId?: string) => {
+    async (office: string, excludeDoctorId?: string) => {
       setLoading(true);
       try {
         const result = await doctorService.getAvailableShifts(
-          consultorio,
+          office,
           excludeDoctorId
         );
-        setShifts(result.available_shifts);
+        setShifts(result.availableShifts);
       } catch {
         setShifts([]);
       } finally {

@@ -1,22 +1,22 @@
-import { Doctor, DoctorStatus, FranjaHoraria } from '../entities/doctor.entity';
+import { Doctor, DoctorStatus, Shift } from '../entities/doctor.entity';
 
 export interface CreateDoctorData {
-    nombre: string;
-    cedula: string;
-    consultorio: string | null;
-    franjaHoraria: FranjaHoraria | null;
+    name: string;
+    documentId: string;
+    office: string | null;
+    shift: Shift | null;
     status: DoctorStatus;
 }
 
 export interface AvailableShiftsResult {
-    availableShifts: FranjaHoraria[];
-    occupiedShifts: FranjaHoraria[];
+    availableShifts: Shift[];
+    occupiedShifts: Shift[];
 }
 
 export interface IDoctorRepository {
     create(data: CreateDoctorData): Promise<Doctor>;
     findAll(): Promise<Doctor[]>;
-    findByCedula(cedula: string): Promise<Doctor | null>;
-    findByConsultorioAndFranja(consultorio: string, franjaHoraria: FranjaHoraria): Promise<Doctor | null>;
-    findAvailableShifts(consultorio: string, excludeDoctorId?: string): Promise<AvailableShiftsResult>;
+    findByDocumentId(documentId: string): Promise<Doctor | null>;
+    findByOfficeAndShift(office: string, shift: Shift): Promise<Doctor | null>;
+    findAvailableShifts(office: string, excludeDoctorId?: string): Promise<AvailableShiftsResult>;
 }

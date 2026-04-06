@@ -82,10 +82,10 @@ function DoctorsContent() {
           )}
           {doctors.map((doctor) => (
             <tr key={doctor._id}>
-              <td>Dr. {doctor.nombre}</td>
-              <td>{doctor.cedula}</td>
-              <td>{doctor.consultorio ?? "Sin asignar"}</td>
-              <td>{doctor.franjaHoraria ?? "Sin asignar"}</td>
+              <td>Dr. {doctor.name}</td>
+              <td>{doctor.documentId}</td>
+              <td>{doctor.office ?? "Sin asignar"}</td>
+              <td>{doctor.shift ?? "Sin asignar"}</td>
               <td></td>
             </tr>
           ))}

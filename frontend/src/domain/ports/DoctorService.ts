@@ -4,7 +4,7 @@ export interface DoctorService {
   getAll(): Promise<Doctor[]>;
   create(data: CreateDoctorData): Promise<Doctor>;
   getAvailableShifts(
-    consultorio: string,
+    office: string,
     excludeDoctorId?: string
   ): Promise<AvailableShiftsResponse>;
 }
