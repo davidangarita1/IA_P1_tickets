@@ -1,6 +1,6 @@
 ---
 id: SPEC-001
-status: DRAFT
+status: APPROVED
 feature: doctors-module
 created: 2026-04-06
 updated: 2026-04-06
@@ -11,7 +11,7 @@ related-specs: []
 
 # Spec: Módulo de Gestión de Médicos y Consultorios
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `APPROVED` → implementación autorizada.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---
