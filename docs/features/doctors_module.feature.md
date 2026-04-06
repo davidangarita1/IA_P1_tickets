@@ -43,20 +43,20 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Dado que el usuario “Empleado/Administrador” está autenticado y visualiza el botón “Gestión Médicos” en la barra de navegación
   Cuando hace clic en él
   Entonces se navega a la pantalla de gestión de médicos
-  **Y** la pantalla muestra el título centrado de “Gestión de Médicos”
-  **Y** la pantalla muestra una tabla vacía con los encabezados: “Nombre completo”, “Consultorio”, “Franja Horaria”, “Acciones”
-  **Y** la pantalla muestra el botón “Crear médico” en la parte superior derecha de la tabla
+  Y la pantalla muestra el título centrado de “Gestión de Médicos”
+  Y la pantalla muestra una tabla vacía con los encabezados: “Nombre completo”, “Consultorio”, “Franja Horaria”, “Acciones”
+  Y la pantalla muestra el botón “Crear médico” en la parte superior derecha de la tabla
 
 - **Escenario:** La tabla aparece vacía cuando no hay médicos creados
   Dado que no existe ningún médico registrado en el sistema
   Cuando el administrador accede a la pantalla de gestión de médicos
   Entonces la tabla se muestra vacía
-  **Y** aparece el mensaje “No hay médicos creados” en la parte central de la tabla
+  Y aparece el mensaje “No hay médicos creados” en la parte central de la tabla
 
 - **Escenario:** El botón “Crear médico” es visible pero su funcionalidad se define en HU-02
   Dado que el usuario “Empleado/Administrador” está en el módulo de gestión de médicos
   Entonces el botón “Crear médico” es visible en la pantalla
-  **Y** permanece deshabilitado hasta que HU-02 (Crear un nuevo médico) sea implementada
+  Y permanece deshabilitado hasta que HU-02 (Crear un nuevo médico) sea implementada
 
 ### HU-02 (Refinada): Crear un nuevo médico
 
