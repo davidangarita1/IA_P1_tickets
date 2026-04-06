@@ -3,7 +3,6 @@ export type Shift = '06:00-14:00' | '14:00-22:00';
 
 export class Doctor {
     readonly _id: string;
-    readonly id: string;
     readonly name: string;
     readonly documentId: string;
     readonly office: string | null;
@@ -23,7 +22,6 @@ export class Doctor {
         updatedAt: Date;
     }) {
         this._id = props.id;
-        this.id = props.id;
         this.name = props.name;
         this.documentId = props.documentId;
         this.office = props.office;

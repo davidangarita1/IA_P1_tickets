@@ -38,7 +38,7 @@ describe('DoctorMongooseAdapter - update and findById (Infrastructure)', () => {
             const result = await adapter.findById('doc-id-1');
 
             expect(result).not.toBeNull();
-            expect(result?.id).toBe('doc-id-1');
+            expect(result?._id).toBe('doc-id-1');
             expect(result?.name).toBe('Juan García');
             expect(mockModel.findById).toHaveBeenCalledWith('doc-id-1');
         });

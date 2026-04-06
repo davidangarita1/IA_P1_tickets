@@ -13,7 +13,7 @@ describe('Doctor (Domain)', () => {
             updatedAt: new Date('2026-01-01'),
         });
 
-        expect(doctor.id).toBe('doc-1');
+        expect(doctor._id).toBe('doc-1');
         expect(doctor.name).toBe('Juan García');
         expect(doctor.documentId).toBe('12345678');
         expect(doctor.office).toBe('2');
@@ -68,7 +68,6 @@ describe('Doctor (Domain)', () => {
 
         const serialized = JSON.parse(JSON.stringify(doctor));
         expect(serialized._id).toBe('doc-json');
-        expect(serialized.id).toBe('doc-json');
-        expect(serialized._id).toBe(serialized.id);
+        expect(serialized.id).toBeUndefined();
     });
 });

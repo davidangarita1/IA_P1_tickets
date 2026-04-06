@@ -41,7 +41,7 @@ export class UpdateDoctorUseCase {
 
         if ((officeChanged || shiftChanged) && finalOffice && finalShift) {
             const conflict = await this.doctorRepository.findByOfficeAndShift(finalOffice, finalShift);
-            if (conflict && conflict.id !== id) {
+            if (conflict && conflict._id !== id) {
                 throw new ConflictException('La franja horaria del consultorio ya está ocupada');
             }
         }
