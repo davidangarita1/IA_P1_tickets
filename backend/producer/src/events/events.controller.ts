@@ -3,10 +3,6 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 import { TurnosGateway } from './turnos.gateway';
 import { TurnoEventPayload } from '../domain/entities/turno.entity';
 
-// ⚕️ HUMAN CHECK - Controlador de eventos RabbitMQ → WebSocket
-// Escucha eventos del Consumer y los reenvía por WebSocket a los clientes
-// ⚕️ HUMAN CHECK - Eliminado uso de `any` en los handlers
-// Ahora usa TurnoEventPayload para garantizar type safety end-to-end
 @Controller()
 export class EventsController {
     private readonly logger = new Logger(EventsController.name);

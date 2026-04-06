@@ -37,8 +37,6 @@ describe("HtmlSanitizer", () => {
     expect(sanitizer.sanitize("Carlos Pérez")).toBe("Carlos Pérez");
   });
 
-  // ── NoSQL Injection ───────────────────────────────────────────────────────
-
   it("removes MongoDB $gt operator", () => {
     expect(sanitizer.sanitize("$gt")).toBe("");
   });
@@ -52,7 +50,7 @@ describe("HtmlSanitizer", () => {
   });
 
   it("strips NoSQL injection payload embedded in a string", () => {
-    // e.g. attacker sends email: 'admin@eps.com$gt'
+
     const result = sanitizer.sanitize("admin@eps.com$gt");
     expect(result).not.toContain("$");
   });
@@ -61,8 +59,6 @@ describe("HtmlSanitizer", () => {
     const result = sanitizer.sanitize("$gt$where$regex");
     expect(result).toBe("");
   });
-
-  // ── Prototype Pollution ───────────────────────────────────────────────────
 
   it("removes __proto__ pollution attempt", () => {
     expect(sanitizer.sanitize("__proto__")).toBe("");

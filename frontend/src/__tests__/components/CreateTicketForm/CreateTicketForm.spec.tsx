@@ -1,4 +1,4 @@
-import { mockAuthService, mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
+import { mockAuthService, mockSanitizer, mockTicketWriter, mockDoctorService } from "@/__tests__/mocks/factories";
 import CreateTicketForm from "@/components/CreateTicketForm/CreateTicketForm";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
@@ -49,6 +49,7 @@ function setupMocks(overrides: {
     },
     sanitizer,
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseCreateTicket.mockReturnValue({

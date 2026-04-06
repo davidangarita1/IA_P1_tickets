@@ -23,6 +23,7 @@ import { InMemoryUserRepository } from './infrastructure/adapters/in-memory-user
 import { ScryptPasswordHasherAdapter } from './infrastructure/adapters/scrypt-password-hasher.adapter';
 import { HmacTokenService } from './infrastructure/adapters/hmac-token.service';
 import { AuthGuard } from './presentation/auth.guard';
+import { DoctorsModule } from './doctors/doctors.module';
 
 @Module({
     imports: [
@@ -30,7 +31,7 @@ import { AuthGuard } from './presentation/auth.guard';
             isGlobal: true,
             envFilePath: '.env',
         }),
-        // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => {
@@ -50,7 +51,7 @@ import { AuthGuard } from './presentation/auth.guard';
                     return {
                     transport: Transport.RMQ,
                     options: {
-                        // ⚕️ HUMAN CHECK - use ConfigService instead of hardcoded string
+
                         urls: [rabbitUrl],
                         queue: configService.get<string>('RABBITMQ_QUEUE', 'turnos_queue'),
                         queueOptions: {
@@ -63,11 +64,12 @@ import { AuthGuard } from './presentation/auth.guard';
             },
         ]),
         TurnosModule,
-        // ⚕️ HUMAN CHECK - Módulo de Eventos (WebSocket + RabbitMQ listener)
+
         EventsModule,
+        DoctorsModule,
     ],
     controllers: [ProducerController, AuthController],
-    // ⚕️ HUMAN CHECK - DIP: Use Cases inyectan puertos, registrados con tokens
+
     providers: [
         CreateTurnoUseCase,
         GetAllTurnosUseCase,

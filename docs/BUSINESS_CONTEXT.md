@@ -21,7 +21,7 @@
   - Control de áreas restringidas: protección automática de las secciones internas para que solo el personal autorizado pueda acceder.
   - Menú de navegación condicional: el menú principal solo aparece cuando el usuario ha iniciado sesión.
   - Gestión de turnos: solicitud y visualización de turnos con actualización inmediata en pantalla.
-  - Gestión de médicos: acceso al módulo de administración de médicos desde la barra de navegación, con tabla de médicos activos y sus consultorios/franjas horarias asignadas.
+  - Gestión de médicos: acceso al módulo de administración de médicos desde la barra de navegación, con tabla de médicos activos y sus consultorios/franjas horarias asignadas. Creación de médicos con nombre completo, cédula única (7-10 dígitos), consultorio y franja horaria opcionales — si se asigna consultorio, la franja horaria pasa a ser obligatoria. El sistema agrega el prefijo "Dr." automáticamente en la UI. Garantiza unicidad de la combinación consultorio/franja horaria entre médicos activos. Validaciones en tiempo real de nombre (mín. 3 caracteres) y cédula (solo números, 7-10 dígitos, única). Notificaciones flotantes de éxito y error con auto-cierre.
 
 ---
 

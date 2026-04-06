@@ -88,6 +88,7 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-CM-10 | Nombre vacío impide guardar | Modal abierto | Hacer foco en nombre y salir sin escribir | Mensaje "El nombre completo es obligatorio"; "Guardar" deshabilitado |
 | TC-CM-11 | Nombre con menos de 3 caracteres impide guardar | Modal abierto | Escribir "Ju" en nombre | Mensaje "El nombre completo debe tener al menos 3 caracteres"; "Guardar" deshabilitado |
 | TC-CM-12 | Cédula duplicada muestra alerta | Existe médico con cédula "12345678" | Escribir "12345678" en cédula, nombre "Pedro", clic en "Guardar" | Mensaje flotante "Ya existe un médico registrado con ese número de cédula"; modal permanece abierto |
+| TC-CM-13 | Consultorio sin franja horaria impide guardar | Modal abierto | Seleccionar consultorio "2", dejar franja sin seleccionar | Mensaje "La franja horaria es obligatoria cuando se asigna un consultorio"; "Guardar" deshabilitado |
 
 ### Suite 3 — Edición de médico (HU-03)
 
@@ -168,6 +169,13 @@ Feature: Gestión de Médicos
     And el usuario abre el modal de creación
     When selecciona Consultorio "1"
     Then el desplegable de franjas muestra solo "14:00 - 22:00"
+
+  Scenario: Consultorio seleccionado sin franja horaria impide guardar
+    Given el usuario abre el modal de creación
+    And el campo "Nombre completo" contiene "Juan García" y el campo "Número de cédula" contiene "12345678"
+    When selecciona Consultorio "2" y no selecciona ninguna franja horaria
+    Then el botón "Guardar" permanece deshabilitado
+    And aparece el mensaje "La franja horaria es obligatoria cuando se asigna un consultorio"
 
   # --- Edición de médico ---
 
