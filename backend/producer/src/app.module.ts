@@ -65,6 +65,7 @@ import { AuthGuard } from './presentation/auth.guard';
         TurnosModule,
         // ⚕️ HUMAN CHECK - Módulo de Eventos (WebSocket + RabbitMQ listener)
         EventsModule,
+        DoctorsModule,
     ],
     controllers: [ProducerController, AuthController],
     // ⚕️ HUMAN CHECK - DIP: Use Cases inyectan puertos, registrados con tokens
