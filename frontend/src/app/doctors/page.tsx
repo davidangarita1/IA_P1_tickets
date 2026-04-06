@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EditOutlined } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard/AuthGuard";
 import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
 import DoctorEditModal from "@/components/DoctorEditModal/DoctorEditModal";
@@ -108,7 +109,7 @@ function DoctorsContent() {
                   onClick={() => setEditingDoctor(doctor)}
                   aria-label={`Editar Dr. ${doctor.name}`}
                 >
-                  ✏️
+                  <EditOutlined />
                 </button>
               </td>
             </tr>

@@ -98,13 +98,18 @@
   border: none;
   cursor: pointer;
   font-size: 16px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.15s ease;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .editButton:hover {
   background: #f1f5f9;
+  color: #c6a96b;
 }
 
 @media (prefers-color-scheme: dark) {

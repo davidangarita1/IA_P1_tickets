@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { CloseOutlined } from "@ant-design/icons";
 import { useAvailableShifts } from "@/hooks/useAvailableShifts";
 import type { DoctorService } from "@/domain/ports/DoctorService";
 import type { Doctor, Shift } from "@/domain/Doctor";
@@ -119,7 +120,7 @@ export default function DoctorEditModal({
           onClick={onClose}
           aria-label="Cerrar modal"
         >
-          ✕
+          <CloseOutlined />
         </button>
 
         <h2 className={styles.title}>Editar Médico</h2>

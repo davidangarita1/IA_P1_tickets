@@ -6,6 +6,7 @@ const config: Config = {
   roots: ["<rootDir>/src"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^@ant-design/icons$": "<rootDir>/src/__mocks__/antDesignIcons.tsx",
   },
   setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
   transform: {
