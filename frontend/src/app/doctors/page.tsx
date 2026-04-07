@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { EditOutlined } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard/AuthGuard";
 import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
+import DoctorEditModal from "@/components/DoctorEditModal/DoctorEditModal";
 import Toast from "@/components/Toast/Toast";
 import { useDoctors } from "@/hooks/useDoctors";
 import { useToast } from "@/hooks/useToast";
 import { useDeps } from "@/providers/DependencyProvider";
+import type { Doctor } from "@/domain/Doctor";
 import styles from "@/styles/doctors.module.css";
 
 const TABLE_HEADERS = [
@@ -30,6 +33,7 @@ function DoctorsContent() {
   const { doctors, loading, error, refresh } = useDoctors(doctorService);
   const toast = useToast();
   const [showModal, setShowModal] = useState(false);
+  const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
 
   return (
     <main className={styles.container}>
@@ -66,6 +70,19 @@ function DoctorsContent() {
         />
       )}
 
+      {editingDoctor && (
+        <DoctorEditModal
+          doctor={editingDoctor}
+          onClose={() => setEditingDoctor(null)}
+          onSuccess={() => {
+            setEditingDoctor(null);
+            refresh();
+          }}
+          doctorService={doctorService}
+          showToast={toast.show}
+        />
+      )}
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -86,7 +103,15 @@ function DoctorsContent() {
               <td>{doctor.documentId}</td>
               <td>{doctor.office ?? "Sin asignar"}</td>
               <td>{doctor.shift ?? "Sin asignar"}</td>
-              <td></td>
+              <td>
+                <button
+                  className={styles.editButton}
+                  onClick={() => setEditingDoctor(doctor)}
+                  aria-label={`Editar Dr. ${doctor.name}`}
+                >
+                  <EditOutlined />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

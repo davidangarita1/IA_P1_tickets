@@ -39,7 +39,7 @@ describe('DoctorMongooseAdapter (Infrastructure)', () => {
                 status: 'active',
             });
 
-            expect(result.id).toBe('doc-id-1');
+            expect(result._id).toBe('doc-id-1');
             expect(result.name).toBe('Juan García');
             expect(result.documentId).toBe('12345678');
             expect(result.office).toBe('2');

@@ -1,9 +1,11 @@
-import { Body, Controller, Get, HttpCode, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateDoctorDto } from '../dtos/create-doctor.dto';
+import { UpdateDoctorDto } from '../dtos/update-doctor.dto';
 import { CreateDoctorUseCase } from '../../application/use-cases/create-doctor.use-case';
 import { GetAllDoctorsUseCase } from '../../application/use-cases/get-all-doctors.use-case';
 import { GetAvailableShiftsUseCase, AvailableShiftsResponse } from '../../application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '../../application/use-cases/update-doctor.use-case';
 import { AuthGuard } from '../../../presentation/auth.guard';
 import { Doctor } from '../../domain/entities/doctor.entity';
 
@@ -16,6 +18,7 @@ export class DoctorController {
         private readonly createDoctorUseCase: CreateDoctorUseCase,
         private readonly getAllDoctorsUseCase: GetAllDoctorsUseCase,
         private readonly getAvailableShiftsUseCase: GetAvailableShiftsUseCase,
+        private readonly updateDoctorUseCase: UpdateDoctorUseCase,
     ) {}
 
     @Post()
@@ -46,5 +49,20 @@ export class DoctorController {
         @Query('exclude_doctor_id') excludeDoctorId?: string,
     ): Promise<AvailableShiftsResponse> {
         return this.getAvailableShiftsUseCase.execute({ office, excludeDoctorId });
+    }
+
+    @Put(':id')
+    @ApiOperation({ summary: 'Actualizar un médico existente' })
+    @ApiParam({ name: 'id', description: 'ID del médico' })
+    @ApiResponse({ status: 200, description: 'Médico actualizado exitosamente' })
+    @ApiResponse({ status: 400, description: 'Datos inválidos' })
+    @ApiResponse({ status: 401, description: 'Token no proporcionado o inválido' })
+    @ApiResponse({ status: 404, description: 'Médico no encontrado' })
+    @ApiResponse({ status: 409, description: 'Cédula duplicada o combinación consultorio/franja ocupada' })
+    async updateDoctor(
+        @Param('id') id: string,
+        @Body() dto: UpdateDoctorDto,
+    ): Promise<Doctor> {
+        return this.updateDoctorUseCase.execute(id, dto);
     }
 }

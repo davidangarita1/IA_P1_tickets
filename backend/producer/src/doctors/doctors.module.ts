@@ -6,6 +6,7 @@ import { DOCTOR_REPOSITORY_TOKEN, TOKEN_SERVICE_TOKEN, ACCESS_TOKEN_VERIFIER_TOK
 import { CreateDoctorUseCase } from './application/use-cases/create-doctor.use-case';
 import { GetAllDoctorsUseCase } from './application/use-cases/get-all-doctors.use-case';
 import { GetAvailableShiftsUseCase } from './application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from './application/use-cases/update-doctor.use-case';
 import { DoctorController } from './presentation/controllers/doctor.controller';
 import { AuthGuard } from '../presentation/auth.guard';
 import { HmacTokenService } from '../infrastructure/adapters/hmac-token.service';
@@ -23,6 +24,7 @@ import { HmacTokenService } from '../infrastructure/adapters/hmac-token.service'
         CreateDoctorUseCase,
         GetAllDoctorsUseCase,
         GetAvailableShiftsUseCase,
+        UpdateDoctorUseCase,
         {
             provide: TOKEN_SERVICE_TOKEN,
             useClass: HmacTokenService,

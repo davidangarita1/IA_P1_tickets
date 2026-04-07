@@ -14,7 +14,7 @@ Permitir que un paciente registre su turno y reciba actualizaciones en tiempo re
 - Notificar cambios de estado en tiempo real al frontend.
 - Consultar turnos por lista general o por cédula.
 - Gestionar usuarios: registro, inicio y cierre de sesión con autenticación HMAC.
-- Gestión de médicos: crear médicos con nombre, cédula, consultorio y franja horaria; visualizar el catálogo de médicos activos. La franja horaria disponible se consulta en tiempo real antes de guardar, garantizando que no dos médicos activos compartan consultorio y franja. Módulo accesible solo para usuarios autenticados.
+- Gestión de médicos: crear y editar médicos con nombre, cédula, consultorio y franja horaria; visualizar el catálogo de médicos activos. La franja horaria disponible se consulta en tiempo real antes de guardar, garantizando que no dos médicos activos compartan consultorio y franja. Módulo accesible solo para usuarios autenticados.
 
 ## Próxima feature en ideación: Login + Dashboard privado
 
@@ -139,6 +139,7 @@ Todos los endpoints requieren `Authorization: Bearer <token>`.
 
 - `POST /api/v1/doctors`: crear médico (`{ nombre, cedula, consultorio?, franjaHoraria? }`). Responde `201` con el médico creado. Devuelve `409` si la cédula ya existe o si el consultorio+franja ya está asignado a otro médico activo.
 - `GET /api/v1/doctors`: listar médicos activos.
+- `PUT /api/v1/doctors/:id`: actualizar un médico existente (`{ nombre?, cedula?, consultorio?, franjaHoraria? }`). Devuelve `200` con el médico actualizado. Devuelve `404` si no existe, `409` si la cédula ya pertenece a otro médico o si el consultorio+franja ya está ocupado.
 - `GET /api/v1/doctors/available-shifts?consultorio=<n>`: consultar franjas disponibles para un consultorio dado.
 
 Ejemplo:

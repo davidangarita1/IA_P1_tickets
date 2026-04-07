@@ -103,6 +103,9 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-EM-07 | Nombre vacío o menor a 3 caracteres impide guardar | Modal con datos del médico | Borrar nombre o reducirlo a menos de 3 caracteres | "Guardar" deshabilitado, mensaje de validación en rojo |
 | TC-EM-08 | Cédula vacía impide guardar | Modal con datos del médico | Borrar contenido de cédula | "Guardar" deshabilitado, mensaje "El número de cédula es obligatorio" en rojo |
 | TC-EM-09 | Cédula duplicada en edición muestra alerta | Otro médico con cédula "99999999" | Cambiar cédula a "99999999" y perder foco o intentar guardar | "Guardar" deshabilitado, mensaje flotante rojo "Ya existe un médico registrado con ese número de cédula", modal abierto |
+| TC-EM-10 | Franja horaria se precarga correctamente en modal de edición | Médico con consultorio "2" y franja "06:00-14:00" | Clic en ícono de lápiz | El desplegable de franja muestra "06:00-14:00" seleccionada y las franjas disponibles del consultorio |
+| TC-EM-11 | Guardar edición envía el ID correcto del médico (regresión: CastError undefined) | Médico existente con _id válido | Abrir modal de edición, modificar nombre, clic en "Guardar" | PUT /api/v1/doctors/:id se ejecuta con el ID real del médico (no "undefined"), respuesta 200 |
+| TC-EM-12 | La entidad Doctor incluye _id en serialización JSON (regresión) | Médico creado en BD | GET /api/v1/doctors | Cada objeto doctor en la respuesta contiene la propiedad `_id` con su ID.
 
 ### Suite 4 — Baja de médico (HU-04)
 
@@ -191,6 +194,18 @@ Feature: Gestión de Médicos
     When el usuario hace clic fuera del modal o presiona Escape
     Then el modal permanece abierto
 
+  Scenario: Franja horaria se precarga en el modal de edición
+    Given el "Dr. Juan García" tiene Consultorio "2" y Franja "6:00 - 14:00"
+    And el usuario abre el modal de edición del "Dr. Juan García"
+    Then el desplegable de franja muestra "6:00 - 14:00" seleccionada
+    And las franjas disponibles del Consultorio "2" aparecen en el desplegable
+
+  Scenario: Guardar edición envía el ID correcto del médico (regresión)
+    Given el usuario abre el modal de edición del "Dr. Juan García"
+    When modifica el nombre a "Juan Pedro García" y hace clic en "Guardar"
+    Then la solicitud PUT se envía a /api/v1/doctors/:id con el ID real del médico
+    And la tabla refleja el nombre actualizado
+
   # --- Baja de médico ---
 
   Scenario: Confirmar baja lógica de un médico
@@ -262,6 +277,8 @@ Verifican escenarios completos en lenguaje Gherkin, enfocados en el resultado es
 | Baja de médico con turno en curso no bloqueada | HU-04 | 2 | 3 | **6** | Probar baja mientras el médico tiene un turno activo en franjas activas |
 | Eliminación física en lugar de lógica | HU-04 | 1 | 3 | **3** | Verificar que el registro persista en BD con estado "Inactivo" tras la baja |
 | Combinación consultorio/franja no liberada tras baja | HU-04 | 2 | 3 | **6** | Tras dar de baja, intentar asignar la misma combinación a otro médico |
+| Serialización de _id ausente en respuesta JSON del backend | HU-03 | 2 | 3 | **6** | Test de regresión (TC-EM-12) verifica que `_id` esté presente y que no exista `id` duplicado en JSON.stringify de Doctor; usar propiedad de instancia única `_id`, no getters ni duplicados |
+| Franja horaria no precargada en modal de edición por _id undefined | HU-03 | 2 | 2 | **4** | Test de regresión (TC-EM-10) verifica que el desplegable de franja muestre la selección actual al abrir el modal |
 
 *(Escala: 1 Bajo, 2 Medio, 3 Alto)*
 

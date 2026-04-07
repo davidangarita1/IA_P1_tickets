@@ -2,12 +2,14 @@ import { DoctorController } from '../../../src/doctors/presentation/controllers/
 import { CreateDoctorUseCase } from '../../../src/doctors/application/use-cases/create-doctor.use-case';
 import { GetAllDoctorsUseCase } from '../../../src/doctors/application/use-cases/get-all-doctors.use-case';
 import { GetAvailableShiftsUseCase } from '../../../src/doctors/application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '../../../src/doctors/application/use-cases/update-doctor.use-case';
 import { Doctor } from '../../../src/doctors/domain/entities/doctor.entity';
 
 describe('DoctorController (Presentation)', () => {
     const createDoctorUseCase: Pick<CreateDoctorUseCase, 'execute'> = { execute: jest.fn() };
     const getAllDoctorsUseCase: Pick<GetAllDoctorsUseCase, 'execute'> = { execute: jest.fn() };
     const getAvailableShiftsUseCase: Pick<GetAvailableShiftsUseCase, 'execute'> = { execute: jest.fn() };
+    const updateDoctorUseCase: Pick<UpdateDoctorUseCase, 'execute'> = { execute: jest.fn() };
 
     let controller: DoctorController;
 
@@ -29,6 +31,7 @@ describe('DoctorController (Presentation)', () => {
             createDoctorUseCase as CreateDoctorUseCase,
             getAllDoctorsUseCase as GetAllDoctorsUseCase,
             getAvailableShiftsUseCase as GetAvailableShiftsUseCase,
+            updateDoctorUseCase as UpdateDoctorUseCase,
         );
     });
 

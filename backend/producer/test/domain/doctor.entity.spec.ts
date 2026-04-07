@@ -13,7 +13,7 @@ describe('Doctor (Domain)', () => {
             updatedAt: new Date('2026-01-01'),
         });
 
-        expect(doctor.id).toBe('doc-1');
+        expect(doctor._id).toBe('doc-1');
         expect(doctor.name).toBe('Juan García');
         expect(doctor.documentId).toBe('12345678');
         expect(doctor.office).toBe('2');
@@ -52,5 +52,22 @@ describe('Doctor (Domain)', () => {
         });
 
         expect(doctor.status).toBe('inactive');
+    });
+
+    it('includes _id in JSON serialization (regression: CastError undefined)', () => {
+        const doctor = new Doctor({
+            id: 'doc-json',
+            name: 'Test Serialization',
+            documentId: '99999999',
+            office: '1',
+            shift: '06:00-14:00',
+            status: 'active',
+            createdAt: new Date('2026-01-01'),
+            updatedAt: new Date('2026-01-01'),
+        });
+
+        const serialized = JSON.parse(JSON.stringify(doctor));
+        expect(serialized._id).toBe('doc-json');
+        expect(serialized.id).toBeUndefined();
     });
 });

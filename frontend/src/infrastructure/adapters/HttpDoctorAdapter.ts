@@ -1,4 +1,4 @@
-import type { Doctor, CreateDoctorData, AvailableShiftsResponse } from "@/domain/Doctor";
+import type { Doctor, CreateDoctorData, UpdateDoctorData, AvailableShiftsResponse } from "@/domain/Doctor";
 import type { DoctorService } from "@/domain/ports/DoctorService";
 import { getAuthCookie } from "@/infrastructure/cookies/cookieUtils";
 
@@ -27,6 +27,27 @@ export class HttpDoctorAdapter implements DoctorService {
 
     const res = await fetch(`${this.baseUrl}/api/v1/doctors`, {
       method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.message || "CONFLICT");
+    }
+
+    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    return res.json();
+  }
+
+  async update(id: string, data: UpdateDoctorData): Promise<Doctor> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...this.buildHeaders(),
+    };
+
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
+      method: "PUT",
       headers,
       body: JSON.stringify(data),
     });
