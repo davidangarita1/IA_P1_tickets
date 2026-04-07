@@ -65,7 +65,7 @@ describe("useAvailableShifts", () => {
     expect(service.getAvailableShifts).toHaveBeenCalledWith("2", "doc-123");
   });
 
-  it("resets shifts to empty array when fetchShifts fails", async () => {
+  it("resets shifts to empty array when fetchShifts fails for a new office", async () => {
     const service = mockDoctorService();
     service.getAvailableShifts.mockResolvedValueOnce({
       office: "1",
@@ -83,7 +83,7 @@ describe("useAvailableShifts", () => {
     service.getAvailableShifts.mockRejectedValueOnce(new Error("API Error"));
 
     await act(async () => {
-      await result.current.fetchShifts("1");
+      await result.current.fetchShifts("2");
     });
 
     expect(result.current.shifts).toEqual([]);
