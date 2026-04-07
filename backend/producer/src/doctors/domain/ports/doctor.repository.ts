@@ -28,4 +28,5 @@ export interface IDoctorRepository {
     findByOfficeAndShift(office: string, shift: Shift): Promise<Doctor | null>;
     findAvailableShifts(office: string, excludeDoctorId?: string): Promise<AvailableShiftsResult>;
     update(id: string, data: UpdateDoctorData): Promise<Doctor>;
+    softDelete(id: string): Promise<Doctor>;
 }

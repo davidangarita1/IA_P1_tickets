@@ -66,6 +66,14 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
         return this.toDomain(doc);
     }
 
+    async softDelete(id: string): Promise<Doctor> {
+        const doc = await this.doctorModel.findByIdAndUpdate(id, { status: 'inactive' }, { new: true }).exec();
+        if (!doc) {
+            throw new NotFoundException('Médico no encontrado');
+        }
+        return this.toDomain(doc);
+    }
+
     private toDomain(doc: DoctorDocument): Doctor {
         return new Doctor({
             id: String(doc._id),

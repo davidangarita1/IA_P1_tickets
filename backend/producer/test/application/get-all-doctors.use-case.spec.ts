@@ -11,6 +11,7 @@ describe('GetAllDoctorsUseCase (Application)', () => {
         findByOfficeAndShift: jest.fn(),
         findAvailableShifts: jest.fn(),
         update: jest.fn(),
+        softDelete: jest.fn(),
     };
 
     let useCase: GetAllDoctorsUseCase;
