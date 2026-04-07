@@ -838,7 +838,7 @@ frontend/src/
 - [x] Validación cruzada: si se asigna consultorio, la franja horaria es obligatoria (400 si consultorio presente y franja ausente)
 - [x] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
 - [x] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
-- [ ] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors
+- [x] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors
 - [ ] Auditoría: `created_at`, `updated_at`, `created_by`, `updated_by` se registran automáticamente
 
 ### Backend — Tests
@@ -923,7 +923,7 @@ frontend/src/
 - [x] Crear `hooks/useAvailableShifts.ts` que:
   - [x] Estado: `shifts[]`, `loading`, `error`
   - [x] Método: `fetchShifts(consultorio, excludeDoctorId?)`
-  - [ ] Cachés resultados si consultorio igual (prevé calls innecesarias)
+  - [x] Cachés resultados si consultorio igual (prevé calls innecesarias)
   - [x] Retorna franjas disponibles como array
 - [x] Crear `domain/Doctor.ts` (TypeScript interface/tipo):
   - [x] `_id: string`
@@ -940,7 +940,7 @@ frontend/src/
 - [x] `test_DoctorTable_renders_list_correctly` — tabla renderiza médicos
 - [x] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
 - [x] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
-- [ ] `test_DoctorTable_delete_icon_opens_confirm_modal` — ícono eliminación abre confirm
+- [x] `test_DoctorTable_delete_icon_opens_confirm_modal` — ícono eliminación abre confirm
 - [x] `test_DoctorFormModal_mode_create_shows_empty_fields` — modal create campos vacíos
 - [x] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
 - [x] `test_DoctorFormModal_cedula_field_only_accepts_numbers` — validación cedula
