@@ -9,6 +9,7 @@ describe('UpdateDoctorUseCase (Application)', () => {
     findAll: jest.fn(),
     findById: jest.fn(),
     findByDocumentId: jest.fn(),
+    findActiveByDocumentId: jest.fn(),
     findByOfficeAndShift: jest.fn(),
     findAvailableShifts: jest.fn(),
     update: jest.fn(),
@@ -116,23 +117,36 @@ describe('UpdateDoctorUseCase (Application)', () => {
     const existing = makeDoctor();
     const otherDoctor = makeDoctor({ id: 'doc-other', documentId: '99999999' });
     mockRepository.findById.mockResolvedValue(existing);
-    mockRepository.findByDocumentId.mockResolvedValue(otherDoctor);
+    mockRepository.findActiveByDocumentId.mockResolvedValue(otherDoctor);
 
     await expect(useCase.execute('doc-1', { documentId: '99999999' })).rejects.toThrow(
       ConflictException,
     );
   });
 
-  it('allows updating documentId when no conflict exists', async () => {
+  it('allows updating documentId when no active conflict exists', async () => {
     const existing = makeDoctor();
     const updated = makeDoctor({ documentId: '87654321' });
     mockRepository.findById.mockResolvedValue(existing);
-    mockRepository.findByDocumentId.mockResolvedValue(null);
+    mockRepository.findActiveByDocumentId.mockResolvedValue(null);
     mockRepository.update.mockResolvedValue(updated);
 
     const result = await useCase.execute('doc-1', { documentId: '87654321' });
 
     expect(result.documentId).toBe('87654321');
+  });
+
+  it('allows updating documentId to one that belongs to an inactive doctor', async () => {
+    const existing = makeDoctor();
+    const updated = makeDoctor({ documentId: '87654321' });
+    mockRepository.findById.mockResolvedValue(existing);
+    mockRepository.findActiveByDocumentId.mockResolvedValue(null);
+    mockRepository.update.mockResolvedValue(updated);
+
+    const result = await useCase.execute('doc-1', { documentId: '87654321' });
+
+    expect(result.documentId).toBe('87654321');
+    expect(mockRepository.findByDocumentId).not.toHaveBeenCalled();
   });
 
   it('skips documentId conflict check when documentId does not change', async () => {
@@ -143,7 +157,7 @@ describe('UpdateDoctorUseCase (Application)', () => {
 
     await useCase.execute('doc-1', { name: 'Otro Nombre' });
 
-    expect(mockRepository.findByDocumentId).not.toHaveBeenCalled();
+    expect(mockRepository.findActiveByDocumentId).not.toHaveBeenCalled();
   });
 
   it('allows removing office and shift by setting both to null', async () => {

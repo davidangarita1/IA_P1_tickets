@@ -25,6 +25,7 @@ export interface IDoctorRepository {
   findAll(): Promise<Doctor[]>;
   findById(id: string): Promise<Doctor | null>;
   findByDocumentId(documentId: string): Promise<Doctor | null>;
+  findActiveByDocumentId(documentId: string): Promise<Doctor | null>;
   findByOfficeAndShift(office: string, shift: Shift): Promise<Doctor | null>;
   findAvailableShifts(office: string, excludeDoctorId?: string): Promise<AvailableShiftsResult>;
   update(id: string, data: UpdateDoctorData): Promise<Doctor>;

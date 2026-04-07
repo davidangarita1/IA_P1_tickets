@@ -31,6 +31,11 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
     return doc ? this.toDomain(doc) : null;
   }
 
+  async findActiveByDocumentId(documentId: string): Promise<Doctor | null> {
+    const doc = await this.doctorModel.findOne({ documentId, status: 'active' }).exec();
+    return doc ? this.toDomain(doc) : null;
+  }
+
   async findByOfficeAndShift(office: string, shift: Shift): Promise<Doctor | null> {
     const doc = await this.doctorModel.findOne({ office, shift, status: 'active' }).exec();
     return doc ? this.toDomain(doc) : null;
