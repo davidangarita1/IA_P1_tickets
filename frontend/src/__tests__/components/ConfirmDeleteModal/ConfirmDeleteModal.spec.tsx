@@ -65,7 +65,7 @@ describe("ConfirmDeleteModal", () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
     expect(
-      screen.getByText(/ocultará de la lista de médicos activos/i)
+      screen.getByText(/eliminará de la lista de médicos activos/i)
     ).toBeInTheDocument();
   });
 });

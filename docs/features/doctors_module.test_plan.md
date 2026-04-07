@@ -112,7 +112,7 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | ID | Descripción | Precondición | Paso | Resultado esperado |
 | :--- | :--- | :--- | :--- | :--- |
 | TC-BM-01 | Ícono de baja visible en cada fila | Existen médicos activos | Consultar la tabla | Cada fila muestra ícono de baja junto al ícono de edición |
-| TC-BM-02 | Modal de confirmación al hacer clic en baja | Médico "Dr. Juan García" activo | Clic en ícono de baja | Modal muestra "¿Está seguro de que desea dar de baja al Dr. Juan García?..." con botones "Cancelar" y "Aceptar" |
+| TC-BM-02 | Modal de confirmación al hacer clic en baja | Médico "Dr. Juan García" activo | Clic en ícono de baja | Modal muestra "¿Está seguro de que desea dar de baja al Dr. Juan García? Esta acción lo eliminará de la lista de médicos activos." con botones "Cancelar" y "Aceptar" |
 | TC-BM-03 | Cancelar la baja cierra modal sin cambios | Modal de confirmación abierto | Clic en "Cancelar" | Modal se cierra, médico permanece en la tabla |
 | TC-BM-04 | Confirmar baja lógica | Modal de confirmación abierto | Clic en "Aceptar" | Modal se cierra, médico desaparece de la tabla, estado cambia a "Inactivo" en BD, mensaje "Médico dado de baja exitosamente" |
 | TC-BM-05 | Bloqueo de baja con turno en curso | Médico con turno en ejecución en este momento | Clic en ícono de baja | Mensaje flotante de alerta "No se puede dar de baja a un médico que se encuentra atendiendo un turno en este momento.", modal no se abre |

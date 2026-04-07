@@ -25,7 +25,7 @@ export default function ConfirmDeleteModal({
         <h2 className={styles.title}>Confirmar baja</h2>
         <p className={styles.message}>
           ¿Está seguro de que desea dar de baja al Dr. {doctorName}? Esta acción
-          lo ocultará de la lista de médicos activos.
+          lo eliminará de la lista de médicos activos.
         </p>
         <div className={styles.actions}>
           <button className={styles.cancelButton} onClick={onCancel}>
