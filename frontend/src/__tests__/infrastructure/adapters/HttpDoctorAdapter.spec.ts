@@ -62,6 +62,28 @@ describe('HttpDoctorAdapter', () => {
 
       await expect(adapter.getAll()).rejects.toThrow('HTTP_ERROR_500');
     });
+
+    it('appends page and limit as query params when provided', async () => {
+      mockFetch.mockResolvedValueOnce(mockResponse(200, { data: [], total: 0, page: 2, limit: 10 }));
+
+      await adapter.getAll({ page: 2, limit: 10 });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${BASE}/api/v1/doctors?page=2&limit=10`,
+        expect.any(Object),
+      );
+    });
+
+    it('appends only page when limit is not provided', async () => {
+      mockFetch.mockResolvedValueOnce(mockResponse(200, { data: [], total: 0, page: 1, limit: 25 }));
+
+      await adapter.getAll({ page: 1 });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${BASE}/api/v1/doctors?page=1`,
+        expect.any(Object),
+      );
+    });
   });
 
   describe('create()', () => {

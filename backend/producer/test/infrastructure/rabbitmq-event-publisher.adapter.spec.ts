@@ -15,7 +15,7 @@ describe('RabbitMQEventPublisher (Infrastructure)', () => {
   });
 
   describe('publish', () => {
-    it('emite el evento al ClientProxy con el payload', () => {
+    it('emits the event to ClientProxy with the payload', () => {
       const event = 'turno_creado';
       const payload = { cedula: 123, nombre: 'Test' };
 
@@ -26,7 +26,7 @@ describe('RabbitMQEventPublisher (Infrastructure)', () => {
   });
 
   describe('onModuleDestroy', () => {
-    it('cierra la conexión del ClientProxy', async () => {
+    it('closes the ClientProxy connection', async () => {
       await publisher.onModuleDestroy();
 
       expect(mockClient.close).toHaveBeenCalled();

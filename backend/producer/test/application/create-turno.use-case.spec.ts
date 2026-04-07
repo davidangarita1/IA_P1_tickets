@@ -13,7 +13,7 @@ describe('CreateTurnoUseCase (Application)', () => {
     useCase = new CreateTurnoUseCase(eventPublisher);
   });
 
-  it('publica evento crear_turno y retorna status accepted', () => {
+  it('publishes crear_turno event and returns accepted status', () => {
     const data = { cedula: 123, nombre: 'Paciente Test', priority: 'media' as const };
 
     const result = useCase.execute(data);
@@ -25,7 +25,7 @@ describe('CreateTurnoUseCase (Application)', () => {
     });
   });
 
-  it('propaga error si el publisher falla', () => {
+  it('propagates error when publisher fails', () => {
     const publishError = new Error('RabbitMQ connection lost');
     eventPublisher.publish.mockImplementationOnce(() => {
       throw publishError;
@@ -34,7 +34,7 @@ describe('CreateTurnoUseCase (Application)', () => {
     expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow(publishError);
   });
 
-  it('propaga error no-Error y lo loguea como string', () => {
+  it('propagates non-Error and logs it as string', () => {
     eventPublisher.publish.mockImplementationOnce(() => {
       throw 'connection timeout';
     });

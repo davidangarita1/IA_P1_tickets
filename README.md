@@ -138,8 +138,9 @@ Configurar en `.env` (basado en `.env.example`):
 Todos los endpoints requieren `Authorization: Bearer <token>`.
 
 - `POST /api/v1/doctors`: crear médico (`{ nombre, cedula, consultorio?, franjaHoraria? }`). Responde `201` con el médico creado. Devuelve `409` si la cédula ya existe o si el consultorio+franja ya está asignado a otro médico activo.
-- `GET /api/v1/doctors`: listar médicos activos.
-- `PUT /api/v1/doctors/:id`: actualizar un médico existente (`{ nombre?, cedula?, consultorio?, franjaHoraria? }`). Devuelve `200` con el médico actualizado. Devuelve `404` si no existe, `409` si la cédula ya pertenece a otro médico o si el consultorio+franja ya está ocupado.
+- `GET /api/v1/doctors`: listar medicos activos (soporta `?page=N&limit=N`, default page=1 limit=25, max 100).
+- `PUT /api/v1/doctors/:id`: actualizar un medico existente (`{ nombre?, cedula?, consultorio?, franjaHoraria? }`). Devuelve `200` con el medico actualizado. Devuelve `404` si no existe, `409` si la cedula ya pertenece a otro medico activo o si el consultorio+franja ya esta ocupado.
+- `DELETE /api/v1/doctors/:id`: dar de baja un medico (soft delete). Devuelve `409` si el medico tiene turnos activos en su consultorio.
 - `GET /api/v1/doctors/available-shifts?consultorio=<n>`: consultar franjas disponibles para un consultorio dado.
 
 Ejemplo:
@@ -191,31 +192,27 @@ bun run test:coverage
 
 ### Cobertura actual
 
-| Módulo | Tests | Cobertura |
-|--------|-------|-----------|
-| Backend producer | 92 | >95% en todos los archivos de doctors |
-| Frontend | 374 | >98% en componentes y hooks de doctors |
+| Modulo | Tests | Suites | Cobertura |
+|--------|-------|--------|-----------|
+| Backend producer | 150 | 33 | 100% Stmts, 100% Branch |
+| Backend consumer | 43 | 10 | 100% Stmts, 100% Branch |
+| Frontend | 448 | 46 | 99.76% Stmts, 98.38% Branch |
 
-## 📋 Documentación de Calidad y Auditoría
+## Documentacion de Calidad y Auditoria
 
-Para entender el estado técnico del proyecto, disponible en [`docs/quality-audits/`](docs/quality-audits/):
+Para entender el estado tecnico del proyecto, disponible en [`docs/quality-audits/`](docs/quality-audits/):
 
-| Documento | Propósito |
+| Documento | Proposito |
 |-----------|----------|
-| **AUDIT_REPORT.md** | Auditoría técnica completa: arquitectura, seguridad, transparencia de IA (🟠 Aceptable con Riesgos Críticos) |
-| **DEBT_REPORT_BACKEND.md** | Análisis de deuda técnica: backend producer + consumer (13 items pendientes) |
-| **DEBT_REPORT_FRONT.md** | Análisis de deuda técnica: frontend (🔴 Crítico — 0 tests) |
-| **AI_WORKFLOW.md** | Flujo de trabajo AI-First: orquestación de agentes y generación de código |
-| **CHANGELOG_SOURCES.md** | Decisiones humanas vs propuestas de IA en módulo de médicos |
+| **AUDIT_REPORT.md** | Auditoria tecnica completa: arquitectura, seguridad, transparencia de IA |
+| **DEBT_REPORT_BACKEND.md** | Analisis de deuda tecnica: backend producer + consumer |
+| **DEBT_REPORT_FRONT.md** | Analisis de deuda tecnica: frontend |
+| **AI_WORKFLOW.md** | Flujo de trabajo AI-First: orquestacion de agentes y generacion de codigo |
+| **CHANGELOG_SOURCES.md** | Decisiones humanas vs propuestas de IA en modulo de medicos |
 | **TEST_PLAN.md** | Plan de pruebas v3.1: procesos validados (registro, login, turnos) |
 | **TESTING_STRATEGY.md** | Estrategia de QA: verificar vs validar, roadmap de TDD |
 
-**Hallazgos críticos resumidos:**
-- ⚠️ Frontend sin framework de testing (0 tests instalados)
-- ⚠️ Seguridad: middleware mal nombrado, no se ejecuta en producción
-- ⚠️ Falta trazabilidad de prompts y correcciones de IA
-
-## 💬 Feedback de Revisores
+## Feedback de Revisores
 
 Disponible en [`docs/feedback/`](docs/feedback/):
 

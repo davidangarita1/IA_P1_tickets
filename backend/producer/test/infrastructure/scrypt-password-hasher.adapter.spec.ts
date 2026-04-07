@@ -8,7 +8,7 @@ describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
   });
 
   describe('hash', () => {
-    it('genera un hash con formato salt:digest', async () => {
+    it('generates a hash with salt:digest format', async () => {
       const password = 'mySecurePassword123';
 
       const hashed = await hasher.hash(password);
@@ -17,7 +17,7 @@ describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
       expect(hashed.split(':')).toHaveLength(2);
     });
 
-    it('genera hashes diferentes para el mismo password (salt aleatorio)', async () => {
+    it('generates different hashes for the same password (random salt)', async () => {
       const password = 'samePassword';
 
       const hash1 = await hasher.hash(password);
@@ -28,7 +28,7 @@ describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
   });
 
   describe('compare', () => {
-    it('retorna true para password correcto', async () => {
+    it('returns true for correct password', async () => {
       const password = 'correctPassword';
       const hashed = await hasher.hash(password);
 
@@ -37,7 +37,7 @@ describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
       expect(result).toBe(true);
     });
 
-    it('retorna false para password incorrecto', async () => {
+    it('returns false for incorrect password', async () => {
       const password = 'correctPassword';
       const hashed = await hasher.hash(password);
 
@@ -46,7 +46,7 @@ describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
       expect(result).toBe(false);
     });
 
-    it('retorna false si el hash tiene formato inválido', async () => {
+    it('returns false when hash has invalid format', async () => {
       const invalidHash = 'no-colon-here';
 
       const result = await hasher.compare('anyPassword', invalidHash);

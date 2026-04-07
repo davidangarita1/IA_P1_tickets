@@ -38,7 +38,7 @@ describe('GetAllTurnosUseCase (Application)', () => {
     useCase = new GetAllTurnosUseCase(turnoRepository);
   });
 
-  it('retorna todos los turnos mapeados a payload', async () => {
+  it('returns all turnos mapped to payload', async () => {
     turnoRepository.findAll.mockResolvedValue([turno1, turno2]);
 
     const result = await useCase.execute();
@@ -47,7 +47,7 @@ describe('GetAllTurnosUseCase (Application)', () => {
     expect(result).toEqual([turno1.toEventPayload(), turno2.toEventPayload()]);
   });
 
-  it('retorna array vacío cuando no hay turnos', async () => {
+  it('returns empty array when no turnos exist', async () => {
     turnoRepository.findAll.mockResolvedValue([]);
 
     const result = await useCase.execute();
