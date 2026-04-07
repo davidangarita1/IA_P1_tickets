@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useAvailableShifts } from "@/hooks/useAvailableShifts";
-import type { DoctorService } from "@/domain/ports/DoctorService";
-import type { Shift } from "@/domain/Doctor";
-import styles from "./DoctorFormModal.module.css";
+import { useState, useEffect, useCallback } from 'react';
+import { useAvailableShifts } from '@/hooks/useAvailableShifts';
+import type { DoctorService } from '@/domain/ports/DoctorService';
+import type { Shift } from '@/domain/Doctor';
+import styles from './DoctorFormModal.module.css';
 
-const OFFICES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+const OFFICES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
 interface DoctorFormModalProps {
   onClose: () => void;
   onSuccess: () => void;
   doctorService: DoctorService;
-  showToast: (message: string, type: "success" | "error") => void;
+  showToast: (message: string, type: 'success' | 'error') => void;
 }
 
 function stripNonNumeric(value: string): string {
-  return value.replace(/\D/g, "");
+  return value.replace(/\D/g, '');
 }
 
 export default function DoctorFormModal({
@@ -25,10 +25,10 @@ export default function DoctorFormModal({
   doctorService,
   showToast,
 }: DoctorFormModalProps) {
-  const [name, setName] = useState("");
-  const [documentId, setDocumentId] = useState("");
-  const [office, setOffice] = useState("");
-  const [shift, setShift] = useState("");
+  const [name, setName] = useState('');
+  const [documentId, setDocumentId] = useState('');
+  const [office, setOffice] = useState('');
+  const [shift, setShift] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
   const [documentIdTouched, setDocumentIdTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -37,38 +37,38 @@ export default function DoctorFormModal({
 
   const nameError =
     nameTouched && name.length > 0 && name.length < 3
-      ? "El nombre debe tener mínimo 3 caracteres"
+      ? 'El nombre debe tener mínimo 3 caracteres'
       : nameTouched && name.length === 0
-        ? "El nombre completo es obligatorio"
+        ? 'El nombre completo es obligatorio'
         : null;
 
   const documentIdError =
     documentIdTouched && documentId.length === 0
-      ? "El número de cédula es obligatorio"
+      ? 'El número de cédula es obligatorio'
       : documentIdTouched && (documentId.length < 7 || documentId.length > 10)
-        ? "La cédula debe tener entre 7 y 10 dígitos"
+        ? 'La cédula debe tener entre 7 y 10 dígitos'
         : null;
 
-  const officeSelected = office !== "";
+  const officeSelected = office !== '';
   const noShiftsAvailable = officeSelected && !shiftsLoading && shifts.length === 0;
   const shiftDisabled = !officeSelected || shiftsLoading || noShiftsAvailable;
-  const shiftRequiredError = officeSelected && !shiftDisabled && shift === "";
+  const shiftRequiredError = officeSelected && !shiftDisabled && shift === '';
 
   const isFormValid =
     name.length >= 3 &&
     documentId.length >= 7 &&
     documentId.length <= 10 &&
-    !(officeSelected && shift === "");
+    !(officeSelected && shift === '');
 
   const handleOfficeChange = useCallback(
     (value: string) => {
       setOffice(value);
-      setShift("");
+      setShift('');
       if (value) {
         fetchShifts(value);
       }
     },
-    [fetchShifts]
+    [fetchShifts],
   );
 
   const handleSubmit = async () => {
@@ -82,11 +82,11 @@ export default function DoctorFormModal({
         office: office || null,
         shift: (shift as Shift) || null,
       });
-      showToast("Médico creado exitosamente", "success");
+      showToast('Médico creado exitosamente', 'success');
       onSuccess();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Error al crear médico";
-      showToast(message, "error");
+      const message = err instanceof Error ? err.message : 'Error al crear médico';
+      showToast(message, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -94,12 +94,12 @@ export default function DoctorFormModal({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         e.preventDefault();
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -178,9 +178,7 @@ export default function DoctorFormModal({
             ))}
           </select>
           {noShiftsAvailable && (
-            <span className={styles.error}>
-              No hay franjas disponibles para este consultorio
-            </span>
+            <span className={styles.error}>No hay franjas disponibles para este consultorio</span>
           )}
           {shiftRequiredError && (
             <span className={styles.error}>
@@ -190,11 +188,7 @@ export default function DoctorFormModal({
         </div>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.cancelButton}
-            onClick={onClose}
-          >
+          <button type="button" className={styles.cancelButton} onClick={onClose}>
             Cerrar
           </button>
           <button
@@ -203,7 +197,7 @@ export default function DoctorFormModal({
             onClick={handleSubmit}
             disabled={!isFormValid || submitting}
           >
-            {submitting ? "Guardando..." : "Guardar"}
+            {submitting ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </div>

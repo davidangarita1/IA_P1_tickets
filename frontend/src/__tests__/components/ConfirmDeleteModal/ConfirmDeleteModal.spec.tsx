@@ -1,10 +1,10 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal/ConfirmDeleteModal';
 
-describe("ConfirmDeleteModal", () => {
+describe('ConfirmDeleteModal', () => {
   const defaultProps = {
-    doctorName: "Juan García",
+    doctorName: 'Juan García',
     onConfirm: jest.fn(),
     onCancel: jest.fn(),
     loading: false,
@@ -14,58 +14,54 @@ describe("ConfirmDeleteModal", () => {
     jest.clearAllMocks();
   });
 
-  it("renders the confirmation message with the doctor name", () => {
+  it('renders the confirmation message with the doctor name', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
     expect(
-      screen.getByText(
-        /Está seguro de que desea dar de baja al Dr\. Juan García/i
-      )
+      screen.getByText(/Está seguro de que desea dar de baja al Dr\. Juan García/i),
     ).toBeInTheDocument();
   });
 
-  it("renders Cancelar and Aceptar buttons", () => {
+  it('renders Cancelar and Aceptar buttons', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
-    expect(screen.getByRole("button", { name: /cancelar/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /aceptar/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancelar/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /aceptar/i })).toBeInTheDocument();
   });
 
-  it("calls onCancel when Cancelar button is clicked", () => {
+  it('calls onCancel when Cancelar button is clicked', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
 
     expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onConfirm when Aceptar button is clicked", () => {
+  it('calls onConfirm when Aceptar button is clicked', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /aceptar/i }));
+    fireEvent.click(screen.getByRole('button', { name: /aceptar/i }));
 
     expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it("disables Aceptar button when loading is true", () => {
+  it('disables Aceptar button when loading is true', () => {
     render(<ConfirmDeleteModal {...defaultProps} loading={true} />);
 
-    expect(screen.getByRole("button", { name: /aceptar/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /aceptar/i })).toBeDisabled();
   });
 
-  it("does not close when clicking the overlay", () => {
+  it('does not close when clicking the overlay', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId("confirm-delete-overlay"));
+    fireEvent.click(screen.getByTestId('confirm-delete-overlay'));
 
     expect(defaultProps.onCancel).not.toHaveBeenCalled();
   });
 
-  it("includes the description about hiding from active doctors list", () => {
+  it('includes the description about hiding from active doctors list', () => {
     render(<ConfirmDeleteModal {...defaultProps} />);
 
-    expect(
-      screen.getByText(/eliminará de la lista de médicos activos/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/eliminará de la lista de médicos activos/i)).toBeInTheDocument();
   });
 });

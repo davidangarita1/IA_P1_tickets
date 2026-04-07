@@ -50,7 +50,10 @@ describe('LoginUseCase — aligned with frontend contract', () => {
 
     // Act & Assert
     await expect(useCase.execute(credentials)).rejects.toThrow('Invalid credentials');
-    expect(passwordHasher.compare).toHaveBeenCalledWith(credentials.password, storedUser.passwordHash);
+    expect(passwordHasher.compare).toHaveBeenCalledWith(
+      credentials.password,
+      storedUser.passwordHash,
+    );
   });
 
   it('should return token AND usuario when credentials are valid', async () => {

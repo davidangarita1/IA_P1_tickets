@@ -1,6 +1,11 @@
-import type { Doctor, CreateDoctorData, UpdateDoctorData, AvailableShiftsResponse } from "@/domain/Doctor";
-import type { DoctorService } from "@/domain/ports/DoctorService";
-import { getAuthCookie } from "@/infrastructure/cookies/cookieUtils";
+import type {
+  Doctor,
+  CreateDoctorData,
+  UpdateDoctorData,
+  AvailableShiftsResponse,
+} from '@/domain/Doctor';
+import type { DoctorService } from '@/domain/ports/DoctorService';
+import { getAuthCookie } from '@/infrastructure/cookies/cookieUtils';
 
 export class HttpDoctorAdapter implements DoctorService {
   constructor(private readonly baseUrl: string) {}
@@ -21,19 +26,19 @@ export class HttpDoctorAdapter implements DoctorService {
 
   async create(data: CreateDoctorData): Promise<Doctor> {
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...this.buildHeaders(),
     };
 
     const res = await fetch(`${this.baseUrl}/api/v1/doctors`, {
-      method: "POST",
+      method: 'POST',
       headers,
       body: JSON.stringify(data),
     });
 
     if (res.status === 409) {
       const body = await res.json();
-      throw new Error(body.message || "CONFLICT");
+      throw new Error(body.message || 'CONFLICT');
     }
 
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
@@ -42,19 +47,19 @@ export class HttpDoctorAdapter implements DoctorService {
 
   async update(id: string, data: UpdateDoctorData): Promise<Doctor> {
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...this.buildHeaders(),
     };
 
     const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers,
       body: JSON.stringify(data),
     });
 
     if (res.status === 409) {
       const body = await res.json();
-      throw new Error(body.message || "CONFLICT");
+      throw new Error(body.message || 'CONFLICT');
     }
 
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
@@ -63,15 +68,14 @@ export class HttpDoctorAdapter implements DoctorService {
 
   async getAvailableShifts(
     office: string,
-    excludeDoctorId?: string
+    excludeDoctorId?: string,
   ): Promise<AvailableShiftsResponse> {
     const params = new URLSearchParams({ office });
-    if (excludeDoctorId) params.set("exclude_doctor_id", excludeDoctorId);
+    if (excludeDoctorId) params.set('exclude_doctor_id', excludeDoctorId);
 
-    const res = await fetch(
-      `${this.baseUrl}/api/v1/doctors/available-shifts?${params}`,
-      { headers: this.buildHeaders() }
-    );
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/available-shifts?${params}`, {
+      headers: this.buildHeaders(),
+    });
 
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
     return res.json();
@@ -79,13 +83,13 @@ export class HttpDoctorAdapter implements DoctorService {
 
   async remove(id: string): Promise<void> {
     const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: this.buildHeaders(),
     });
 
     if (res.status === 409) {
       const body = await res.json();
-      throw new Error(body.message || "CONFLICT");
+      throw new Error(body.message || 'CONFLICT');
     }
 
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);

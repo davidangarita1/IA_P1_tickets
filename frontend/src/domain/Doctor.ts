@@ -1,5 +1,5 @@
-export type Shift = "06:00-14:00" | "14:00-22:00";
-export type DoctorStatus = "active" | "inactive";
+export type Shift = '06:00-14:00' | '14:00-22:00';
+export type DoctorStatus = 'active' | 'inactive';
 
 export interface Doctor {
   _id: string;

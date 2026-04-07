@@ -5,15 +5,13 @@ import { TurnoMongooseAdapter } from '../infrastructure/adapters/turno-mongoose.
 import { TURNO_REPOSITORY_TOKEN } from '../domain/ports/tokens';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Turno.name, schema: TurnoSchema }]),
-    ],
-    providers: [
-        {
-            provide: TURNO_REPOSITORY_TOKEN,
-            useClass: TurnoMongooseAdapter,
-        },
-    ],
-    exports: [TURNO_REPOSITORY_TOKEN],
+  imports: [MongooseModule.forFeature([{ name: Turno.name, schema: TurnoSchema }])],
+  providers: [
+    {
+      provide: TURNO_REPOSITORY_TOKEN,
+      useClass: TurnoMongooseAdapter,
+    },
+  ],
+  exports: [TURNO_REPOSITORY_TOKEN],
 })
-export class TurnosModule { }
+export class TurnosModule {}

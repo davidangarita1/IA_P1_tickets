@@ -121,7 +121,9 @@ describe('AuthController — frontend-aligned contract', () => {
   describe('GET /auth/me', () => {
     it('returns the current user from the token payload', async () => {
       // Arrange — the guard injects authUser into the request
-      const req = { authUser: { sub: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' } };
+      const req = {
+        authUser: { sub: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+      };
 
       // Act
       const result = await controller.me(req as any);

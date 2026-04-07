@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from 'react';
 
-type ToastType = "success" | "error";
+type ToastType = 'success' | 'error';
 
 const DEFAULT_DURATION = 3000;
 
 export function useToast() {
   const [message, setMessage] = useState<string | null>(null);
-  const [type, setType] = useState<ToastType>("success");
+  const [type, setType] = useState<ToastType>('success');
   const [visible, setVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -35,7 +35,7 @@ export function useToast() {
         setVisible(false);
       }, duration ?? DEFAULT_DURATION);
     },
-    [clearTimer]
+    [clearTimer],
   );
 
   useEffect(() => {

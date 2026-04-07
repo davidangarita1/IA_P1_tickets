@@ -1,45 +1,41 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import DoctorsPage from "@/app/doctors/page";
-import { buildDoctor, mockDoctorService } from "@/__tests__/mocks/factories";
-import type { Doctor } from "@/domain/Doctor";
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import DoctorsPage from '@/app/doctors/page';
+import { buildDoctor, mockDoctorService } from '@/__tests__/mocks/factories';
+import type { Doctor } from '@/domain/Doctor';
 
 const mockPush = jest.fn();
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/hooks/useDoctors", () => ({
+jest.mock('@/hooks/useDoctors', () => ({
   useDoctors: jest.fn(),
 }));
 
-jest.mock("@/hooks/useToast", () => ({
+jest.mock('@/hooks/useToast', () => ({
   useToast: jest.fn(),
 }));
 
-jest.mock("@/components/Toast/Toast", () => ({
+jest.mock('@/components/Toast/Toast', () => ({
   __esModule: true,
   default: function MockToast() {
     return null;
   },
 }));
 
-jest.mock("@/components/DoctorFormModal/DoctorFormModal", () => ({
+jest.mock('@/components/DoctorFormModal/DoctorFormModal', () => ({
   __esModule: true,
-  default: function MockDoctorFormModal({
-    onClose,
-  }: {
-    onClose: () => void;
-  }) {
+  default: function MockDoctorFormModal({ onClose }: { onClose: () => void }) {
     return (
       <div data-testid="doctor-form-modal">
         <button onClick={onClose}>close-modal</button>
@@ -48,10 +44,10 @@ jest.mock("@/components/DoctorFormModal/DoctorFormModal", () => ({
   },
 }));
 
-import { useAuth } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
-import { useDoctors } from "@/hooks/useDoctors";
-import { useToast } from "@/hooks/useToast";
+import { useAuth } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
+import { useDoctors } from '@/hooks/useDoctors';
+import { useToast } from '@/hooks/useToast';
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -60,9 +56,7 @@ const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 
 function setupAuth(isAuthenticated: boolean) {
   mockUseAuth.mockReturnValue({
-    user: isAuthenticated
-      ? { id: "1", email: "u@u.com", name: "User", role: "employee" }
-      : null,
+    user: isAuthenticated ? { id: '1', email: 'u@u.com', name: 'User', role: 'employee' } : null,
     loading: false,
     error: null,
     signIn: jest.fn(),
@@ -73,11 +67,7 @@ function setupAuth(isAuthenticated: boolean) {
   });
 }
 
-function setupDoctors(
-  doctors: Doctor[] = [],
-  loading = false,
-  error: string | null = null
-) {
+function setupDoctors(doctors: Doctor[] = [], loading = false, error: string | null = null) {
   mockUseDoctors.mockReturnValue({
     doctors,
     loading,
@@ -94,7 +84,12 @@ function setupDeps() {
     realTime: { connect: jest.fn(), disconnect: jest.fn(), isConnected: jest.fn() },
     audio: { init: jest.fn(), unlock: jest.fn(), play: jest.fn(), isEnabled: jest.fn() },
     sanitizer: { sanitize: jest.fn((s: string) => s) },
-    authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
+    authService: {
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      getSession: jest.fn(),
+    },
     doctorService: mockDoctorService(),
   });
 }
@@ -102,14 +97,14 @@ function setupDeps() {
 function setupToast() {
   mockUseToast.mockReturnValue({
     message: null,
-    type: "success",
+    type: 'success',
     visible: false,
     show: jest.fn(),
     hide: jest.fn(),
   });
 }
 
-describe("DoctorsPage", () => {
+describe('DoctorsPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupAuth(true);
@@ -118,85 +113,81 @@ describe("DoctorsPage", () => {
     setupToast();
   });
 
-  it("renders page title centered", () => {
+  it('renders page title centered', () => {
     render(<DoctorsPage />);
 
-    expect(
-      screen.getByRole("heading", { name: /gestión de médicos/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /gestión de médicos/i })).toBeInTheDocument();
   });
 
-  it("renders table with correct column headers", () => {
+  it('renders table with correct column headers', () => {
     render(<DoctorsPage />);
 
-    expect(screen.getByText("Nombre completo")).toBeInTheDocument();
-    expect(screen.getByText("Cédula")).toBeInTheDocument();
-    expect(screen.getByText("Consultorio")).toBeInTheDocument();
-    expect(screen.getByText("Franja Horaria")).toBeInTheDocument();
-    expect(screen.getByText("Acciones")).toBeInTheDocument();
+    expect(screen.getByText('Nombre completo')).toBeInTheDocument();
+    expect(screen.getByText('Cédula')).toBeInTheDocument();
+    expect(screen.getByText('Consultorio')).toBeInTheDocument();
+    expect(screen.getByText('Franja Horaria')).toBeInTheDocument();
+    expect(screen.getByText('Acciones')).toBeInTheDocument();
   });
 
   it("renders 'Crear médico' button", () => {
     render(<DoctorsPage />);
 
-    const button = screen.getByRole("button", { name: /crear médico/i });
+    const button = screen.getByRole('button', { name: /crear médico/i });
     expect(button).toBeInTheDocument();
   });
 
   it("'Crear médico' button is enabled", () => {
     render(<DoctorsPage />);
 
-    const button = screen.getByRole("button", { name: /crear médico/i });
+    const button = screen.getByRole('button', { name: /crear médico/i });
     expect(button).not.toBeDisabled();
   });
 
-  it("shows empty state message when no doctors exist", () => {
+  it('shows empty state message when no doctors exist', () => {
     render(<DoctorsPage />);
 
-    expect(screen.getByText("No hay médicos creados")).toBeInTheDocument();
+    expect(screen.getByText('No hay médicos creados')).toBeInTheDocument();
   });
 
-  it("wraps content with AuthGuard and redirects when unauthenticated", () => {
+  it('wraps content with AuthGuard and redirects when unauthenticated', () => {
     setupAuth(false);
 
     render(<DoctorsPage />);
 
-    expect(mockPush).toHaveBeenCalledWith("/signin");
-    expect(
-      screen.queryByRole("heading", { name: /gestión de médicos/i })
-    ).not.toBeInTheDocument();
+    expect(mockPush).toHaveBeenCalledWith('/signin');
+    expect(screen.queryByRole('heading', { name: /gestión de médicos/i })).not.toBeInTheDocument();
   });
 
-  it("renders table element", () => {
+  it('renders table element', () => {
     render(<DoctorsPage />);
 
-    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
   });
 
-  it("renders five column headers", () => {
+  it('renders five column headers', () => {
     render(<DoctorsPage />);
 
-    const headers = screen.getAllByRole("columnheader");
+    const headers = screen.getAllByRole('columnheader');
     expect(headers).toHaveLength(5);
   });
 
   it("shows doctor names with 'Dr.' prefix in table rows", () => {
-    const doctor = buildDoctor({ name: "Juan García", documentId: "12345678" });
+    const doctor = buildDoctor({ name: 'Juan García', documentId: '12345678' });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
 
-    expect(screen.getByText("Dr. Juan García")).toBeInTheDocument();
-    expect(screen.getByText("12345678")).toBeInTheDocument();
+    expect(screen.getByText('Dr. Juan García')).toBeInTheDocument();
+    expect(screen.getByText('12345678')).toBeInTheDocument();
   });
 
-  it("shows office value when it is not null", () => {
-    const doctor = buildDoctor({ office: "5" });
+  it('shows office value when it is not null', () => {
+    const doctor = buildDoctor({ office: '5' });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
 
-    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
   it("shows 'Sin asignar' when office is null", () => {
@@ -205,7 +196,7 @@ describe("DoctorsPage", () => {
 
     render(<DoctorsPage />);
 
-    expect(screen.getAllByText("Sin asignar").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Sin asignar').length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows 'Sin asignar' when shift is null", () => {
@@ -214,29 +205,29 @@ describe("DoctorsPage", () => {
 
     render(<DoctorsPage />);
 
-    expect(screen.getAllByText("Sin asignar").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Sin asignar').length).toBeGreaterThanOrEqual(1);
   });
 
-  it("opens the create doctor modal when button is clicked", () => {
+  it('opens the create doctor modal when button is clicked', () => {
     render(<DoctorsPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: /crear médico/i }));
+    fireEvent.click(screen.getByRole('button', { name: /crear médico/i }));
 
-    expect(screen.getByTestId("doctor-form-modal")).toBeInTheDocument();
+    expect(screen.getByTestId('doctor-form-modal')).toBeInTheDocument();
   });
 
-  it("closes the modal when the modal triggers onClose", () => {
+  it('closes the modal when the modal triggers onClose', () => {
     render(<DoctorsPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: /crear médico/i }));
-    expect(screen.getByTestId("doctor-form-modal")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /crear médico/i }));
+    expect(screen.getByTestId('doctor-form-modal')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("close-modal"));
+    fireEvent.click(screen.getByText('close-modal'));
 
-    expect(screen.queryByTestId("doctor-form-modal")).not.toBeInTheDocument();
+    expect(screen.queryByTestId('doctor-form-modal')).not.toBeInTheDocument();
   });
 
-  it("shows loading indicator when loading is true", () => {
+  it('shows loading indicator when loading is true', () => {
     setupDoctors([], true);
 
     render(<DoctorsPage />);
@@ -244,11 +235,11 @@ describe("DoctorsPage", () => {
     expect(screen.getByText(/cargando/i)).toBeInTheDocument();
   });
 
-  it("shows error message when error is set", () => {
-    setupDoctors([], false, "Error al cargar médicos.");
+  it('shows error message when error is set', () => {
+    setupDoctors([], false, 'Error al cargar médicos.');
 
     render(<DoctorsPage />);
 
-    expect(screen.getByText("Error al cargar médicos.")).toBeInTheDocument();
+    expect(screen.getByText('Error al cargar médicos.')).toBeInTheDocument();
   });
 });

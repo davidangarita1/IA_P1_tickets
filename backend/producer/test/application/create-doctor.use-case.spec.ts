@@ -4,118 +4,118 @@ import { IDoctorRepository } from '../../src/doctors/domain/ports/doctor.reposit
 import { Doctor } from '../../src/doctors/domain/entities/doctor.entity';
 
 describe('CreateDoctorUseCase (Application)', () => {
-    const mockRepository: jest.Mocked<IDoctorRepository> = {
-        create: jest.fn(),
-        findAll: jest.fn(),
-        findById: jest.fn(),
-        findByDocumentId: jest.fn(),
-        findByOfficeAndShift: jest.fn(),
-        findAvailableShifts: jest.fn(),
-        update: jest.fn(),
-        softDelete: jest.fn(),
-    };
+  const mockRepository: jest.Mocked<IDoctorRepository> = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findById: jest.fn(),
+    findByDocumentId: jest.fn(),
+    findByOfficeAndShift: jest.fn(),
+    findAvailableShifts: jest.fn(),
+    update: jest.fn(),
+    softDelete: jest.fn(),
+  };
 
-    let useCase: CreateDoctorUseCase;
+  let useCase: CreateDoctorUseCase;
 
-    const makeDoctor = (): Doctor =>
-        new Doctor({
-            id: 'doc-1',
-            name: 'Juan García',
-            documentId: '12345678',
-            office: '2',
-            shift: '06:00-14:00',
-            status: 'active',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-
-    beforeEach(() => {
-        jest.clearAllMocks();
-        useCase = new CreateDoctorUseCase(mockRepository);
+  const makeDoctor = (): Doctor =>
+    new Doctor({
+      id: 'doc-1',
+      name: 'Juan García',
+      documentId: '12345678',
+      office: '2',
+      shift: '06:00-14:00',
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
-    it('creates a doctor when no conflicts exist', async () => {
-        mockRepository.findByDocumentId.mockResolvedValue(null);
-        mockRepository.findByOfficeAndShift.mockResolvedValue(null);
-        const created = makeDoctor();
-        mockRepository.create.mockResolvedValue(created);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useCase = new CreateDoctorUseCase(mockRepository);
+  });
 
-        const result = await useCase.execute({
-            name: 'Juan García',
-            documentId: '12345678',
-            office: '2',
-            shift: '06:00-14:00',
-        });
+  it('creates a doctor when no conflicts exist', async () => {
+    mockRepository.findByDocumentId.mockResolvedValue(null);
+    mockRepository.findByOfficeAndShift.mockResolvedValue(null);
+    const created = makeDoctor();
+    mockRepository.create.mockResolvedValue(created);
 
-        expect(result).toEqual(created);
-        expect(mockRepository.findByDocumentId).toHaveBeenCalledWith('12345678');
-        expect(mockRepository.findByOfficeAndShift).toHaveBeenCalledWith('2', '06:00-14:00');
-        expect(mockRepository.create).toHaveBeenCalledTimes(1);
+    const result = await useCase.execute({
+      name: 'Juan García',
+      documentId: '12345678',
+      office: '2',
+      shift: '06:00-14:00',
     });
 
-    it('creates a doctor without office and shift', async () => {
-        mockRepository.findByDocumentId.mockResolvedValue(null);
-        const created = new Doctor({
-            id: 'doc-2',
-            name: 'Juan García',
-            documentId: '12345678',
-            office: null,
-            shift: null,
-            status: 'active',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        mockRepository.create.mockResolvedValue(created);
+    expect(result).toEqual(created);
+    expect(mockRepository.findByDocumentId).toHaveBeenCalledWith('12345678');
+    expect(mockRepository.findByOfficeAndShift).toHaveBeenCalledWith('2', '06:00-14:00');
+    expect(mockRepository.create).toHaveBeenCalledTimes(1);
+  });
 
-        const result = await useCase.execute({
-            name: 'Juan García',
-            documentId: '12345678',
-            office: null,
-            shift: null,
-        });
+  it('creates a doctor without office and shift', async () => {
+    mockRepository.findByDocumentId.mockResolvedValue(null);
+    const created = new Doctor({
+      id: 'doc-2',
+      name: 'Juan García',
+      documentId: '12345678',
+      office: null,
+      shift: null,
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    mockRepository.create.mockResolvedValue(created);
 
-        expect(result).toEqual(created);
-        expect(mockRepository.findByOfficeAndShift).not.toHaveBeenCalled();
+    const result = await useCase.execute({
+      name: 'Juan García',
+      documentId: '12345678',
+      office: null,
+      shift: null,
     });
 
-    it('throws ConflictException when documentId already exists', async () => {
-        mockRepository.findByDocumentId.mockResolvedValue(makeDoctor());
+    expect(result).toEqual(created);
+    expect(mockRepository.findByOfficeAndShift).not.toHaveBeenCalled();
+  });
 
-        await expect(
-            useCase.execute({ name: 'Otro', documentId: '12345678' }),
-        ).rejects.toThrow(ConflictException);
+  it('throws ConflictException when documentId already exists', async () => {
+    mockRepository.findByDocumentId.mockResolvedValue(makeDoctor());
 
-        expect(mockRepository.create).not.toHaveBeenCalled();
-    });
+    await expect(useCase.execute({ name: 'Otro', documentId: '12345678' })).rejects.toThrow(
+      ConflictException,
+    );
 
-    it('throws ConflictException when office+shift combination is taken', async () => {
-        mockRepository.findByDocumentId.mockResolvedValue(null);
-        mockRepository.findByOfficeAndShift.mockResolvedValue(makeDoctor());
+    expect(mockRepository.create).not.toHaveBeenCalled();
+  });
 
-        await expect(
-            useCase.execute({
-                name: 'Otro',
-                documentId: '99988877',
-                office: '2',
-                shift: '06:00-14:00',
-            }),
-        ).rejects.toThrow(ConflictException);
+  it('throws ConflictException when office+shift combination is taken', async () => {
+    mockRepository.findByDocumentId.mockResolvedValue(null);
+    mockRepository.findByOfficeAndShift.mockResolvedValue(makeDoctor());
 
-        expect(mockRepository.create).not.toHaveBeenCalled();
-    });
+    await expect(
+      useCase.execute({
+        name: 'Otro',
+        documentId: '99988877',
+        office: '2',
+        shift: '06:00-14:00',
+      }),
+    ).rejects.toThrow(ConflictException);
 
-    it('throws BadRequestException when office is provided without shift', async () => {
-        mockRepository.findByDocumentId.mockResolvedValue(null);
+    expect(mockRepository.create).not.toHaveBeenCalled();
+  });
 
-        await expect(
-            useCase.execute({
-                name: 'Ana Torres',
-                documentId: '55566677',
-                office: '3',
-                shift: null,
-            }),
-        ).rejects.toThrow(BadRequestException);
+  it('throws BadRequestException when office is provided without shift', async () => {
+    mockRepository.findByDocumentId.mockResolvedValue(null);
 
-        expect(mockRepository.create).not.toHaveBeenCalled();
-    });
+    await expect(
+      useCase.execute({
+        name: 'Ana Torres',
+        documentId: '55566677',
+        office: '3',
+        shift: null,
+      }),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(mockRepository.create).not.toHaveBeenCalled();
+  });
 });

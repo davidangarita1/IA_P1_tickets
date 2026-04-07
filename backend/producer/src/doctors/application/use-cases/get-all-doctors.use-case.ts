@@ -5,11 +5,11 @@ import { Doctor } from '../../domain/entities/doctor.entity';
 
 @Injectable()
 export class GetAllDoctorsUseCase {
-    constructor(
-        @Inject(DOCTOR_REPOSITORY_TOKEN) private readonly doctorRepository: IDoctorRepository,
-    ) {}
+  constructor(
+    @Inject(DOCTOR_REPOSITORY_TOKEN) private readonly doctorRepository: IDoctorRepository,
+  ) {}
 
-    async execute(): Promise<Doctor[]> {
-        return this.doctorRepository.findAll();
-    }
+  async execute(): Promise<Doctor[]> {
+    return this.doctorRepository.findAll();
+  }
 }

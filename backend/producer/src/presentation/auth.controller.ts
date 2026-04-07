@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LoginUseCase, LoginResult, UsuarioResponse } from '../application/use-cases/login.use-case';
+import {
+  LoginUseCase,
+  LoginResult,
+  UsuarioResponse,
+} from '../application/use-cases/login.use-case';
 import { SignupUseCase, SignupResult } from '../application/use-cases/signup.use-case';
 import { GetAllTurnosUseCase } from '../application/use-cases/get-all-turnos.use-case';
 import { TurnoEventPayload } from '../domain/entities/turno.entity';
@@ -32,9 +36,17 @@ export class AuthController {
   async signUp(@Body() dto: SignupDto): Promise<BackendAuthResponse> {
     try {
       const result: SignupResult = await this.signupUseCase.execute(dto);
-      return { success: true, message: 'Registro exitoso', token: result.token, usuario: result.usuario };
+      return {
+        success: true,
+        message: 'Registro exitoso',
+        token: result.token,
+        usuario: result.usuario,
+      };
     } catch (error) {
-      return { success: false, message: error instanceof Error ? error.message : 'Error en registro' };
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Error en registro',
+      };
     }
   }
 
@@ -45,7 +57,12 @@ export class AuthController {
   async signIn(@Body() dto: LoginDto): Promise<BackendAuthResponse> {
     try {
       const result: LoginResult = await this.loginUseCase.execute(dto);
-      return { success: true, message: 'Login exitoso', token: result.token, usuario: result.usuario };
+      return {
+        success: true,
+        message: 'Login exitoso',
+        token: result.token,
+        usuario: result.usuario,
+      };
     } catch (error) {
       return { success: false, message: error instanceof Error ? error.message : 'Error en login' };
     }

@@ -1,9 +1,9 @@
-import type { User, UserRole } from "@/domain/User";
-import type { AuthResult } from "@/domain/AuthCredentials";
+import type { User, UserRole } from '@/domain/User';
+import type { AuthResult } from '@/domain/AuthCredentials';
 
 const AUTH_MESSAGE_TRANSLATIONS: Record<string, string> = {
-  "Email already in use": "El correo ya está registrado.",
-  "email already in use": "El correo ya está registrado.",
+  'Email already in use': 'El correo ya está registrado.',
+  'email already in use': 'El correo ya está registrado.',
 };
 
 export function translateAuthMessage(message: string): string {
@@ -25,8 +25,8 @@ interface BackendAuthResponse {
 }
 
 const ROLE_MAP: Record<string, UserRole> = {
-  admin: "admin",
-  empleado: "employee",
+  admin: 'admin',
+  empleado: 'employee',
 };
 
 export function toUser(raw: BackendUser): User {
@@ -34,7 +34,7 @@ export function toUser(raw: BackendUser): User {
     id: raw.id,
     email: raw.email,
     name: raw.nombre,
-    role: ROLE_MAP[raw.rol] ?? "employee",
+    role: ROLE_MAP[raw.rol] ?? 'employee',
   };
 }
 

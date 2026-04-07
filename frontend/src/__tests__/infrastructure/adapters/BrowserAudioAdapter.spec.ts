@@ -1,6 +1,6 @@
-import { BrowserAudioAdapter } from "@/infrastructure/adapters/BrowserAudioAdapter";
+import { BrowserAudioAdapter } from '@/infrastructure/adapters/BrowserAudioAdapter';
 
-describe("BrowserAudioAdapter", () => {
+describe('BrowserAudioAdapter', () => {
   let adapter: BrowserAudioAdapter;
   let mockPlay: jest.Mock;
   let mockPause: jest.Mock;
@@ -11,18 +11,18 @@ describe("BrowserAudioAdapter", () => {
     mockPause = jest.fn();
     listeners = {};
 
-    jest.spyOn(globalThis, "Audio").mockImplementation(
+    jest.spyOn(globalThis, 'Audio').mockImplementation(
       () =>
         ({
           play: mockPlay,
           pause: mockPause,
           volume: 0,
-          preload: "",
+          preload: '',
           currentTime: 0,
           addEventListener: jest.fn((event: string, cb: () => void) => {
             listeners[event] = cb;
           }),
-        }) as unknown as HTMLAudioElement
+        }) as unknown as HTMLAudioElement,
     );
 
     adapter = new BrowserAudioAdapter();
@@ -32,25 +32,25 @@ describe("BrowserAudioAdapter", () => {
     jest.restoreAllMocks();
   });
 
-  it("starts with audio disabled", () => {
+  it('starts with audio disabled', () => {
     expect(adapter.isEnabled()).toBe(false);
   });
 
-  it("initializes audio element with src and volume", () => {
-    adapter.init("/sounds/ding.mp3", 0.6);
+  it('initializes audio element with src and volume', () => {
+    adapter.init('/sounds/ding.mp3', 0.6);
 
-    expect(Audio).toHaveBeenCalledWith("/sounds/ding.mp3");
+    expect(Audio).toHaveBeenCalledWith('/sounds/ding.mp3');
   });
 
-  it("does not create multiple audio elements on repeated init", () => {
-    adapter.init("/sounds/ding.mp3");
-    adapter.init("/sounds/ding.mp3");
+  it('does not create multiple audio elements on repeated init', () => {
+    adapter.init('/sounds/ding.mp3');
+    adapter.init('/sounds/ding.mp3');
 
     expect(Audio).toHaveBeenCalledTimes(1);
   });
 
-  it("unlocks audio on user interaction", async () => {
-    adapter.init("/sounds/ding.mp3");
+  it('unlocks audio on user interaction', async () => {
+    adapter.init('/sounds/ding.mp3');
 
     await adapter.unlock();
 
@@ -59,18 +59,18 @@ describe("BrowserAudioAdapter", () => {
     expect(adapter.isEnabled()).toBe(true);
   });
 
-  it("does not play when not enabled", () => {
-    adapter.init("/sounds/ding.mp3");
-    listeners["canplaythrough"]?.();
+  it('does not play when not enabled', () => {
+    adapter.init('/sounds/ding.mp3');
+    listeners['canplaythrough']?.();
 
     adapter.play();
 
     expect(mockPlay).not.toHaveBeenCalled();
   });
 
-  it("plays sound when enabled and ready", async () => {
-    adapter.init("/sounds/ding.mp3");
-    listeners["canplaythrough"]?.();
+  it('plays sound when enabled and ready', async () => {
+    adapter.init('/sounds/ding.mp3');
+    listeners['canplaythrough']?.();
     await adapter.unlock();
     mockPlay.mockClear();
 
@@ -79,17 +79,17 @@ describe("BrowserAudioAdapter", () => {
     expect(mockPlay).toHaveBeenCalledTimes(1);
   });
 
-  it("handles play failure gracefully during unlock", async () => {
-    adapter.init("/sounds/ding.mp3");
-    mockPlay.mockRejectedValueOnce(new Error("NotAllowedError"));
+  it('handles play failure gracefully during unlock', async () => {
+    adapter.init('/sounds/ding.mp3');
+    mockPlay.mockRejectedValueOnce(new Error('NotAllowedError'));
 
     await adapter.unlock();
 
     expect(adapter.isEnabled()).toBe(false);
   });
 
-  it("does not unlock again when already enabled", async () => {
-    adapter.init("/sounds/ding.mp3");
+  it('does not unlock again when already enabled', async () => {
+    adapter.init('/sounds/ding.mp3');
     await adapter.unlock();
     mockPlay.mockClear();
 
@@ -98,9 +98,9 @@ describe("BrowserAudioAdapter", () => {
     expect(mockPlay).not.toHaveBeenCalled();
   });
 
-  it("plays without catching when play() returns undefined (old browser compat)", async () => {
-    adapter.init("/sounds/ding.mp3");
-    listeners["canplaythrough"]?.();
+  it('plays without catching when play() returns undefined (old browser compat)', async () => {
+    adapter.init('/sounds/ding.mp3');
+    listeners['canplaythrough']?.();
     await adapter.unlock();
     mockPlay.mockClear();
     mockPlay.mockReturnValueOnce(undefined);
@@ -108,12 +108,12 @@ describe("BrowserAudioAdapter", () => {
     expect(() => adapter.play()).not.toThrow();
   });
 
-  it("silently catches play rejection when enabled and ready", async () => {
-    adapter.init("/sounds/ding.mp3");
-    listeners["canplaythrough"]?.();
+  it('silently catches play rejection when enabled and ready', async () => {
+    adapter.init('/sounds/ding.mp3');
+    listeners['canplaythrough']?.();
     await adapter.unlock();
     mockPlay.mockClear();
-    mockPlay.mockRejectedValueOnce(new Error("Play interrupted"));
+    mockPlay.mockRejectedValueOnce(new Error('Play interrupted'));
 
     adapter.play();
     await new Promise((r) => setTimeout(r, 0));
@@ -121,12 +121,12 @@ describe("BrowserAudioAdapter", () => {
     expect(mockPlay).toHaveBeenCalledTimes(1);
   });
 
-  it("does not play when init was never called", () => {
+  it('does not play when init was never called', () => {
     expect(() => adapter.play()).not.toThrow();
     expect(mockPlay).not.toHaveBeenCalled();
   });
 
-  it("unlock resolves immediately when init was never called", async () => {
+  it('unlock resolves immediately when init was never called', async () => {
     await adapter.unlock();
 
     expect(adapter.isEnabled()).toBe(false);

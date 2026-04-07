@@ -1,25 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import AuthGuard from "@/components/AuthGuard/AuthGuard";
-import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
-import DoctorEditModal from "@/components/DoctorEditModal/DoctorEditModal";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
-import Toast from "@/components/Toast/Toast";
-import { useDoctors } from "@/hooks/useDoctors";
-import { useToast } from "@/hooks/useToast";
-import { useDeps } from "@/providers/DependencyProvider";
-import type { Doctor } from "@/domain/Doctor";
-import styles from "@/styles/doctors.module.css";
+import { useState } from 'react';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import AuthGuard from '@/components/AuthGuard/AuthGuard';
+import DoctorFormModal from '@/components/DoctorFormModal/DoctorFormModal';
+import DoctorEditModal from '@/components/DoctorEditModal/DoctorEditModal';
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal/ConfirmDeleteModal';
+import Toast from '@/components/Toast/Toast';
+import { useDoctors } from '@/hooks/useDoctors';
+import { useToast } from '@/hooks/useToast';
+import { useDeps } from '@/providers/DependencyProvider';
+import type { Doctor } from '@/domain/Doctor';
+import styles from '@/styles/doctors.module.css';
 
-const TABLE_HEADERS = [
-  "Nombre completo",
-  "Cédula",
-  "Consultorio",
-  "Franja Horaria",
-  "Acciones",
-];
+const TABLE_HEADERS = ['Nombre completo', 'Cédula', 'Consultorio', 'Franja Horaria', 'Acciones'];
 
 export default function DoctorsPage() {
   return (
@@ -43,17 +37,14 @@ function DoctorsContent() {
       <h1 className={styles.title}>Gestión de Médicos</h1>
 
       <Toast
-        message={toast.message ?? ""}
+        message={toast.message ?? ''}
         type={toast.type}
         visible={toast.visible}
         onHide={toast.hide}
       />
 
       <div className={styles.toolbar}>
-        <button
-          className={styles.createButton}
-          onClick={() => setShowModal(true)}
-        >
+        <button className={styles.createButton} onClick={() => setShowModal(true)}>
           Crear médico
         </button>
       </div>
@@ -95,13 +86,12 @@ function DoctorsContent() {
             setDeleteLoading(true);
             try {
               await remove(deletingDoctor._id);
-              toast.show("Médico dado de baja exitosamente", "success", 5000);
+              toast.show('Médico dado de baja exitosamente', 'success', 5000);
               setDeletingDoctor(null);
               refresh();
             } catch (err: unknown) {
-              const message =
-                err instanceof Error ? err.message : "Error al dar de baja";
-              toast.show(message, "error", 5000);
+              const message = err instanceof Error ? err.message : 'Error al dar de baja';
+              toast.show(message, 'error', 5000);
               setDeletingDoctor(null);
             } finally {
               setDeleteLoading(false);
@@ -128,8 +118,8 @@ function DoctorsContent() {
             <tr key={doctor._id}>
               <td>Dr. {doctor.name}</td>
               <td>{doctor.documentId}</td>
-              <td>{doctor.office ?? "Sin asignar"}</td>
-              <td>{doctor.shift ?? "Sin asignar"}</td>
+              <td>{doctor.office ?? 'Sin asignar'}</td>
+              <td>{doctor.shift ?? 'Sin asignar'}</td>
               <td>
                 <button
                   className={styles.editButton}

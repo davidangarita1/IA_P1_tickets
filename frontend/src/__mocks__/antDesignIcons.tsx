@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
 type IconProps = {
   className?: string;
   style?: React.CSSProperties;
-  "aria-hidden"?: boolean;
+  'aria-hidden'?: boolean;
 };
 
 function makeIcon(name: string) {
@@ -21,9 +21,9 @@ function makeIcon(name: string) {
   return Icon;
 }
 
-export const EditOutlined = makeIcon("edit");
-export const CloseOutlined = makeIcon("close");
-export const DeleteOutlined = makeIcon("delete");
-export const PlusOutlined = makeIcon("plus");
-export const CheckOutlined = makeIcon("check");
-export const LoadingOutlined = makeIcon("loading");
+export const EditOutlined = makeIcon('edit');
+export const CloseOutlined = makeIcon('close');
+export const DeleteOutlined = makeIcon('delete');
+export const PlusOutlined = makeIcon('plus');
+export const CheckOutlined = makeIcon('check');
+export const LoadingOutlined = makeIcon('loading');

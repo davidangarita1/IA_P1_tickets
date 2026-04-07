@@ -73,7 +73,17 @@ describe('AuthController (Presentation)', () => {
 
   it('returns dashboard history from use case when already authenticated', async () => {
     // Arrange
-    const history = [{ id: 't1', nombre: 'Paciente', cedula: 1, consultorio: null, estado: 'espera', priority: 'media', timestamp: 1 }];
+    const history = [
+      {
+        id: 't1',
+        nombre: 'Paciente',
+        cedula: 1,
+        consultorio: null,
+        estado: 'espera',
+        priority: 'media',
+        timestamp: 1,
+      },
+    ];
     (getAllTurnosUseCase.execute as jest.Mock).mockResolvedValue(history);
 
     // Act
@@ -89,7 +99,12 @@ describe('AuthController (Presentation)', () => {
     (signupUseCase.execute as jest.Mock).mockRejectedValue(new Error('Email ya registrado'));
 
     // Act
-    const result = await controller.signUp({ email: 'test@test.com', password: 'pass', nombre: 'Test', rol: 'employee' });
+    const result = await controller.signUp({
+      email: 'test@test.com',
+      password: 'pass',
+      nombre: 'Test',
+      rol: 'employee',
+    });
 
     // Assert
     expect(result).toEqual({ success: false, message: 'Email ya registrado' });
@@ -100,7 +115,12 @@ describe('AuthController (Presentation)', () => {
     (signupUseCase.execute as jest.Mock).mockRejectedValue('string error');
 
     // Act
-    const result = await controller.signUp({ email: 'test@test.com', password: 'pass', nombre: 'Test', rol: 'employee' });
+    const result = await controller.signUp({
+      email: 'test@test.com',
+      password: 'pass',
+      nombre: 'Test',
+      rol: 'employee',
+    });
 
     // Assert
     expect(result).toEqual({ success: false, message: 'Error en registro' });

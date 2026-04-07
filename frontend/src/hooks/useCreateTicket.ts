@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import type { CreateTicketDTO } from "@/domain/CreateTicket";
-import type { TicketWriter } from "@/domain/ports/TicketWriter";
-import type { TicketReader } from "@/domain/ports/TicketReader";
+import { useState, useRef, useEffect } from 'react';
+import type { CreateTicketDTO } from '@/domain/CreateTicket';
+import type { TicketWriter } from '@/domain/ports/TicketWriter';
+import type { TicketReader } from '@/domain/ports/TicketReader';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  TIMEOUT: "El servidor tardó demasiado. Intente nuevamente.",
-  RATE_LIMIT: "Demasiadas solicitudes. Espere unos segundos.",
-  HTTP_ERROR: "Error del servidor. Intente más tarde.",
-  SERVER_ERROR: "Error del servidor. Intente más tarde.",
-  CIRCUIT_OPEN: "Servidor temporalmente no disponible. Reintentando...",
+  TIMEOUT: 'El servidor tardó demasiado. Intente nuevamente.',
+  RATE_LIMIT: 'Demasiadas solicitudes. Espere unos segundos.',
+  HTTP_ERROR: 'Error del servidor. Intente más tarde.',
+  SERVER_ERROR: 'Error del servidor. Intente más tarde.',
+  CIRCUIT_OPEN: 'Servidor temporalmente no disponible. Reintentando...',
 };
 
-export const DUPLICATE_ACTIVE_MSG =
-  "Ya existe un turno activo para esta cédula.";
+export const DUPLICATE_ACTIVE_MSG = 'Ya existe un turno activo para esta cédula.';
 
 function mapError(err: unknown): string {
-  const message = err instanceof Error ? err.message : "";
-  return ERROR_MESSAGES[message] ?? "No se pudo registrar el turno.";
+  const message = err instanceof Error ? err.message : '';
+  return ERROR_MESSAGES[message] ?? 'No se pudo registrar el turno.';
 }
 
 export function useCreateTicket(writer: TicketWriter, reader: TicketReader) {
@@ -35,7 +34,7 @@ export function useCreateTicket(writer: TicketWriter, reader: TicketReader) {
     };
   }, []);
 
-  const safeSet = <T,>(setter: (v: T) => void, value: T) => {
+  const safeSet = <T>(setter: (v: T) => void, value: T) => {
     if (isMountedRef.current) setter(value);
   };
 
@@ -51,8 +50,7 @@ export function useCreateTicket(writer: TicketWriter, reader: TicketReader) {
       const existingTickets = await reader.getTickets();
       const hasDuplicate = existingTickets.some(
         (t) =>
-          t.documentId === data.documentId &&
-          (t.status === "waiting" || t.status === "called"),
+          t.documentId === data.documentId && (t.status === 'waiting' || t.status === 'called'),
       );
       if (hasDuplicate) {
         safeSet(setError, DUPLICATE_ACTIVE_MSG);
@@ -60,7 +58,7 @@ export function useCreateTicket(writer: TicketWriter, reader: TicketReader) {
       }
 
       const res = await writer.createTicket(data);
-      safeSet(setSuccess, res.message ?? "Turno registrado correctamente");
+      safeSet(setSuccess, res.message ?? 'Turno registrado correctamente');
       return true;
     } catch (err: unknown) {
       safeSet(setError, mapError(err));

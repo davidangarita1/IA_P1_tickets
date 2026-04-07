@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useRef } from "react";
-import type { Shift } from "@/domain/Doctor";
-import type { DoctorService } from "@/domain/ports/DoctorService";
+import { useState, useCallback, useRef } from 'react';
+import type { Shift } from '@/domain/Doctor';
+import type { DoctorService } from '@/domain/ports/DoctorService';
 
 export function useAvailableShifts(doctorService: DoctorService) {
   const [shifts, setShifts] = useState<Shift[]>([]);
@@ -11,17 +11,14 @@ export function useAvailableShifts(doctorService: DoctorService) {
 
   const fetchShifts = useCallback(
     async (office: string, excludeDoctorId?: string) => {
-      const key = `${office}:${excludeDoctorId ?? ""}`;
+      const key = `${office}:${excludeDoctorId ?? ''}`;
       if (cache.current.has(key)) {
         setShifts(cache.current.get(key)!);
         return;
       }
       setLoading(true);
       try {
-        const result = await doctorService.getAvailableShifts(
-          office,
-          excludeDoctorId
-        );
+        const result = await doctorService.getAvailableShifts(office, excludeDoctorId);
         cache.current.set(key, result.availableShifts);
         setShifts(result.availableShifts);
       } catch {
@@ -30,7 +27,7 @@ export function useAvailableShifts(doctorService: DoctorService) {
         setLoading(false);
       }
     },
-    [doctorService]
+    [doctorService],
   );
 
   return { shifts, loading, fetchShifts };

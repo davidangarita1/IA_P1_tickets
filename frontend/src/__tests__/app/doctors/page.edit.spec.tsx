@@ -1,39 +1,39 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import DoctorsPage from "@/app/doctors/page";
-import { buildDoctor, mockDoctorService } from "@/__tests__/mocks/factories";
-import type { Doctor } from "@/domain/Doctor";
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import DoctorsPage from '@/app/doctors/page';
+import { buildDoctor, mockDoctorService } from '@/__tests__/mocks/factories';
+import type { Doctor } from '@/domain/Doctor';
 
 const mockPush = jest.fn();
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/hooks/useDoctors", () => ({
+jest.mock('@/hooks/useDoctors', () => ({
   useDoctors: jest.fn(),
 }));
 
-jest.mock("@/hooks/useToast", () => ({
+jest.mock('@/hooks/useToast', () => ({
   useToast: jest.fn(),
 }));
 
-jest.mock("@/components/Toast/Toast", () => ({
+jest.mock('@/components/Toast/Toast', () => ({
   __esModule: true,
   default: function MockToast() {
     return null;
   },
 }));
 
-jest.mock("@/components/DoctorFormModal/DoctorFormModal", () => ({
+jest.mock('@/components/DoctorFormModal/DoctorFormModal', () => ({
   __esModule: true,
   default: function MockDoctorFormModal({ onClose }: { onClose: () => void }) {
     return (
@@ -44,7 +44,7 @@ jest.mock("@/components/DoctorFormModal/DoctorFormModal", () => ({
   },
 }));
 
-jest.mock("@/components/DoctorEditModal/DoctorEditModal", () => ({
+jest.mock('@/components/DoctorEditModal/DoctorEditModal', () => ({
   __esModule: true,
   default: function MockDoctorEditModal({
     onClose,
@@ -62,10 +62,10 @@ jest.mock("@/components/DoctorEditModal/DoctorEditModal", () => ({
   },
 }));
 
-import { useAuth } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
-import { useDoctors } from "@/hooks/useDoctors";
-import { useToast } from "@/hooks/useToast";
+import { useAuth } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
+import { useDoctors } from '@/hooks/useDoctors';
+import { useToast } from '@/hooks/useToast';
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -74,9 +74,7 @@ const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 
 function setupAuth(isAuthenticated: boolean) {
   mockUseAuth.mockReturnValue({
-    user: isAuthenticated
-      ? { id: "1", email: "u@u.com", name: "User", role: "employee" }
-      : null,
+    user: isAuthenticated ? { id: '1', email: 'u@u.com', name: 'User', role: 'employee' } : null,
     loading: false,
     error: null,
     signIn: jest.fn(),
@@ -87,11 +85,7 @@ function setupAuth(isAuthenticated: boolean) {
   });
 }
 
-function setupDoctors(
-  doctors: Doctor[] = [],
-  loading = false,
-  error: string | null = null
-) {
+function setupDoctors(doctors: Doctor[] = [], loading = false, error: string | null = null) {
   mockUseDoctors.mockReturnValue({
     doctors,
     loading,
@@ -109,7 +103,12 @@ function setupDeps() {
     realTime: { connect: jest.fn(), disconnect: jest.fn(), isConnected: jest.fn() },
     audio: { init: jest.fn(), unlock: jest.fn(), play: jest.fn(), isEnabled: jest.fn() },
     sanitizer: { sanitize: jest.fn((s: string) => s) },
-    authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
+    authService: {
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      getSession: jest.fn(),
+    },
     doctorService: mockDoctorService(),
   });
 }
@@ -117,14 +116,14 @@ function setupDeps() {
 function setupToast() {
   mockUseToast.mockReturnValue({
     message: null,
-    type: "success",
+    type: 'success',
     visible: false,
     show: jest.fn(),
     hide: jest.fn(),
   });
 }
 
-describe("DoctorsPage - edit actions", () => {
+describe('DoctorsPage - edit actions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupAuth(true);
@@ -133,8 +132,8 @@ describe("DoctorsPage - edit actions", () => {
     setupToast();
   });
 
-  it("renders edit icon button in each doctor row", () => {
-    const doctor = buildDoctor({ name: "Juan García" });
+  it('renders edit icon button in each doctor row', () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
@@ -142,28 +141,28 @@ describe("DoctorsPage - edit actions", () => {
     expect(screen.getByLabelText(/editar.*juan garcía/i)).toBeInTheDocument();
   });
 
-  it("opens edit modal when edit icon is clicked", () => {
-    const doctor = buildDoctor({ name: "Juan García" });
+  it('opens edit modal when edit icon is clicked', () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
 
     fireEvent.click(screen.getByLabelText(/editar.*juan garcía/i));
 
-    expect(screen.getByTestId("doctor-edit-modal")).toBeInTheDocument();
-    expect(screen.getByTestId("edit-modal-doctor")).toHaveTextContent("Juan García");
+    expect(screen.getByTestId('doctor-edit-modal')).toBeInTheDocument();
+    expect(screen.getByTestId('edit-modal-doctor')).toHaveTextContent('Juan García');
   });
 
-  it("closes edit modal when onClose is triggered", () => {
-    const doctor = buildDoctor({ name: "Juan García" });
+  it('closes edit modal when onClose is triggered', () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
     setupDoctors([doctor]);
 
     render(<DoctorsPage />);
 
     fireEvent.click(screen.getByLabelText(/editar.*juan garcía/i));
-    expect(screen.getByTestId("doctor-edit-modal")).toBeInTheDocument();
+    expect(screen.getByTestId('doctor-edit-modal')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("close-edit-modal"));
-    expect(screen.queryByTestId("doctor-edit-modal")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('close-edit-modal'));
+    expect(screen.queryByTestId('doctor-edit-modal')).not.toBeInTheDocument();
   });
 });

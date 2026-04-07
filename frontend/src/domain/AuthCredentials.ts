@@ -1,4 +1,4 @@
-import type { UserRole, User } from "@/domain/User";
+import type { UserRole, User } from '@/domain/User';
 
 export interface AuthCredentials {
   email: string;

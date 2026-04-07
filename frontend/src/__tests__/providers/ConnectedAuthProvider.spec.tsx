@@ -1,25 +1,25 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import ConnectedAuthProvider from "@/providers/ConnectedAuthProvider";
-import { mockAuthService, mockDoctorService } from "@/__tests__/mocks/factories";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import ConnectedAuthProvider from '@/providers/ConnectedAuthProvider';
+import { mockAuthService, mockDoctorService } from '@/__tests__/mocks/factories';
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   AuthProvider: jest.fn(({ children }: { children: React.ReactNode }) => (
     <div data-testid="auth-provider">{children}</div>
   )),
 }));
 
-import { useDeps } from "@/providers/DependencyProvider";
-import { AuthProvider } from "@/providers/AuthProvider";
+import { useDeps } from '@/providers/DependencyProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const MockAuthProvider = AuthProvider as jest.MockedFunction<typeof AuthProvider>;
 
-describe("ConnectedAuthProvider", () => {
+describe('ConnectedAuthProvider', () => {
   const fakeAuthService = mockAuthService();
 
   beforeEach(() => {
@@ -35,27 +35,27 @@ describe("ConnectedAuthProvider", () => {
     });
   });
 
-  it("renders children inside AuthProvider", () => {
+  it('renders children inside AuthProvider', () => {
     render(
       <ConnectedAuthProvider>
         <span data-testid="child">Hello</span>
-      </ConnectedAuthProvider>
+      </ConnectedAuthProvider>,
     );
 
-    expect(screen.getByTestId("auth-provider")).toBeInTheDocument();
-    expect(screen.getByTestId("child")).toBeInTheDocument();
+    expect(screen.getByTestId('auth-provider')).toBeInTheDocument();
+    expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
-  it("passes authService from DependencyProvider to AuthProvider", () => {
+  it('passes authService from DependencyProvider to AuthProvider', () => {
     render(
       <ConnectedAuthProvider>
         <span>child</span>
-      </ConnectedAuthProvider>
+      </ConnectedAuthProvider>,
     );
 
     expect(MockAuthProvider).toHaveBeenCalledWith(
       expect.objectContaining({ authService: fakeAuthService }),
-      undefined
+      undefined,
     );
   });
 });

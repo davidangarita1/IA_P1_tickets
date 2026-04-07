@@ -4,15 +4,13 @@ import { IEventPublisher } from '../../domain/ports/IEventPublisher';
 
 @Injectable()
 export class RabbitMQEventPublisher implements IEventPublisher, OnModuleDestroy {
-    constructor(
-        @Inject('TURNOS_SERVICE') private readonly client: ClientProxy,
-    ) {}
+  constructor(@Inject('TURNOS_SERVICE') private readonly client: ClientProxy) {}
 
-    publish(event: string, payload: unknown): void {
-        this.client.emit(event, payload);
-    }
+  publish(event: string, payload: unknown): void {
+    this.client.emit(event, payload);
+  }
 
-    async onModuleDestroy(): Promise<void> {
-        await this.client.close();
-    }
+  async onModuleDestroy(): Promise<void> {
+    await this.client.close();
+  }
 }

@@ -46,7 +46,10 @@ describe('LoginUseCase (red tests)', () => {
     const useCase = new LoginUseCase(dependencies);
 
     await expect(useCase.execute(credentials)).rejects.toThrow('Invalid credentials');
-    expect(passwordHasher.compare).toHaveBeenCalledWith(credentials.password, storedUser.passwordHash);
+    expect(passwordHasher.compare).toHaveBeenCalledWith(
+      credentials.password,
+      storedUser.passwordHash,
+    );
   });
 
   it('should return a LoginResult with token and usuario when credentials are valid', async () => {
@@ -59,7 +62,12 @@ describe('LoginUseCase (red tests)', () => {
 
     expect(result).toEqual({
       token: 'valid-token',
-      usuario: { id: storedUser.id, email: storedUser.email, nombre: storedUser.nombre, rol: storedUser.rol },
+      usuario: {
+        id: storedUser.id,
+        email: storedUser.email,
+        nombre: storedUser.nombre,
+        rol: storedUser.rol,
+      },
     });
     expect(tokenService.generateToken).toHaveBeenCalled();
   });

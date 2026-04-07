@@ -1,6 +1,6 @@
-import { io, Socket } from "socket.io-client";
-import type { RealTimeProvider, RealTimeCallbacks } from "@/domain/ports/RealTimeProvider";
-import { toDomainTicket } from "@/infrastructure/mappers/ticketMapper";
+import { io, Socket } from 'socket.io-client';
+import type { RealTimeProvider, RealTimeCallbacks } from '@/domain/ports/RealTimeProvider';
+import { toDomainTicket } from '@/infrastructure/mappers/ticketMapper';
 
 export class SocketIOAdapter implements RealTimeProvider {
   private socket: Socket | null = null;
@@ -9,34 +9,32 @@ export class SocketIOAdapter implements RealTimeProvider {
 
   connect(callbacks: RealTimeCallbacks): void {
     this.socket = io(`${this.wsUrl}/ws/turnos`, {
-      transports: ["websocket"],
+      transports: ['websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: Infinity,
     });
 
-    this.socket.on("connect", () => callbacks.onConnect());
+    this.socket.on('connect', () => callbacks.onConnect());
 
-    this.socket.on("disconnect", () => callbacks.onDisconnect());
+    this.socket.on('disconnect', () => callbacks.onDisconnect());
 
-    this.socket.on("connect_error", () => {
-      callbacks.onError("Error de conexión con el servidor");
+    this.socket.on('connect_error', () => {
+      callbacks.onError('Error de conexión con el servidor');
     });
 
-    this.socket.on(
-      "TURNOS_SNAPSHOT",
-      (payload: { type: string; data: unknown[] }) => {
-        callbacks.onSnapshot(payload.data.map((raw) => toDomainTicket(raw as Parameters<typeof toDomainTicket>[0])));
-      }
-    );
+    this.socket.on('TURNOS_SNAPSHOT', (payload: { type: string; data: unknown[] }) => {
+      callbacks.onSnapshot(
+        payload.data.map((raw) => toDomainTicket(raw as Parameters<typeof toDomainTicket>[0])),
+      );
+    });
 
-    this.socket.on(
-      "TURNO_ACTUALIZADO",
-      (payload: { type: string; data: unknown }) => {
-        callbacks.onTicketUpdate(toDomainTicket(payload.data as Parameters<typeof toDomainTicket>[0]));
-      }
-    );
+    this.socket.on('TURNO_ACTUALIZADO', (payload: { type: string; data: unknown }) => {
+      callbacks.onTicketUpdate(
+        toDomainTicket(payload.data as Parameters<typeof toDomainTicket>[0]),
+      );
+    });
   }
 
   disconnect(): void {

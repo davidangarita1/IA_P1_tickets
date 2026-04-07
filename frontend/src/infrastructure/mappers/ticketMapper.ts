@@ -1,5 +1,5 @@
-import type { Ticket, TicketStatus } from "@/domain/Ticket";
-import type { CreateTicketDTO } from "@/domain/CreateTicket";
+import type { Ticket, TicketStatus } from '@/domain/Ticket';
+import type { CreateTicketDTO } from '@/domain/CreateTicket';
 
 interface BackendTicket {
   id: string;
@@ -11,9 +11,9 @@ interface BackendTicket {
 }
 
 const STATUS_MAP: Record<string, TicketStatus> = {
-  espera: "waiting",
-  llamado: "called",
-  atendido: "served",
+  espera: 'waiting',
+  llamado: 'called',
+  atendido: 'served',
 };
 
 export function toDomainTicket(raw: BackendTicket): Ticket {
@@ -23,7 +23,7 @@ export function toDomainTicket(raw: BackendTicket): Ticket {
     documentId: raw.cedula,
     office: raw.consultorio,
     timestamp: raw.timestamp,
-    status: STATUS_MAP[raw.estado] ?? "waiting",
+    status: STATUS_MAP[raw.estado] ?? 'waiting',
   };
 }
 

@@ -1,9 +1,9 @@
-import type { Ticket } from "@/domain/Ticket";
-import type { CreateTicketDTO, CreateTicketResponse } from "@/domain/CreateTicket";
-import type { TicketWriter } from "@/domain/ports/TicketWriter";
-import type { TicketReader } from "@/domain/ports/TicketReader";
-import { httpGet, httpPost } from "@/infrastructure/http/httpClient";
-import { toDomainTicket, toBackendCreateDTO } from "@/infrastructure/mappers/ticketMapper";
+import type { Ticket } from '@/domain/Ticket';
+import type { CreateTicketDTO, CreateTicketResponse } from '@/domain/CreateTicket';
+import type { TicketWriter } from '@/domain/ports/TicketWriter';
+import type { TicketReader } from '@/domain/ports/TicketReader';
+import { httpGet, httpPost } from '@/infrastructure/http/httpClient';
+import { toDomainTicket, toBackendCreateDTO } from '@/infrastructure/mappers/ticketMapper';
 
 export class HttpTicketAdapter implements TicketWriter, TicketReader {
   constructor(private readonly baseUrl: string) {}
@@ -14,9 +14,6 @@ export class HttpTicketAdapter implements TicketWriter, TicketReader {
   }
 
   async createTicket(data: CreateTicketDTO): Promise<CreateTicketResponse> {
-    return httpPost<CreateTicketResponse>(
-      `${this.baseUrl}/turnos`,
-      toBackendCreateDTO(data)
-    );
+    return httpPost<CreateTicketResponse>(`${this.baseUrl}/turnos`, toBackendCreateDTO(data));
   }
 }

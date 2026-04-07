@@ -6,27 +6,26 @@ export type TurnoDocument = HydratedDocument<Turno>;
 
 @Schema({ timestamps: true })
 export class Turno {
+  @Prop({ required: true })
+  cedula: number;
 
-    @Prop({ required: true })
-    cedula: number;
+  @Prop({ required: true })
+  nombre: string;
 
-    @Prop({ required: true })
-    nombre: string;
+  @Prop({ default: null })
+  consultorio: string | null;
 
-    @Prop({ default: null })
-    consultorio: string | null;
+  @Prop({ default: 'espera', enum: ['espera', 'llamado', 'atendido'] })
+  estado: TurnoEstado;
 
-    @Prop({ default: 'espera', enum: ['espera', 'llamado', 'atendido'] })
-    estado: TurnoEstado;
+  @Prop({ default: 'media', enum: ['alta', 'media', 'baja'] })
+  priority: TurnoPriority;
 
-    @Prop({ default: 'media', enum: ['alta', 'media', 'baja'] })
-    priority: TurnoPriority;
+  @Prop({ default: () => Date.now() })
+  timestamp: number;
 
-    @Prop({ default: () => Date.now() })
-    timestamp: number;
-
-    @Prop({ default: null })
-    finAtencionAt: number | null;
+  @Prop({ default: null })
+  finAtencionAt: number | null;
 }
 
 export const TurnoSchema = SchemaFactory.createForClass(Turno);

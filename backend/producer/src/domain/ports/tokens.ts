@@ -1,5 +1,3 @@
-
-
 export const TURNO_REPOSITORY_TOKEN = 'ITurnoRepository';
 export const DOCTOR_REPOSITORY_TOKEN = 'IDoctorRepository';
 export const EVENT_PUBLISHER_TOKEN = 'IEventPublisher';
