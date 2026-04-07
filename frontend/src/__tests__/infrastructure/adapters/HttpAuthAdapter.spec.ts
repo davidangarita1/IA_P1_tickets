@@ -187,7 +187,6 @@ describe('HttpAuthAdapter', () => {
 
     it("falls back to 'empleado' when role is not in the map", async () => {
       mockedHttpPost.mockResolvedValue({ success: true, message: 'OK' });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await adapter.signUp({ email: 'a@b.com', password: 'x', name: 'Y', role: 'unknown' as any });
       expect(mockedHttpPost).toHaveBeenCalledWith(
         expect.any(String),

@@ -28,17 +28,14 @@ describe('ProducerController (Presentation)', () => {
   });
 
   it('delega creación de turno al use case', async () => {
-    // Arrange: use case retorna confirmación aceptada.
     (createTurnoUseCase.execute as jest.Mock).mockReturnValue({
       status: 'accepted',
       message: 'Turno en proceso de asignación',
     });
     const dto = { cedula: 123, nombre: 'Paciente Test' };
 
-    // Act: llamar al endpoint.
     const result = await controller.createTurno(dto);
 
-    // Assert: debe delegar sin lógica de negocio.
     expect(createTurnoUseCase.execute).toHaveBeenCalledWith(dto);
     expect(result).toEqual({
       status: 'accepted',
@@ -47,7 +44,6 @@ describe('ProducerController (Presentation)', () => {
   });
 
   it('delega consulta de todos los turnos al use case', async () => {
-    // Arrange: use case retorna lista de payloads.
     const mockPayloads = [
       {
         id: 't1',
@@ -61,16 +57,13 @@ describe('ProducerController (Presentation)', () => {
     ];
     (getAllTurnosUseCase.execute as jest.Mock).mockResolvedValue(mockPayloads);
 
-    // Act: llamar al endpoint GET.
     const result = await controller.getAllTurnos();
 
-    // Assert: debe delegar sin transformaciones.
     expect(getAllTurnosUseCase.execute).toHaveBeenCalledTimes(1);
     expect(result).toEqual(mockPayloads);
   });
 
   it('delega consulta por cédula al use case', async () => {
-    // Arrange: use case retorna turnos del paciente.
     const mockPayloads = [
       {
         id: 't2',
@@ -84,10 +77,8 @@ describe('ProducerController (Presentation)', () => {
     ];
     (getTurnosByCedulaUseCase.execute as jest.Mock).mockResolvedValue(mockPayloads);
 
-    // Act: llamar al endpoint GET /:cedula.
     const result = await controller.getTurnosByCedula(123);
 
-    // Assert: debe delegar el parámetro.
     expect(getTurnosByCedulaUseCase.execute).toHaveBeenCalledWith(123);
     expect(result).toEqual(mockPayloads);
   });

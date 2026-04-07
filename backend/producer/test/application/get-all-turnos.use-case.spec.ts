@@ -38,25 +38,19 @@ describe('GetAllTurnosUseCase (Application)', () => {
   });
 
   it('retorna todos los turnos mapeados a payload', async () => {
-    // Arrange: repositorio devuelve entidades de dominio.
     turnoRepository.findAll.mockResolvedValue([turno1, turno2]);
 
-    // Act: ejecutar consulta.
     const result = await useCase.execute();
 
-    // Assert: debe mapear cada entidad a evento payload.
     expect(turnoRepository.findAll).toHaveBeenCalledTimes(1);
     expect(result).toEqual([turno1.toEventPayload(), turno2.toEventPayload()]);
   });
 
   it('retorna array vacío cuando no hay turnos', async () => {
-    // Arrange: repositorio sin datos.
     turnoRepository.findAll.mockResolvedValue([]);
 
-    // Act: ejecutar consulta.
     const result = await useCase.execute();
 
-    // Assert: debe retornar array vacío.
     expect(result).toEqual([]);
   });
 });

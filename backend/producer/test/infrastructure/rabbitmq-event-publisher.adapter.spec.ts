@@ -16,24 +16,19 @@ describe('RabbitMQEventPublisher (Infrastructure)', () => {
 
   describe('publish', () => {
     it('emite el evento al ClientProxy con el payload', () => {
-      // Arrange
       const event = 'turno_creado';
       const payload = { cedula: 123, nombre: 'Test' };
 
-      // Act
       publisher.publish(event, payload);
 
-      // Assert
       expect(mockClient.emit).toHaveBeenCalledWith(event, payload);
     });
   });
 
   describe('onModuleDestroy', () => {
     it('cierra la conexión del ClientProxy', async () => {
-      // Act
       await publisher.onModuleDestroy();
 
-      // Assert
       expect(mockClient.close).toHaveBeenCalled();
     });
   });

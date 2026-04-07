@@ -8,7 +8,6 @@ import {
 import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
 import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
 
-// Valida el contrato esperado para el caso de uso de login antes de implementarlo.
 describe('LoginUseCase (red tests)', () => {
   const credentials: LoginCredentials = { email: 'luis@example.com', password: 'secret' };
   const storedUser: IUserRecord = {

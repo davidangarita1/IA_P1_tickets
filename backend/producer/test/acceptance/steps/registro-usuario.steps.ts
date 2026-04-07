@@ -1,6 +1,3 @@
-// ⚕️ HUMAN CHECK - Step Definitions: Registro de usuario (Caja Negra)
-// Valida el flujo de registro y login vía HTTP como consumidor externo.
-// El UserRepository es InMemory (ya lo es en producción) — cero mocks artificiales.
 
 import { Given, When, Then, Before, After, setDefaultTimeout } from '@cucumber/cucumber';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -26,7 +23,6 @@ import { ConfigModule } from '@nestjs/config';
 
 setDefaultTimeout(30_000);
 
-// ── Stubs ──────────────────────────────────────────────────────────────────
 const stubEventPublisher: IEventPublisher = {
   publish: () => {
     /* no-op */
@@ -37,12 +33,10 @@ const stubTurnoRepository = {
   findByCedula: async () => [],
 };
 
-// ── World state ────────────────────────────────────────────────────────────
 let app: INestApplication;
 let response: request.Response;
 
 Before({ tags: '@auth or not @turnos' }, async function () {
-  // Solo inicializa si no hay app activa del otro feature
   if (app) return;
 
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -94,19 +88,15 @@ After(async function () {
   }
 });
 
-// ── Given ──────────────────────────────────────────────────────────────────
 
 Given('el sistema de autenticación está disponible', function () {
   if (!app) throw new Error('La aplicación de auth no se inicializó');
 });
 
 Given('no existe un usuario registrado con correo {string}', function (_email: string) {
-  // Estado inicial: InMemoryUserRepository vacío
-  // No se requiere acción — el repositorio se reinicia en cada escenario
 });
 
 Given('existe un usuario registrado con correo {string}', async function (email: string) {
-  // Pre-condición: registrar usuario para que exista antes del When
   await request(app.getHttpServer())
     .post('/auth/signUp')
     .send({ email, password: 'SecurePass1!', nombre: 'Pre-existente', rol: 'empleado' });
@@ -121,7 +111,6 @@ Given(
   },
 );
 
-// ── When ───────────────────────────────────────────────────────────────────
 
 When(
   'se registra un usuario con nombre {string}, correo {string}, contraseña {string} y rol {string}',
@@ -150,7 +139,6 @@ When(
   },
 );
 
-// ── Then ───────────────────────────────────────────────────────────────────
 
 Then('el registro es exitoso', function () {
   if (!response.body.success) {

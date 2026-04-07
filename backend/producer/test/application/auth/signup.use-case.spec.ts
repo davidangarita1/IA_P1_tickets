@@ -8,7 +8,6 @@ import {
 } from '@/application/use-cases/signup.use-case';
 import { ITokenService } from '@/application/use-cases/login.use-case';
 
-// Asegura que el contrato de signup lanza los errores esperados antes de implementarlo.
 describe('SignupUseCase (red tests)', () => {
   const credentials: SignupCredentials = {
     email: 'luis@example.com',

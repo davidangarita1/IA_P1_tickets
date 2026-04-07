@@ -1,6 +1,3 @@
-// ⚕️ HUMAN CHECK - Step Definitions: Creación de turno (Caja Negra)
-// Usa NestJS Testing Module + Supertest para validar la API como consumidor externo.
-// Las dependencias externas (RabbitMQ, MongoDB) se sustituyen por stubs in-memory.
 
 import { Given, When, Then, Before, After, setDefaultTimeout } from '@cucumber/cucumber';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -13,10 +10,8 @@ import { GetTurnosByCedulaUseCase } from '@/application/use-cases/get-turnos-by-
 import { EVENT_PUBLISHER_TOKEN, TURNO_REPOSITORY_TOKEN } from '@/domain/ports/tokens';
 import { IEventPublisher } from '@/domain/ports/IEventPublisher';
 
-// ⚕️ HUMAN CHECK - Timeout de 30s para levantar el módulo NestJS en CI
 setDefaultTimeout(30_000);
 
-// ── Stubs in-memory para aislar la prueba de Caja Negra ────────────────────
 const stubEventPublisher: IEventPublisher = {
   publish: () => {
     /* no-op: stub para desacoplar de RabbitMQ */
@@ -28,7 +23,6 @@ const stubTurnoRepository = {
   findByCedula: async () => [],
 };
 
-// ── World state compartido entre steps ─────────────────────────────────────
 let app: INestApplication;
 let response: request.Response;
 
@@ -45,8 +39,6 @@ Before(async function () {
   }).compile();
 
   app = moduleFixture.createNestApplication();
-  // ⚕️ HUMAN CHECK - Habilitar ValidationPipe igual que en producción
-  // para que class-validator rechace payloads inválidos (prueba de Caja Negra real).
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -61,19 +53,14 @@ After(async function () {
   if (app) await app.close();
 });
 
-// ── Given ──────────────────────────────────────────────────────────────────
 
 Given('el sistema de turnos está disponible', function () {
-  // Estado inicial: la app NestJS está inicializada (Before hook)
   if (!app) throw new Error('La aplicación no se inicializó correctamente');
 });
 
 Given('no existe un turno previo para el paciente con cédula {int}', function (_cedula: number) {
-  // Estado inicial: repositorio in-memory vacío (stub retorna [])
-  // No se requiere acción — el stub ya garantiza este estado
 });
 
-// ── When ───────────────────────────────────────────────────────────────────
 
 When(
   'el paciente {string} con cédula {int} solicita un turno con prioridad {string}',
@@ -102,7 +89,6 @@ When('se envía una solicitud de turno sin nombre ni cédula', async function ()
     .set('Content-Type', 'application/json');
 });
 
-// ── Then ───────────────────────────────────────────────────────────────────
 
 Then('el sistema acepta el turno para procesamiento asíncrono', function () {
   if (response.status !== 202) {

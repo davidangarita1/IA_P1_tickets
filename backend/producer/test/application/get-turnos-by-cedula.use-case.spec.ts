@@ -27,25 +27,19 @@ describe('GetTurnosByCedulaUseCase (Application)', () => {
   });
 
   it('retorna turnos filtrados por cédula', async () => {
-    // Arrange: repositorio retorna turnos del paciente.
     turnoRepository.findByCedula.mockResolvedValue([turnoDelPaciente]);
 
-    // Act: ejecutar consulta por cédula específica.
     const result = await useCase.execute(123);
 
-    // Assert: debe filtrar correctamente.
     expect(turnoRepository.findByCedula).toHaveBeenCalledWith(123);
     expect(result).toEqual([turnoDelPaciente.toEventPayload()]);
   });
 
   it('retorna array vacío cuando no hay turnos para la cédula', async () => {
-    // Arrange: repositorio sin turnos para esa cédula.
     turnoRepository.findByCedula.mockResolvedValue([]);
 
-    // Act: consultar cédula sin turnos.
     const result = await useCase.execute(999);
 
-    // Assert: debe retornar array vacío.
     expect(result).toEqual([]);
   });
 });
