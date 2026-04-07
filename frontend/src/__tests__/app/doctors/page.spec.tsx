@@ -35,10 +35,17 @@ jest.mock('@/components/Toast/Toast', () => ({
 
 jest.mock('@/components/DoctorFormModal/DoctorFormModal', () => ({
   __esModule: true,
-  default: function MockDoctorFormModal({ onClose }: { onClose: () => void }) {
+  default: function MockDoctorFormModal({
+    onClose,
+    onSuccess,
+  }: {
+    onClose: () => void;
+    onSuccess: () => void;
+  }) {
     return (
       <div data-testid="doctor-form-modal">
         <button onClick={onClose}>close-modal</button>
+        <button onClick={onSuccess}>success-modal</button>
       </div>
     );
   },
@@ -70,9 +77,12 @@ function setupAuth(isAuthenticated: boolean) {
 function setupDoctors(doctors: Doctor[] = [], loading = false, error: string | null = null) {
   mockUseDoctors.mockReturnValue({
     doctors,
+    total: doctors.length,
     loading,
     error,
     create: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
     refresh: jest.fn(),
   });
 }
@@ -241,5 +251,29 @@ describe('DoctorsPage', () => {
     render(<DoctorsPage />);
 
     expect(screen.getByText('Error al cargar médicos.')).toBeInTheDocument();
+  });
+
+  it('closes form modal and refreshes on successful creation', () => {
+    const mockRefresh = jest.fn();
+    mockUseDoctors.mockReturnValue({
+      doctors: [],
+      total: 0,
+      loading: false,
+      error: null,
+      create: jest.fn(),
+      update: jest.fn(),
+      remove: jest.fn(),
+      refresh: mockRefresh,
+    });
+
+    render(<DoctorsPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /crear médico/i }));
+    expect(screen.getByTestId('doctor-form-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('success-modal'));
+
+    expect(screen.queryByTestId('doctor-form-modal')).not.toBeInTheDocument();
+    expect(mockRefresh).toHaveBeenCalled();
   });
 });

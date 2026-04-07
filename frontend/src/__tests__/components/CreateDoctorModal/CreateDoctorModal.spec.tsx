@@ -357,4 +357,73 @@ describe('DoctorFormModal', () => {
     expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
     removeEventListenerSpy.mockRestore();
   });
+
+  it('shows nombre obligatorio error when nombre is touched and empty', () => {
+    renderModal();
+
+    const nombreInput = screen.getByLabelText(/nombre/i);
+    fireEvent.change(nombreInput, { target: { value: 'A' } });
+    fireEvent.change(nombreInput, { target: { value: '' } });
+    fireEvent.blur(nombreInput);
+
+    expect(screen.getByText(/nombre completo es obligatorio/i)).toBeInTheDocument();
+  });
+
+  it('shows cedula obligatorio error when cedula is touched and empty', () => {
+    renderModal();
+
+    const cedulaInput = screen.getByLabelText(/cédula/i);
+    fireEvent.change(cedulaInput, { target: { value: '1' } });
+    fireEvent.change(cedulaInput, { target: { value: '' } });
+    fireEvent.blur(cedulaInput);
+
+    expect(screen.getByText(/cédula es obligatorio/i)).toBeInTheDocument();
+  });
+
+  it('shows shift required error when office is set and shifts available but none selected', () => {
+    setupShifts(['06:00-14:00', '14:00-22:00']);
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+
+    expect(screen.getByText(/franja horaria es obligatoria/i)).toBeInTheDocument();
+  });
+
+  it('disables Guardar when office is set but shift is not selected', () => {
+    setupShifts(['06:00-14:00', '14:00-22:00']);
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'Dr Juan' } });
+    fireEvent.change(screen.getByLabelText(/cédula/i), { target: { value: '12345678' } });
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+
+    expect(screen.getByRole('button', { name: /guardar/i })).toBeDisabled();
+  });
+
+  it('does not preventDefault for non-Escape key events', () => {
+    renderModal();
+
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+    const preventDefaultSpy = jest.spyOn(enterEvent, 'preventDefault');
+    document.dispatchEvent(enterEvent);
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not fetch shifts when office is cleared back to empty', () => {
+    const fetchShifts = jest.fn();
+    mockUseAvailableShifts.mockReturnValue({
+      shifts: [],
+      loading: false,
+      fetchShifts,
+    });
+
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+    fetchShifts.mockClear();
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '' } });
+
+    expect(fetchShifts).not.toHaveBeenCalled();
+  });
 });

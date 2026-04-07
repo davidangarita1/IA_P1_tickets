@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DoctorsPage from '@/app/doctors/page';
 import { buildDoctor, mockDoctorService } from '@/__tests__/mocks/factories';
 import type { Doctor } from '@/domain/Doctor';
@@ -60,6 +60,7 @@ jest.mock('@/components/ConfirmDeleteModal/ConfirmDeleteModal', () => ({
   default: function MockConfirmDeleteModal({
     doctorName,
     onCancel,
+    onConfirm,
   }: {
     doctorName: string;
     onCancel: () => void;
@@ -70,6 +71,7 @@ jest.mock('@/components/ConfirmDeleteModal/ConfirmDeleteModal', () => ({
       <div data-testid="confirm-delete-modal">
         <span data-testid="delete-modal-doctor">{doctorName}</span>
         <button onClick={onCancel}>cancel-delete</button>
+        <button onClick={onConfirm}>confirm-delete</button>
       </div>
     );
   },
@@ -84,6 +86,10 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseDoctors = useDoctors as jest.MockedFunction<typeof useDoctors>;
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
+
+const mockRemove = jest.fn();
+const mockRefresh = jest.fn();
+const mockShowToast = jest.fn();
 
 function setupAuth(isAuthenticated: boolean) {
   mockUseAuth.mockReturnValue({
@@ -101,12 +107,13 @@ function setupAuth(isAuthenticated: boolean) {
 function setupDoctors(doctors: Doctor[] = [], loading = false, error: string | null = null) {
   mockUseDoctors.mockReturnValue({
     doctors,
+    total: doctors.length,
     loading,
     error,
     create: jest.fn(),
     update: jest.fn(),
-    remove: jest.fn(),
-    refresh: jest.fn(),
+    remove: mockRemove,
+    refresh: mockRefresh,
   });
 }
 
@@ -132,7 +139,7 @@ function setupToast() {
     message: null,
     type: 'success',
     visible: false,
-    show: jest.fn(),
+    show: mockShowToast,
     hide: jest.fn(),
   });
 }
@@ -187,5 +194,54 @@ describe('DoctorsPage - delete actions', () => {
     fireEvent.click(screen.getByText('cancel-delete'));
 
     expect(screen.queryByTestId('confirm-delete-modal')).not.toBeInTheDocument();
+  });
+
+  it('calls remove and shows success toast on confirm', async () => {
+    const doctor = buildDoctor({ _id: 'doc-1', name: 'Juan García' });
+    setupDoctors([doctor]);
+    mockRemove.mockResolvedValue(undefined);
+
+    render(<DoctorsPage />);
+    fireEvent.click(screen.getByLabelText(/dar de baja.*juan garcía/i));
+    fireEvent.click(screen.getByText('confirm-delete'));
+
+    await waitFor(() => {
+      expect(mockRemove).toHaveBeenCalledWith('doc-1');
+    });
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'Médico dado de baja exitosamente',
+        'success',
+        5000,
+      );
+    });
+  });
+
+  it('shows error toast when remove fails with Error', async () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
+    setupDoctors([doctor]);
+    mockRemove.mockRejectedValue(new Error('No se puede dar de baja'));
+
+    render(<DoctorsPage />);
+    fireEvent.click(screen.getByLabelText(/dar de baja.*juan garcía/i));
+    fireEvent.click(screen.getByText('confirm-delete'));
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith('No se puede dar de baja', 'error', 5000);
+    });
+  });
+
+  it('shows generic error toast when remove fails with non-Error', async () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
+    setupDoctors([doctor]);
+    mockRemove.mockRejectedValue('unexpected');
+
+    render(<DoctorsPage />);
+    fireEvent.click(screen.getByLabelText(/dar de baja.*juan garcía/i));
+    fireEvent.click(screen.getByText('confirm-delete'));
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith('Error al dar de baja', 'error', 5000);
+    });
   });
 });

@@ -300,4 +300,112 @@ describe('DoctorEditModal', () => {
 
     expect(fetchShifts).toHaveBeenCalledWith('2', 'doc-1');
   });
+
+  it('does not preventDefault for non-Escape key events', () => {
+    renderModal();
+
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+    const preventDefaultSpy = jest.spyOn(enterEvent, 'preventDefault');
+    document.dispatchEvent(enterEvent);
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+  });
+
+  it('shows cedula length error when value is too short', () => {
+    renderModal();
+
+    const cedulaInput = screen.getByLabelText(/cédula/i);
+    fireEvent.change(cedulaInput, { target: { value: '123' } });
+    fireEvent.blur(cedulaInput);
+
+    expect(screen.getByText(/7 y 10 dígitos/i)).toBeInTheDocument();
+  });
+
+  it('disables shift select when no office is selected', () => {
+    const doctor = buildDoctor({ office: null, shift: null });
+    renderModal(doctor);
+
+    expect(screen.getByLabelText(/franja horaria/i)).toBeDisabled();
+  });
+
+  it('shows shift required error when office is set but no shift selected', () => {
+    setupShifts(['06:00-14:00', '14:00-22:00']);
+    const doctor = buildDoctor({ office: null, shift: null });
+    renderModal(doctor);
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+
+    expect(screen.getByText(/franja horaria es obligatoria/i)).toBeInTheDocument();
+  });
+
+  it('shows no shifts available message when office has no free shifts', () => {
+    setupShifts([]);
+    const doctor = buildDoctor({ office: null, shift: null });
+    renderModal(doctor);
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+
+    expect(screen.getByText(/no hay franjas disponibles/i)).toBeInTheDocument();
+  });
+
+  it('disables Guardar when office is set but shift is not', () => {
+    setupShifts(['06:00-14:00', '14:00-22:00']);
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '3' } });
+
+    expect(screen.getByRole('button', { name: /guardar/i })).toBeDisabled();
+  });
+
+  it('shows generic error when update throws a non-Error', async () => {
+    const doctor = buildDoctor();
+    const service = mockDoctorService([doctor]);
+    service.update.mockRejectedValueOnce('string error');
+    const showToast = jest.fn();
+
+    render(
+      <DoctorEditModal
+        doctor={doctor}
+        onClose={jest.fn()}
+        onSuccess={jest.fn()}
+        doctorService={service}
+        showToast={showToast}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'Nuevo Nombre' } });
+    fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith('Error al actualizar médico', 'error');
+    });
+  });
+
+  it('does not fetch shifts when office is cleared', () => {
+    const doctor = buildDoctor({ office: '2' });
+    const fetchShifts = jest.fn();
+    mockUseAvailableShifts.mockReturnValue({
+      shifts: ['06:00-14:00'],
+      loading: false,
+      fetchShifts,
+    });
+
+    renderModal(doctor);
+    fetchShifts.mockClear();
+
+    fireEvent.change(screen.getByLabelText(/consultorio/i), { target: { value: '' } });
+
+    expect(fetchShifts).not.toHaveBeenCalled();
+  });
+
+  it('updates shift select value when a shift is chosen', () => {
+    setupShifts(['06:00-14:00', '14:00-22:00']);
+    const doctor = buildDoctor({ office: '2', shift: null });
+    renderModal(doctor);
+
+    const franjaSelect = screen.getByLabelText(/franja horaria/i) as HTMLSelectElement;
+    fireEvent.change(franjaSelect, { target: { value: '14:00-22:00' } });
+
+    expect(franjaSelect.value).toBe('14:00-22:00');
+  });
 });

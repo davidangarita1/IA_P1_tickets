@@ -48,15 +48,18 @@ jest.mock('@/components/DoctorEditModal/DoctorEditModal', () => ({
   __esModule: true,
   default: function MockDoctorEditModal({
     onClose,
+    onSuccess,
     doctor,
   }: {
     onClose: () => void;
+    onSuccess: () => void;
     doctor: Doctor;
   }) {
     return (
       <div data-testid="doctor-edit-modal">
         <span data-testid="edit-modal-doctor">{doctor.name}</span>
         <button onClick={onClose}>close-edit-modal</button>
+        <button onClick={onSuccess}>success-edit-modal</button>
       </div>
     );
   },
@@ -88,10 +91,12 @@ function setupAuth(isAuthenticated: boolean) {
 function setupDoctors(doctors: Doctor[] = [], loading = false, error: string | null = null) {
   mockUseDoctors.mockReturnValue({
     doctors,
+    total: doctors.length,
     loading,
     error,
     create: jest.fn(),
     update: jest.fn(),
+    remove: jest.fn(),
     refresh: jest.fn(),
   });
 }
@@ -164,5 +169,30 @@ describe('DoctorsPage - edit actions', () => {
 
     fireEvent.click(screen.getByText('close-edit-modal'));
     expect(screen.queryByTestId('doctor-edit-modal')).not.toBeInTheDocument();
+  });
+
+  it('closes edit modal and refreshes on successful edit', () => {
+    const doctor = buildDoctor({ name: 'Juan García' });
+    const mockRefresh = jest.fn();
+    mockUseDoctors.mockReturnValue({
+      doctors: [doctor],
+      total: 1,
+      loading: false,
+      error: null,
+      create: jest.fn(),
+      update: jest.fn(),
+      remove: jest.fn(),
+      refresh: mockRefresh,
+    });
+
+    render(<DoctorsPage />);
+
+    fireEvent.click(screen.getByLabelText(/editar.*juan garcía/i));
+    expect(screen.getByTestId('doctor-edit-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('success-edit-modal'));
+
+    expect(screen.queryByTestId('doctor-edit-modal')).not.toBeInTheDocument();
+    expect(mockRefresh).toHaveBeenCalled();
   });
 });
