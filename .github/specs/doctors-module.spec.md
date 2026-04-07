@@ -3,15 +3,16 @@ id: SPEC-001
 status: IMPLEMENTED
 feature: doctors-module
 created: 2026-04-06
-updated: 2026-04-06
+updated: 2026-04-07
 author: spec-generator
-version: "1.0"
+version: "1.1"
 related-specs: []
 ---
 
 # Spec: Módulo de Gestión de Médicos y Consultorios
 
 > **Estado:** `IMPLEMENTED` → implementación completa. Cobertura BE >97% · FE >94%.
+> **v1.1 (2026-04-07):** Resolución de deuda técnica — cedula reutilizable en inactivos, consulta DB-level para baja, paginación en GET doctors, mapError extendido a 403/409, franjas centralizadas en VALID_SHIFTS.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---
@@ -373,13 +374,13 @@ Status:      FUERA DE ALCANCE — Fase siguiente
 
 ### Reglas de Negocio
 
-1. **Unicidad de Cédula:** Cada médico debe tener un número de cédula único dentro del sistema. Dos médicos no pueden compartir la misma cédula.
+1. **Unicidad de Cédula (activos):** La cédula debe ser única entre médicos con estado `active`. Un médico dado de baja (estado `inactive`) libera su cédula, permitiendo que un nuevo médico sea registrado con ese mismo número de documento.
 
 2. **Unicidad de Consultorio/Franja:** A un médico se le asigna como máximo una combinación única de Consultorio + Franja Horaria. Dos médicos activos no pueden ocupar la misma combinación simultáneamente.
 
-3. **Franjas Horarias Fijas:** Solo existen dos franjas horarias permitidas:
-   - Franja Mañana: 6:00 - 14:00
-   - Franja Tarde: 14:00 - 22:00
+3. **Franjas Horarias Fijas:** Solo existen dos franjas horarias permitidas, definidas en la constante `VALID_SHIFTS` del dominio:
+   - Franja Mañana: 06:00-14:00
+   - Franja Tarde: 14:00-22:00
 
 4. **Prefijo "Dr." en UI:** El sistema almacena solo el nombre sin prefijo en BD, pero lo agrega automáticamente en la presentación (Nombre almacenado: "Juan García" → Mostrado: "Dr. Juan García").
 
@@ -391,11 +392,13 @@ Status:      FUERA DE ALCANCE — Fase siguiente
    - Consultorio: se puede dejar vacío
    - Franja Horaria: se puede dejar vacío, **pero si se asigna Consultorio, la Franja Horaria pasa a ser obligatoria**. No se puede guardar un médico con consultorio asignado y sin franja horaria.
 
-7. **Bloqueo de Eliminación:** Un médico no puede eliminarse si tiene un turno en estado "llamado" o "atendido" en el momento de la solicitud de baja.
+7. **Bloqueo de Eliminación:** Un médico no puede eliminarse si tiene un turno en estado "llamado" o "atendido" en el momento de la solicitud de baja. La verificación se realiza a nivel de base de datos consultando solo el consultorio del médico.
 
 8. **Eliminación Lógica:** Los médicos eliminados no se borran de la BD, se marcan como "Inactivo" (soft delete). No aparecen en la UI pero permanecen en registros históricos.
 
 9. **Auditoría de Cambios:** Todo create, update y delete debe registrar `created_at`, `updated_at` y `status` en la entidad.
+
+10. **Paginación de Listado:** El endpoint `GET /api/v1/doctors` devuelve resultados paginados con los parámetros opcionales `page` (default: 1) y `limit` (default: 25, máximo: 100). La respuesta incluye `data`, `total`, `page` y `limit`.
 
 10. **Control de Acceso:** Solo usuarios autenticados con roles "Empleado" o "Administrador" pueden acceder al módulo y realizar acciones.
 
