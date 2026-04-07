@@ -1,7 +1,7 @@
-import { IUserRecord, IUserRepository } from '../../../src/domain/ports/IUserRepository';
-import { IPasswordHasher } from '../../../src/application/ports/IPasswordHasher';
-import { SignupCredentials, SignupDependencies, SignupUseCase, SignupResult } from '../../../src/application/use-cases/signup.use-case';
-import { ITokenService } from '../../../src/application/use-cases/login.use-case';
+import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
+import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
+import { SignupCredentials, SignupDependencies, SignupUseCase, SignupResult } from '@/application/use-cases/signup.use-case';
+import { ITokenService } from '@/application/use-cases/login.use-case';
 
 // Asegura que el contrato de signup lanza los errores esperados antes de implementarlo.
 describe('SignupUseCase (red tests)', () => {

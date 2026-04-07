@@ -7,7 +7,7 @@ import { GetAllDoctorsUseCase } from '../../application/use-cases/get-all-doctor
 import { GetAvailableShiftsUseCase, AvailableShiftsResponse } from '../../application/use-cases/get-available-shifts.use-case';
 import { UpdateDoctorUseCase } from '../../application/use-cases/update-doctor.use-case';
 import { DeleteDoctorUseCase } from '../../application/use-cases/delete-doctor.use-case';
-import { AuthGuard } from '../../../presentation/auth.guard';
+import { AuthGuard } from '@/presentation/auth.guard';
 import { Doctor } from '../../domain/entities/doctor.entity';
 
 @ApiTags('Doctors')

@@ -1,10 +1,10 @@
-import { DoctorController } from '../../../src/doctors/presentation/controllers/doctor.controller';
-import { CreateDoctorUseCase } from '../../../src/doctors/application/use-cases/create-doctor.use-case';
-import { GetAllDoctorsUseCase } from '../../../src/doctors/application/use-cases/get-all-doctors.use-case';
-import { GetAvailableShiftsUseCase } from '../../../src/doctors/application/use-cases/get-available-shifts.use-case';
-import { UpdateDoctorUseCase } from '../../../src/doctors/application/use-cases/update-doctor.use-case';
-import { DeleteDoctorUseCase } from '../../../src/doctors/application/use-cases/delete-doctor.use-case';
-import { Doctor } from '../../../src/doctors/domain/entities/doctor.entity';
+import { DoctorController } from '@/doctors/presentation/controllers/doctor.controller';
+import { CreateDoctorUseCase } from '@/doctors/application/use-cases/create-doctor.use-case';
+import { GetAllDoctorsUseCase } from '@/doctors/application/use-cases/get-all-doctors.use-case';
+import { GetAvailableShiftsUseCase } from '@/doctors/application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '@/doctors/application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from '@/doctors/application/use-cases/delete-doctor.use-case';
+import { Doctor } from '@/doctors/domain/entities/doctor.entity';
 
 describe('DoctorController - updateDoctor (Presentation)', () => {
     const createDoctorUseCase: Pick<CreateDoctorUseCase, 'execute'> = { execute: jest.fn() };

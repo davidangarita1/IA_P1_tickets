@@ -1,7 +1,7 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IDoctorRepository } from '../../domain/ports/doctor.repository';
-import { DOCTOR_REPOSITORY_TOKEN, TURNO_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
-import { ITurnoRepository } from '../../../domain/ports/ITurnoRepository';
+import { DOCTOR_REPOSITORY_TOKEN, TURNO_REPOSITORY_TOKEN } from '@/domain/ports/tokens';
+import { ITurnoRepository } from '@/domain/ports/ITurnoRepository';
 
 @Injectable()
 export class DeleteDoctorUseCase {

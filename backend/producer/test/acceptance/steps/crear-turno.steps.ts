@@ -6,12 +6,12 @@ import { Given, When, Then, Before, After, setDefaultTimeout } from '@cucumber/c
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { ProducerController } from '../../../src/presentation/producer.controller';
-import { CreateTurnoUseCase } from '../../../src/application/use-cases/create-turno.use-case';
-import { GetAllTurnosUseCase } from '../../../src/application/use-cases/get-all-turnos.use-case';
-import { GetTurnosByCedulaUseCase } from '../../../src/application/use-cases/get-turnos-by-cedula.use-case';
-import { EVENT_PUBLISHER_TOKEN, TURNO_REPOSITORY_TOKEN } from '../../../src/domain/ports/tokens';
-import { IEventPublisher } from '../../../src/domain/ports/IEventPublisher';
+import { ProducerController } from '@/presentation/producer.controller';
+import { CreateTurnoUseCase } from '@/application/use-cases/create-turno.use-case';
+import { GetAllTurnosUseCase } from '@/application/use-cases/get-all-turnos.use-case';
+import { GetTurnosByCedulaUseCase } from '@/application/use-cases/get-turnos-by-cedula.use-case';
+import { EVENT_PUBLISHER_TOKEN, TURNO_REPOSITORY_TOKEN } from '@/domain/ports/tokens';
+import { IEventPublisher } from '@/domain/ports/IEventPublisher';
 
 // ⚕️ HUMAN CHECK - Timeout de 30s para levantar el módulo NestJS en CI
 setDefaultTimeout(30_000);
