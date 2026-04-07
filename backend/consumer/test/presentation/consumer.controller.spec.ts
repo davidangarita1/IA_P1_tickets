@@ -63,4 +63,13 @@ describe('ConsumerController (Presentation)', () => {
         expect(channel.nack).toHaveBeenCalledWith({ id: 'msg-1' }, false, true);
         expect(channel.ack).not.toHaveBeenCalled();
     });
+
+    it('NACK con requeue cuando el error no es instancia de Error', async () => {
+        (createTurnoUseCase.execute as jest.Mock).mockRejectedValue('string error');
+
+        await controller.handleCrearTurno({ cedula: 123, nombre: 'Paciente' } as never, context as never);
+
+        expect(channel.nack).toHaveBeenCalledWith({ id: 'msg-1' }, false, true);
+        expect(channel.ack).not.toHaveBeenCalled();
+    });
 });

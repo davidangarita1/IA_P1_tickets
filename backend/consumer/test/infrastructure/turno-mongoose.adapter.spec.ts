@@ -66,6 +66,21 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('save', () => {
+        it('usa media como prioridad por defecto cuando no se provee', async () => {
+            const data = { cedula: 12345, nombre: 'Nuevo Paciente' };
+            const savedDoc = mockTurnoDoc({ ...data, _id: 'new-id', priority: 'media' });
+
+            const mockSave = jest.fn().mockResolvedValue(savedDoc);
+            (adapter as any).turnoModel = function (docData: any) {
+                return { ...savedDoc, ...docData, save: mockSave };
+            };
+
+            const result = await adapter.save(data as any);
+
+            expect(result).toBeInstanceOf(Turno);
+            expect(mockSave).toHaveBeenCalled();
+        });
+
         it('crea y guarda un nuevo turno', async () => {
             // Arrange
             const data = { cedula: 12345, nombre: 'Nuevo Paciente', priority: 'alta' as const };

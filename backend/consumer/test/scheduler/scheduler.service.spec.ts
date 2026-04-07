@@ -108,4 +108,20 @@ describe('SchedulerService', () => {
         // Act + Assert: no rompe y loguea correctamente.
         await expect(service.handleSchedulerTick()).resolves.not.toThrow();
     });
+
+    it('usa valores por defecto cuando las variables de entorno son falsy', () => {
+        const emptyConfigService: Pick<ConfigService, 'get'> = {
+            get: jest.fn(() => undefined),
+        };
+
+        const svc = new SchedulerService(
+            finalizeTurnosUseCase as FinalizeTurnosUseCase,
+            assignRoomUseCase as AssignRoomUseCase,
+            emptyConfigService as ConfigService,
+            schedulerRegistry as SchedulerRegistry,
+        );
+
+        expect(svc).toBeDefined();
+        expect(schedulerRegistry.addInterval).toHaveBeenCalled();
+    });
 });

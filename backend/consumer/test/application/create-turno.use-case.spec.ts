@@ -82,6 +82,20 @@ describe('CreateTurnoUseCase (Application)', () => {
         expect(result.turno).toEqual(turnoCreado);
     });
 
+    it('no falla si la asignación inmediata lanza error no-Error (best-effort)', async () => {
+        turnoRepository.findActivoPorCedula.mockResolvedValue(null);
+        turnoRepository.save.mockResolvedValue(turnoCreado);
+        notificationGateway.sendNotification.mockResolvedValue(undefined);
+        (assignRoomUseCase.executeAll as jest.Mock).mockRejectedValue('string error');
+
+        await expect(
+            useCase.execute({ cedula: 12345, nombre: 'Paciente Test', priority: 'media' }),
+        ).resolves.toEqual({
+            turno: turnoCreado,
+            eventPayload: turnoCreado.toEventPayload(),
+        });
+    });
+
     it('no falla si la asignación inmediata lanza error (best-effort)', async () => {
         // Arrange: creación exitosa pero falla la asignación posterior.
         turnoRepository.findActivoPorCedula.mockResolvedValue(null);
@@ -107,5 +121,27 @@ describe('CreateTurnoUseCase (Application)', () => {
             useCase.execute({ cedula: 12345, nombre: 'Paciente Test', priority: 'media' }),
         ).rejects.toThrow('El paciente ya tiene un turno en espera o en atención');
         expect(turnoRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('usa 5 consultorios por defecto cuando la variable de entorno no existe', async () => {
+        const emptyConfigService: Pick<ConfigService, 'get'> = {
+            get: jest.fn(() => undefined),
+        };
+        const useCaseDefault = new CreateTurnoUseCase(
+            turnoRepository,
+            eventPublisher,
+            notificationGateway,
+            assignRoomUseCase as AssignRoomUseCase,
+            emptyConfigService as ConfigService,
+        );
+
+        turnoRepository.findActivoPorCedula.mockResolvedValue(null);
+        turnoRepository.save.mockResolvedValue(turnoCreado);
+        notificationGateway.sendNotification.mockResolvedValue(undefined);
+        (assignRoomUseCase.executeAll as jest.Mock).mockResolvedValue([]);
+
+        await useCaseDefault.execute({ cedula: 12345, nombre: 'Test', priority: 'media' });
+
+        expect(assignRoomUseCase.executeAll).toHaveBeenCalledWith(5);
     });
 });
