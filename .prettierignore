@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+
+# Test coverage reports
+coverage/
+
+# Lock files (formatting can corrupt these)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Markdown (preservar formato manual de docs y specs)
+*.md
+
+# Generated files
+next-env.d.ts
