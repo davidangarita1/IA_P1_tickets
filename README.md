@@ -1,4 +1,4 @@
-# IA_P1 - Sistema de Turnos Médicos en Tiempo Real
+# Sistema de Turnos Médicos en Tiempo Real
 
 Sistema para gestionar turnos médicos en tiempo real usando microservicios, mensajería asíncrona y WebSockets.
 
