@@ -799,7 +799,6 @@ frontend/src/
 ### Backend — Implementación
 
 - [x] Crear entidad `Doctor` en `domain/entities/doctor.entity.ts` con propiedades y métodos core
-- [ ] Crear Value Object `DoctorShift` para franjas horarias (`06:00-14:00`, `14:00-22:00`)
 - [x] Crear interfaz `IDoctorRepository` en `domain/ports/doctor.repository.ts`
 - [x] Crear token de inyección `DOCTOR_REPOSITORY_TOKEN` en `domain/ports/tokens.ts`
 `DoctorUpdatedEvent`, `DoctorDeletedEvent`
