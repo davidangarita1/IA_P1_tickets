@@ -958,25 +958,6 @@ frontend/src/
 - [x] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
 - [x] `test_useDoctors_hook_delete_sends_delete_request` — hook elimina
 
-### QA — Test Plan y Casos Gherkin
-
-- [ ] Ejecutar skill `/gherkin-case-generator` con la spec
-  - [ ] Mapear todos los criterios de aceptación (CRITERIO-1.1 al 4.3)
-  - [ ] Generar escenarios Gherkin en `docs/output/qa/doctors-module-gherkin.feature`
-  - [ ] Definir tabla de datos de prueba (physicians, turnos, etc.)
-- [ ] Ejecutar skill `/risk-identifier`
-  - [ ] Clasificar riesgos según regla ASD (Alto/Medio/Bajo)
-  - [ ] Identificar puntos críticos: unicidad cedula, disponibilidad franja, bloqueo de eliminación
-  - [ ] Documentar en `docs/output/qa/doctors-module-risks.md`
-- [ ] Revisar cobertura de criterios de aceptación
-  - [ ] Verificar que cada criterio tiene al menos un caso de prueba
-  - [ ] Validar que tests E2E cubren flujos críticos (crear → editar → eliminar)
-- [ ] Validar Reglas de Negocio
-  - [ ] Prueba de unicidad de cédula
-  - [ ] Prueba de unicidad de consultorio/franja
-  - [ ] Prueba de bloqueo de eliminación por turno activo
-  - [ ] Prueba de soft delete (médico no aparece pero está en BD)
-
 ### Documentación
 
 - [ ] Actualizar `README.md` del proyecto:
