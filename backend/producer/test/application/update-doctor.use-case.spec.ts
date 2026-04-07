@@ -7,6 +7,7 @@ describe('UpdateDoctorUseCase (Application)', () => {
   const mockRepository: jest.Mocked<IDoctorRepository> = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllPaginated: jest.fn(),
     findById: jest.fn(),
     findByDocumentId: jest.fn(),
     findActiveByDocumentId: jest.fn(),

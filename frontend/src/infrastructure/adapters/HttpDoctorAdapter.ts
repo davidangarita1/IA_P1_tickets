@@ -3,6 +3,8 @@ import type {
   CreateDoctorData,
   UpdateDoctorData,
   AvailableShiftsResponse,
+  PaginationParams,
+  PaginatedResult,
 } from '@/domain/Doctor';
 import type { DoctorService } from '@/domain/ports/DoctorService';
 import { getAuthCookie } from '@/infrastructure/cookies/cookieUtils';
@@ -16,8 +18,16 @@ export class HttpDoctorAdapter implements DoctorService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  async getAll(): Promise<Doctor[]> {
-    const res = await fetch(`${this.baseUrl}/api/v1/doctors`, {
+  async getAll(params?: PaginationParams): Promise<PaginatedResult<Doctor>> {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.set('page', String(params.page));
+    if (params?.limit !== undefined) query.set('limit', String(params.limit));
+
+    const url = query.toString()
+      ? `${this.baseUrl}/api/v1/doctors?${query}`
+      : `${this.baseUrl}/api/v1/doctors`;
+
+    const res = await fetch(url, {
       headers: this.buildHeaders(),
     });
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);

@@ -20,9 +20,22 @@ export interface AvailableShiftsResult {
   occupiedShifts: Shift[];
 }
 
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface IDoctorRepository {
   create(data: CreateDoctorData): Promise<Doctor>;
   findAll(): Promise<Doctor[]>;
+  findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Doctor>>;
   findById(id: string): Promise<Doctor | null>;
   findByDocumentId(documentId: string): Promise<Doctor | null>;
   findActiveByDocumentId(documentId: string): Promise<Doctor | null>;

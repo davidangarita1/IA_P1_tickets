@@ -18,6 +18,7 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
   const turnoRepository: jest.Mocked<ITurnoRepository> = {
     findAll: jest.fn(),
     findByCedula: jest.fn(),
+    findActiveByOffice: jest.fn(),
   };
 
   const mockClient: Partial<Socket> = {

@@ -3,10 +3,12 @@ import type {
   CreateDoctorData,
   UpdateDoctorData,
   AvailableShiftsResponse,
+  PaginationParams,
+  PaginatedResult,
 } from '@/domain/Doctor';
 
 export interface DoctorService {
-  getAll(): Promise<Doctor[]>;
+  getAll(params?: PaginationParams): Promise<PaginatedResult<Doctor>>;
   create(data: CreateDoctorData): Promise<Doctor>;
   update(id: string, data: UpdateDoctorData): Promise<Doctor>;
   remove(id: string): Promise<void>;

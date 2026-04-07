@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import type { Doctor, CreateDoctorData, UpdateDoctorData } from '@/domain/Doctor';
+import type { Doctor, CreateDoctorData, UpdateDoctorData, PaginationParams, PaginatedResult } from '@/domain/Doctor';
 import type { DoctorService } from '@/domain/ports/DoctorService';
 
 function mapError(err: unknown): string {
@@ -13,8 +13,9 @@ function mapError(err: unknown): string {
   return 'Error al cargar médicos.';
 }
 
-export function useDoctors(doctorService: DoctorService) {
+export function useDoctors(doctorService: DoctorService, pagination?: PaginationParams) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,14 +23,15 @@ export function useDoctors(doctorService: DoctorService) {
     setLoading(true);
     setError(null);
     try {
-      const result = await doctorService.getAll();
-      setDoctors(result);
+      const result: PaginatedResult<Doctor> = await doctorService.getAll(pagination);
+      setDoctors(result.data);
+      setTotal(result.total);
     } catch (err: unknown) {
       setError(mapError(err));
     } finally {
       setLoading(false);
     }
-  }, [doctorService]);
+  }, [doctorService, pagination]);
 
   useEffect(() => {
     loadDoctors();
@@ -60,5 +62,5 @@ export function useDoctors(doctorService: DoctorService) {
     await loadDoctors();
   }, [loadDoctors]);
 
-  return { doctors, loading, error, create, update, remove, refresh };
+  return { doctors, total, loading, error, create, update, remove, refresh };
 }

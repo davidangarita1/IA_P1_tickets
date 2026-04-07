@@ -7,6 +7,8 @@ import {
   CreateDoctorData,
   UpdateDoctorData,
   AvailableShiftsResult,
+  PaginationParams,
+  PaginatedResult,
 } from '../../domain/ports/doctor.repository';
 import { Doctor, Shift, VALID_SHIFTS } from '../../domain/entities/doctor.entity';
 
@@ -24,6 +26,20 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
   async findAll(): Promise<Doctor[]> {
     const docs = await this.doctorModel.find({ status: 'active' }).exec();
     return docs.map((doc) => this.toDomain(doc));
+  }
+
+  async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Doctor>> {
+    const skip = (params.page - 1) * params.limit;
+    const [docs, total] = await Promise.all([
+      this.doctorModel.find({ status: 'active' }).skip(skip).limit(params.limit).exec(),
+      this.doctorModel.countDocuments({ status: 'active' }).exec(),
+    ]);
+    return {
+      data: docs.map((doc) => this.toDomain(doc)),
+      total,
+      page: params.page,
+      limit: params.limit,
+    };
   }
 
   async findByDocumentId(documentId: string): Promise<Doctor | null> {

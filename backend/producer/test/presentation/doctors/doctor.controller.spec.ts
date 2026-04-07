@@ -56,14 +56,28 @@ describe('DoctorController (Presentation)', () => {
     expect(result).toEqual(doctor);
   });
 
-  it('returns all active doctors', async () => {
+  it('returns paginated active doctors with default params', async () => {
     const doctors = [makeDoctor()];
-    (getAllDoctorsUseCase.execute as jest.Mock).mockResolvedValue(doctors);
+    const paginatedResult = { data: doctors, total: 1, page: 1, limit: 25 };
+    (getAllDoctorsUseCase.execute as jest.Mock).mockResolvedValue(paginatedResult);
 
-    const result = await controller.getAllDoctors();
+    const result = await controller.getAllDoctors(undefined, undefined);
 
-    expect(getAllDoctorsUseCase.execute).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(doctors);
+    expect(getAllDoctorsUseCase.execute).toHaveBeenCalledWith({
+      page: undefined,
+      limit: undefined,
+    });
+    expect(result).toEqual(paginatedResult);
+  });
+
+  it('passes page and limit query params to use case', async () => {
+    const paginatedResult = { data: [], total: 0, page: 2, limit: 10 };
+    (getAllDoctorsUseCase.execute as jest.Mock).mockResolvedValue(paginatedResult);
+
+    const result = await controller.getAllDoctors('2', '10');
+
+    expect(getAllDoctorsUseCase.execute).toHaveBeenCalledWith({ page: 2, limit: 10 });
+    expect(result).toEqual(paginatedResult);
   });
 
   it('returns available shifts for an office', async () => {

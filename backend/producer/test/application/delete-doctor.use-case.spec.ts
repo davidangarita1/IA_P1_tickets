@@ -9,6 +9,7 @@ describe('DeleteDoctorUseCase (Application)', () => {
   const mockDoctorRepository: jest.Mocked<IDoctorRepository> = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllPaginated: jest.fn(),
     findById: jest.fn(),
     findByDocumentId: jest.fn(),
     findActiveByDocumentId: jest.fn(),
