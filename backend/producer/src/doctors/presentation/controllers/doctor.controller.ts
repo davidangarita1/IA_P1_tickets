@@ -31,6 +31,7 @@ import { DeleteDoctorUseCase } from '../../application/use-cases/delete-doctor.u
 import { AuthGuard } from '../../../presentation/auth.guard';
 import { DoctorRoleGuard } from '../guards/doctor-role.guard';
 import { Doctor } from '../../domain/entities/doctor.entity';
+import { PaginatedResult } from '../../domain/ports/doctor.repository';
 
 @ApiTags('Doctors')
 @ApiBearerAuth()
@@ -60,10 +61,18 @@ export class DoctorController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar médicos activos' })
-  @ApiResponse({ status: 200, description: 'Lista de médicos activos' })
-  async getAllDoctors(): Promise<Doctor[]> {
-    return this.getAllDoctorsUseCase.execute();
+  @ApiOperation({ summary: 'Listar médicos activos con paginación' })
+  @ApiQuery({ name: 'page', required: false, description: 'Número de página (default: 1)', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Resultados por página (default: 25, max: 100)', type: Number })
+  @ApiResponse({ status: 200, description: 'Lista paginada de médicos activos' })
+  async getAllDoctors(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ): Promise<PaginatedResult<Doctor>> {
+    return this.getAllDoctorsUseCase.execute({
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+    });
   }
 
   @Get('available-shifts')

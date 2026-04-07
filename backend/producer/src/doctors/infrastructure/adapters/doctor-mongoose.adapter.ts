@@ -7,10 +7,10 @@ import {
   CreateDoctorData,
   UpdateDoctorData,
   AvailableShiftsResult,
+  PaginationParams,
+  PaginatedResult,
 } from '../../domain/ports/doctor.repository';
-import { Doctor, Shift } from '../../domain/entities/doctor.entity';
-
-const ALL_SHIFTS: Shift[] = ['06:00-14:00', '14:00-22:00'];
+import { Doctor, Shift, VALID_SHIFTS } from '../../domain/entities/doctor.entity';
 
 @Injectable()
 export class DoctorMongooseAdapter implements IDoctorRepository {
@@ -28,8 +28,27 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
     return docs.map((doc) => this.toDomain(doc));
   }
 
+  async findAllPaginated(params: PaginationParams): Promise<PaginatedResult<Doctor>> {
+    const skip = (params.page - 1) * params.limit;
+    const [docs, total] = await Promise.all([
+      this.doctorModel.find({ status: 'active' }).skip(skip).limit(params.limit).exec(),
+      this.doctorModel.countDocuments({ status: 'active' }).exec(),
+    ]);
+    return {
+      data: docs.map((doc) => this.toDomain(doc)),
+      total,
+      page: params.page,
+      limit: params.limit,
+    };
+  }
+
   async findByDocumentId(documentId: string): Promise<Doctor | null> {
     const doc = await this.doctorModel.findOne({ documentId }).exec();
+    return doc ? this.toDomain(doc) : null;
+  }
+
+  async findActiveByDocumentId(documentId: string): Promise<Doctor | null> {
+    const doc = await this.doctorModel.findOne({ documentId, status: 'active' }).exec();
     return doc ? this.toDomain(doc) : null;
   }
 
@@ -54,7 +73,7 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
 
     const docs = await this.doctorModel.find(query).exec();
     const occupiedShifts = docs.map((doc) => doc.shift as Shift);
-    const availableShifts = ALL_SHIFTS.filter((s) => !occupiedShifts.includes(s));
+    const availableShifts = VALID_SHIFTS.filter((s) => !occupiedShifts.includes(s));
 
     return { availableShifts, occupiedShifts };
   }

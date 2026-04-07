@@ -1,4 +1,5 @@
 export type Shift = '06:00-14:00' | '14:00-22:00';
+export const VALID_SHIFTS: readonly Shift[] = ['06:00-14:00', '14:00-22:00'];
 export type DoctorStatus = 'active' | 'inactive';
 
 export interface Doctor {
@@ -30,4 +31,16 @@ export interface AvailableShiftsResponse {
   office: string;
   availableShifts: Shift[];
   occupiedShifts: Shift[];
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
 }

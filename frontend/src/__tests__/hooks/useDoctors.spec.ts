@@ -1,18 +1,19 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useDoctors } from '@/hooks/useDoctors';
-import { mockDoctorService, buildDoctor } from '../mocks/factories';
+import { mockDoctorService, buildDoctor, buildPaginatedDoctors } from '../mocks/factories';
 
 describe('useDoctors', () => {
-  it('starts with empty doctors and no error', () => {
+  it('starts with empty doctors, total 0 and no error', () => {
     const service = mockDoctorService([]);
 
     const { result } = renderHook(() => useDoctors(service));
 
     expect(result.current.doctors).toEqual([]);
+    expect(result.current.total).toBe(0);
     expect(result.current.error).toBeNull();
   });
 
-  it('loads doctors on mount', async () => {
+  it('loads doctors on mount and exposes total', async () => {
     const doctor = buildDoctor();
     const service = mockDoctorService([doctor]);
 
@@ -21,12 +22,23 @@ describe('useDoctors', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.doctors).toHaveLength(1);
+    expect(result.current.total).toBe(1);
     expect(result.current.doctors[0]).toEqual(doctor);
     expect(service.getAll).toHaveBeenCalledTimes(1);
   });
 
+  it('passes pagination params to doctorService.getAll', async () => {
+    const service = mockDoctorService([]);
+    const pagination = { page: 2, limit: 10 };
+
+    const { result } = renderHook(() => useDoctors(service, pagination));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(service.getAll).toHaveBeenCalledWith(pagination);
+  });
+
   it('sets loading to true while fetching', async () => {
-    let resolveGetAll!: (val: ReturnType<typeof buildDoctor>[]) => void;
+    let resolveGetAll!: (val: ReturnType<typeof buildPaginatedDoctors>) => void;
     const service = mockDoctorService([]);
     service.getAll.mockReturnValueOnce(
       new Promise((res) => {
@@ -39,7 +51,7 @@ describe('useDoctors', () => {
     expect(result.current.loading).toBe(true);
 
     await act(async () => {
-      resolveGetAll([]);
+      resolveGetAll(buildPaginatedDoctors([]));
     });
 
     expect(result.current.loading).toBe(false);
@@ -54,6 +66,28 @@ describe('useDoctors', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.error).toBe('No autorizado. Inicie sesión nuevamente.');
+  });
+
+  it('sets error when getAll throws HTTP_ERROR_403', async () => {
+    const service = mockDoctorService();
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_403'));
+
+    const { result } = renderHook(() => useDoctors(service));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBe('No tiene permisos para realizar esta acción.');
+  });
+
+  it('sets error when getAll throws HTTP_ERROR_409', async () => {
+    const service = mockDoctorService();
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_409'));
+
+    const { result } = renderHook(() => useDoctors(service));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBe('Conflicto con los datos existentes. Verifique la información.');
   });
 
   it('sets error when getAll throws HTTP_ERROR_500', async () => {
@@ -112,13 +146,14 @@ describe('useDoctors', () => {
     expect(result.current.doctors).toHaveLength(0);
 
     const newDoctor = buildDoctor();
-    service.getAll.mockResolvedValueOnce([newDoctor]);
+    service.getAll.mockResolvedValueOnce(buildPaginatedDoctors([newDoctor]));
 
     await act(async () => {
       await result.current.refresh();
     });
 
     expect(result.current.doctors).toHaveLength(1);
+    expect(result.current.total).toBe(1);
     expect(result.current.doctors[0]).toEqual(newDoctor);
   });
 
@@ -130,7 +165,7 @@ describe('useDoctors', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).not.toBeNull();
 
-    service.getAll.mockResolvedValueOnce([]);
+    service.getAll.mockResolvedValueOnce(buildPaginatedDoctors([]));
 
     await act(async () => {
       await result.current.refresh();

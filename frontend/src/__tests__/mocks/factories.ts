@@ -8,7 +8,7 @@ import type { CreateTicketResponse } from '@/domain/CreateTicket';
 import type { User, UserRole } from '@/domain/User';
 import type { AuthResult } from '@/domain/AuthCredentials';
 import type { AuthService } from '@/domain/ports/AuthService';
-import type { Doctor } from '@/domain/Doctor';
+import type { Doctor, PaginatedResult } from '@/domain/Doctor';
 import type { DoctorService } from '@/domain/ports/DoctorService';
 
 let idCounter = 0;
@@ -139,9 +139,22 @@ export function buildDoctor(overrides: Partial<Doctor> = {}): Doctor {
   };
 }
 
+export function buildPaginatedDoctors(
+  doctors: Doctor[],
+  overrides: Partial<PaginatedResult<Doctor>> = {},
+): PaginatedResult<Doctor> {
+  return {
+    data: doctors,
+    total: doctors.length,
+    page: 1,
+    limit: 25,
+    ...overrides,
+  };
+}
+
 export function mockDoctorService(doctors: Doctor[] = []): jest.Mocked<DoctorService> {
   return {
-    getAll: jest.fn().mockResolvedValue(doctors),
+    getAll: jest.fn().mockResolvedValue(buildPaginatedDoctors(doctors)),
     create: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     update: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     remove: jest.fn().mockResolvedValue(undefined),

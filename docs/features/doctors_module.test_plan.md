@@ -87,8 +87,9 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-CM-09 | Cédula vacía impide guardar | Modal abierto | Hacer foco en cédula y salir sin escribir | Mensaje "El número de cédula es obligatorio"; "Guardar" deshabilitado |
 | TC-CM-10 | Nombre vacío impide guardar | Modal abierto | Hacer foco en nombre y salir sin escribir | Mensaje "El nombre completo es obligatorio"; "Guardar" deshabilitado |
 | TC-CM-11 | Nombre con menos de 3 caracteres impide guardar | Modal abierto | Escribir "Ju" en nombre | Mensaje "El nombre completo debe tener al menos 3 caracteres"; "Guardar" deshabilitado |
-| TC-CM-12 | Cédula duplicada muestra alerta | Existe médico con cédula "12345678" | Escribir "12345678" en cédula, nombre "Pedro", clic en "Guardar" | Mensaje flotante "Ya existe un médico registrado con ese número de cédula"; modal permanece abierto |
+| TC-CM-12 | Cédula de médico activo duplicada muestra alerta | Existe médico activo con cédula "12345678" | Escribir "12345678" en cédula, nombre "Pedro", clic en "Guardar" | Mensaje flotante "Ya existe un médico registrado con ese número de cédula"; modal permanece abierto |
 | TC-CM-13 | Consultorio sin franja horaria impide guardar | Modal abierto | Seleccionar consultorio "2", dejar franja sin seleccionar | Mensaje "La franja horaria es obligatoria cuando se asigna un consultorio"; "Guardar" deshabilitado |
+| TC-CM-14 | Cédula de médico inactivo permite crear nuevo médico | Existe médico inactivo con cédula "12345678", no hay médico activo con esa cédula | Escribir "12345678" en cédula, nombre "Ana Reyes", clic en "Guardar" | Médico "Dr. Ana Reyes" aparece en la tabla; mensaje de éxito visible |
 
 ### Suite 3 — Edición de médico (HU-03)
 

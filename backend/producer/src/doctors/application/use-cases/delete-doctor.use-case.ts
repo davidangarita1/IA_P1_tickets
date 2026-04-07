@@ -17,14 +17,9 @@ export class DeleteDoctorUseCase {
     }
 
     if (doctor.office) {
-      const turnos = await this.turnoRepository.findAll();
-      const hasActiveTurno = turnos.some(
-        (turno) =>
-          turno.consultorio === doctor.office &&
-          (turno.estado === 'llamado' || turno.estado === 'atendido'),
-      );
+      const activeTurnos = await this.turnoRepository.findActiveByOffice(doctor.office);
 
-      if (hasActiveTurno) {
+      if (activeTurnos.length > 0) {
         throw new ConflictException(
           'No se puede dar de baja a un médico que se encuentra atendiendo un turno en este momento',
         );

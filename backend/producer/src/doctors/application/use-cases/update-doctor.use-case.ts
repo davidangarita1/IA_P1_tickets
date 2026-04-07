@@ -38,7 +38,7 @@ export class UpdateDoctorUseCase {
     }
 
     if (data.documentId && data.documentId !== existing.documentId) {
-      const duplicate = await this.doctorRepository.findByDocumentId(data.documentId);
+      const duplicate = await this.doctorRepository.findActiveByDocumentId(data.documentId);
       if (duplicate) {
         throw new ConflictException('Ya existe un médico registrado con ese número de cédula');
       }

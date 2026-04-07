@@ -9,8 +9,10 @@ describe('DeleteDoctorUseCase (Application)', () => {
   const mockDoctorRepository: jest.Mocked<IDoctorRepository> = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllPaginated: jest.fn(),
     findById: jest.fn(),
     findByDocumentId: jest.fn(),
+    findActiveByDocumentId: jest.fn(),
     findByOfficeAndShift: jest.fn(),
     findAvailableShifts: jest.fn(),
     update: jest.fn(),
@@ -20,6 +22,7 @@ describe('DeleteDoctorUseCase (Application)', () => {
   const mockTurnoRepository: jest.Mocked<ITurnoRepository> = {
     findAll: jest.fn(),
     findByCedula: jest.fn(),
+    findActiveByOffice: jest.fn(),
   };
 
   let useCase: DeleteDoctorUseCase;
@@ -43,7 +46,7 @@ describe('DeleteDoctorUseCase (Application)', () => {
       nombre: 'Paciente Uno',
       cedula: 11111111,
       consultorio: '2',
-      estado: 'espera',
+      estado: 'llamado',
       priority: 'media',
       timestamp: Date.now(),
       ...overrides,
@@ -54,31 +57,30 @@ describe('DeleteDoctorUseCase (Application)', () => {
     useCase = new DeleteDoctorUseCase(mockDoctorRepository, mockTurnoRepository);
   });
 
-  it('soft deletes a doctor without active turnos', async () => {
+  it('soft deletes a doctor when no active turnos exist in the office', async () => {
     const doctor = makeDoctor();
     const deletedDoctor = makeDoctor({ status: 'inactive' });
     mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '2', estado: 'espera' }),
-    ]);
+    mockTurnoRepository.findActiveByOffice.mockResolvedValue([]);
     mockDoctorRepository.softDelete.mockResolvedValue(deletedDoctor);
 
     await useCase.execute('doc-1');
 
     expect(mockDoctorRepository.findById).toHaveBeenCalledWith('doc-1');
+    expect(mockTurnoRepository.findActiveByOffice).toHaveBeenCalledWith('2');
     expect(mockDoctorRepository.softDelete).toHaveBeenCalledWith('doc-1');
   });
 
-  it('soft deletes a doctor when no turnos exist', async () => {
+  it('uses DB-level filtering and does not call findAll', async () => {
     const doctor = makeDoctor();
     const deletedDoctor = makeDoctor({ status: 'inactive' });
     mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([]);
+    mockTurnoRepository.findActiveByOffice.mockResolvedValue([]);
     mockDoctorRepository.softDelete.mockResolvedValue(deletedDoctor);
 
     await useCase.execute('doc-1');
 
-    expect(mockDoctorRepository.softDelete).toHaveBeenCalledWith('doc-1');
+    expect(mockTurnoRepository.findAll).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundException when doctor does not exist', async () => {
@@ -87,11 +89,11 @@ describe('DeleteDoctorUseCase (Application)', () => {
     await expect(useCase.execute('non-existent')).rejects.toThrow(NotFoundException);
   });
 
-  it('throws ConflictException when doctor has a turno in llamado state', async () => {
+  it('throws ConflictException when findActiveByOffice returns a turno in llamado state', async () => {
     const doctor = makeDoctor();
     mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '2', estado: 'llamado' }),
+    mockTurnoRepository.findActiveByOffice.mockResolvedValue([
+      makeTurno({ estado: 'llamado' }),
     ]);
 
     await expect(useCase.execute('doc-1')).rejects.toThrow(ConflictException);
@@ -100,56 +102,26 @@ describe('DeleteDoctorUseCase (Application)', () => {
     );
   });
 
-  it('throws ConflictException when doctor has a turno in atendido state', async () => {
+  it('throws ConflictException when findActiveByOffice returns a turno in atendido state', async () => {
     const doctor = makeDoctor();
     mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '2', estado: 'atendido' }),
+    mockTurnoRepository.findActiveByOffice.mockResolvedValue([
+      makeTurno({ estado: 'atendido' }),
     ]);
 
     await expect(useCase.execute('doc-1')).rejects.toThrow(ConflictException);
-  });
-
-  it('allows deletion when doctor office has only espera turnos', async () => {
-    const doctor = makeDoctor();
-    const deletedDoctor = makeDoctor({ status: 'inactive' });
-    mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '2', estado: 'espera' }),
-      makeTurno({ consultorio: '2', estado: 'espera' }),
-    ]);
-    mockDoctorRepository.softDelete.mockResolvedValue(deletedDoctor);
-
-    await useCase.execute('doc-1');
-
-    expect(mockDoctorRepository.softDelete).toHaveBeenCalledWith('doc-1');
-  });
-
-  it('allows deletion when active turnos are in a different office', async () => {
-    const doctor = makeDoctor({ office: '2' });
-    const deletedDoctor = makeDoctor({ status: 'inactive' });
-    mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '5', estado: 'llamado' }),
-    ]);
-    mockDoctorRepository.softDelete.mockResolvedValue(deletedDoctor);
-
-    await useCase.execute('doc-1');
-
-    expect(mockDoctorRepository.softDelete).toHaveBeenCalledWith('doc-1');
   });
 
   it('allows deletion when doctor has no office assigned', async () => {
     const doctor = makeDoctor({ office: null, shift: null });
     const deletedDoctor = makeDoctor({ status: 'inactive', office: null, shift: null });
     mockDoctorRepository.findById.mockResolvedValue(doctor);
-    mockTurnoRepository.findAll.mockResolvedValue([
-      makeTurno({ consultorio: '2', estado: 'llamado' }),
-    ]);
     mockDoctorRepository.softDelete.mockResolvedValue(deletedDoctor);
 
     await useCase.execute('doc-1');
 
+    expect(mockTurnoRepository.findActiveByOffice).not.toHaveBeenCalled();
     expect(mockDoctorRepository.softDelete).toHaveBeenCalledWith('doc-1');
   });
 });
+

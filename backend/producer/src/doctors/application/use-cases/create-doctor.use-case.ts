@@ -23,7 +23,7 @@ export class CreateDoctorUseCase {
       );
     }
 
-    const existing = await this.doctorRepository.findByDocumentId(data.documentId);
+    const existing = await this.doctorRepository.findActiveByDocumentId(data.documentId);
     if (existing) {
       throw new ConflictException('Ya existe un médico registrado con ese número de cédula');
     }

@@ -154,13 +154,22 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Entonces el botón "Guardar" permanece deshabilitado
   Y aparece el mensaje "La franja horaria es obligatoria cuando se asigna un consultorio" debajo del campo
 
-- **Escenario:** No se puede crear un médico con un número de cédula que ya existe
+- **Escenario:** No se puede crear un médico con un número de cédula que ya existe en un médico activo
   Dado que el modal de creación está abierto
-  Y ya existe un médico con el Número de cédula “12345678”
-  Cuando el usuario “Empleado/Administrador” escribe “12345678” en el campo “Número de cédula” y el texto “Pedro” en el campo “Nombre completo”
-  Y hace clic en el botón “Guardar”
-  Entonces aparece el mensaje flotante de alerta ”Ya existe un médico registrado con ese número de cédula” por 5 segundos
+  Y ya existe un médico activo con el Número de cédula "12345678"
+  Cuando el usuario "Empleado/Administrador" escribe "12345678" en el campo "Número de cédula" y el texto "Pedro" en el campo "Nombre completo"
+  Y hace clic en el botón "Guardar"
+  Entonces aparece el mensaje flotante de alerta "Ya existe un médico registrado con ese número de cédula" por 5 segundos
   Y el modal permanece abierto
+
+- **Escenario:** Se puede crear un médico con la cédula de un médico previamente dado de baja
+  Dado que el modal de creación está abierto
+  Y existe un médico con Número de cédula "12345678" pero con estado "inactivo" (dado de baja anteriormente)
+  Cuando el usuario "Empleado/Administrador" escribe "12345678" en el campo "Número de cédula" y el nombre "Ana Reyes" en el campo "Nombre completo"
+  Y hace clic en el botón "Guardar"
+  Entonces el modal se cierra
+  Y aparece el mensaje flotante "Médico guardado exitosamente"
+  Y el médico "Dr. Ana Reyes" con cédula "12345678" aparece en la tabla de médicos activos
 
 ### HU-03 (Refinada): Editar un médico creado
 
