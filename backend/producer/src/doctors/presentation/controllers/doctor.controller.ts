@@ -8,12 +8,13 @@ import { GetAvailableShiftsUseCase, AvailableShiftsResponse } from '../../applic
 import { UpdateDoctorUseCase } from '../../application/use-cases/update-doctor.use-case';
 import { DeleteDoctorUseCase } from '../../application/use-cases/delete-doctor.use-case';
 import { AuthGuard } from '../../../presentation/auth.guard';
+import { DoctorRoleGuard } from '../guards/doctor-role.guard';
 import { Doctor } from '../../domain/entities/doctor.entity';
 
 @ApiTags('Doctors')
 @ApiBearerAuth()
 @Controller('api/v1/doctors')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, DoctorRoleGuard)
 export class DoctorController {
     constructor(
         private readonly createDoctorUseCase: CreateDoctorUseCase,

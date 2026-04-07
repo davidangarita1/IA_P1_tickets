@@ -10,6 +10,7 @@ import { UpdateDoctorUseCase } from './application/use-cases/update-doctor.use-c
 import { DeleteDoctorUseCase } from './application/use-cases/delete-doctor.use-case';
 import { DoctorController } from './presentation/controllers/doctor.controller';
 import { AuthGuard } from '../presentation/auth.guard';
+import { DoctorRoleGuard } from './presentation/guards/doctor-role.guard';
 import { HmacTokenService } from '../infrastructure/adapters/hmac-token.service';
 import { TurnosModule } from '../turnos/turnos.module';
 
@@ -38,6 +39,7 @@ import { TurnosModule } from '../turnos/turnos.module';
             useExisting: TOKEN_SERVICE_TOKEN,
         },
         AuthGuard,
+        DoctorRoleGuard,
     ],
     exports: [DOCTOR_REPOSITORY_TOKEN],
 })
