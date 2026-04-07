@@ -1,5 +1,6 @@
 export type DoctorStatus = 'active' | 'inactive';
 export type Shift = '06:00-14:00' | '14:00-22:00';
+export const VALID_SHIFTS: readonly Shift[] = ['06:00-14:00', '14:00-22:00'];
 
 export class Doctor {
   readonly _id: string;

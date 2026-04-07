@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { DoctorStatus, Shift } from '../../domain/entities/doctor.entity';
+import { DoctorStatus, Shift, VALID_SHIFTS } from '../../domain/entities/doctor.entity';
 
 export type DoctorDocument = HydratedDocument<DoctorSchemaClass> & {
   createdAt: Date;
@@ -18,7 +18,7 @@ export class DoctorSchemaClass {
   @Prop({ default: null })
   office: string | null;
 
-  @Prop({ default: null, enum: ['06:00-14:00', '14:00-22:00', null] })
+  @Prop({ default: null, enum: [...VALID_SHIFTS, null] })
   shift: Shift | null;
 
   @Prop({ default: 'active', enum: ['active', 'inactive'] })

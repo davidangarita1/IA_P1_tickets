@@ -8,9 +8,7 @@ import {
   UpdateDoctorData,
   AvailableShiftsResult,
 } from '../../domain/ports/doctor.repository';
-import { Doctor, Shift } from '../../domain/entities/doctor.entity';
-
-const ALL_SHIFTS: Shift[] = ['06:00-14:00', '14:00-22:00'];
+import { Doctor, Shift, VALID_SHIFTS } from '../../domain/entities/doctor.entity';
 
 @Injectable()
 export class DoctorMongooseAdapter implements IDoctorRepository {
@@ -54,7 +52,7 @@ export class DoctorMongooseAdapter implements IDoctorRepository {
 
     const docs = await this.doctorModel.find(query).exec();
     const occupiedShifts = docs.map((doc) => doc.shift as Shift);
-    const availableShifts = ALL_SHIFTS.filter((s) => !occupiedShifts.includes(s));
+    const availableShifts = VALID_SHIFTS.filter((s) => !occupiedShifts.includes(s));
 
     return { availableShifts, occupiedShifts };
   }
