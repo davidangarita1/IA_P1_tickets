@@ -72,8 +72,36 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     });
   });
 
+  it('hace broadcast con consultorio null sin fallar', () => {
+    const turnoSinConsultorio = new Turno({
+      id: 't2',
+      nombre: 'Paciente B',
+      cedula: 456,
+      consultorio: null,
+      estado: 'espera',
+      priority: 'media',
+      timestamp: 200,
+      finAtencionAt: null,
+    });
+    const payload = turnoSinConsultorio.toEventPayload();
+
+    gateway.broadcastTurnoActualizado(payload);
+
+    expect(mockServer.emit).toHaveBeenCalledWith('TURNO_ACTUALIZADO', {
+      type: 'TURNO_ACTUALIZADO',
+      data: payload,
+    });
+  });
+
   it('no falla si el repositorio lanza error al conectar cliente', async () => {
     turnoRepository.findAll.mockRejectedValue(new Error('DB connection lost'));
+
+    await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
+    expect(mockClient.emit).not.toHaveBeenCalled();
+  });
+
+  it('maneja error no-instancia de Error al conectar cliente', async () => {
+    turnoRepository.findAll.mockRejectedValue('string error');
 
     await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
     expect(mockClient.emit).not.toHaveBeenCalled();

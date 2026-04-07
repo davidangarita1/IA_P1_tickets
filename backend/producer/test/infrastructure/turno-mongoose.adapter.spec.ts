@@ -81,4 +81,34 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
       await expect(adapter.findByCedula(cedula)).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('findActiveByOffice', () => {
+    it('returns active turnos for a given office', async () => {
+      const docs = [
+        mockTurnoDoc({ consultorio: '3', estado: 'llamado' }),
+        mockTurnoDoc({ _id: 'turno-id-2', consultorio: '3', estado: 'atendido' }),
+      ];
+      mockModel.find.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(docs),
+      });
+
+      const result = await adapter.findActiveByOffice('3');
+
+      expect(result).toHaveLength(2);
+      expect(mockModel.find).toHaveBeenCalledWith({
+        consultorio: '3',
+        estado: { $in: ['llamado', 'atendido'] },
+      });
+    });
+
+    it('returns empty array when no active turnos exist for the office', async () => {
+      mockModel.find.mockReturnValue({
+        exec: jest.fn().mockResolvedValue([]),
+      });
+
+      const result = await adapter.findActiveByOffice('9');
+
+      expect(result).toHaveLength(0);
+    });
+  });
 });
