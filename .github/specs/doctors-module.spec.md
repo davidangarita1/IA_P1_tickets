@@ -826,8 +826,8 @@ frontend/src/
   - [x] Registrar controller
   - [x] Exportar `DOCTOR_REPOSITORY_TOKEN` para tests
 - [x] Registrar `DoctorsModule` en `app.module.ts`
-- [ ] Agregar tag "Doctors" en Swagger de `main.ts`
-- [ ] Validar que todos los endpoints aparecen en OpenAPI
+- [x] Agregar tag "Doctors" en Swagger de `main.ts`
+- [x] Validar que todos los endpoints aparecen en OpenAPI
 
 ### Backend — Validaciones y Reglas
 
@@ -867,16 +867,16 @@ frontend/src/
 ### Frontend — Página y Componentes
 
 - [x] Crear `DoctorsPage` (app/doctors/page.tsx) con ProtectedRoute
-- [ ] Crear `DoctorTable` componente que:
-  - [ ] Renderiza tabla con columnas: Nombre (Dr. Nombre), Cédula, Consultorio, Franja, Acciones
-  - [ ] Muestra "No hay médicos creados" cuando lista vacía
-  - [ ] Tiene ícono de edición (lápiz) en cada fila
-  - [ ] Tiene ícono de eliminación (basura) en cada fila
-  - [ ] State loading/error con skeleton o spinner
-  - [ ] Botón "Crear médico" en superior derecha
+- [x] Crear `DoctorTable` componente que:
+  - [x] Renderiza tabla con columnas: Nombre (Dr. Nombre), Cédula, Consultorio, Franja, Acciones
+  - [x] Muestra "No hay médicos creados" cuando lista vacía
+  - [x] Tiene ícono de edición (lápiz) en cada fila
+  - [x] Tiene ícono de eliminación (basura) en cada fila
+  - [x] State loading/error con skeleton o spinner
+  - [x] Botón "Crear médico" en superior derecha
 - [x] Crear `DoctorFormModal` que:
   - [x] Modo create: campos vacíos, botones "Cerrar" y "Guardar"
-  - [ ] Modo edit: campos precargados con datos del médico, mismos botones
+  - [x] Modo edit: campos precargados con datos del médico, mismos botones
   - [x] Campo nombre: validación mín. 3 caracteres en tiempo real, mensaje de error
   - [x] Campo cédula: acepta solo números 7-10 dígitos, validación en tiempo real
   - [x] Desplegable consultorio: solo consultorios válidos
@@ -908,7 +908,7 @@ frontend/src/
 - [x] Crear `services/doctorService.ts` con funciones:
   - [x] `getAllDoctors(token, page?, limit?)` — GET /api/v1/doctors
   - [x] `createDoctor(data, token)` — POST /api/v1/doctors
-  - [ ] `updateDoctor(doctorId, data, token)` — PUT /api/v1/doctors/{id}
+  - [x] `updateDoctor(doctorId, data, token)` — PUT /api/v1/doctors/{id}
   - [x] `deleteDoctor(doctorId, token)` — DELETE /api/v1/doctors/{id}
   - [x] `getAvailableShifts(consultorio, excludeDoctorId?, token)` — GET /api/v1/doctors/available-shifts
   - [x] Manejo de errores: lanzar excepciones descriptivas
@@ -937,12 +937,12 @@ frontend/src/
 
 ### Frontend — Tests
 
-- [ ] `test_DoctorTable_renders_list_correctly` — tabla renderiza médicos
-- [ ] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
-- [ ] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
+- [x] `test_DoctorTable_renders_list_correctly` — tabla renderiza médicos
+- [x] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
+- [x] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
 - [ ] `test_DoctorTable_delete_icon_opens_confirm_modal` — ícono eliminación abre confirm
 - [x] `test_DoctorFormModal_mode_create_shows_empty_fields` — modal create campos vacíos
-- [ ] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
+- [x] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
 - [x] `test_DoctorFormModal_cedula_field_only_accepts_numbers` — validación cedula
 - [x] `test_DoctorFormModal_nombre_field_min_3_chars` — validación nombre
 - [x] `test_DoctorFormModal_submit_success_shows_toast` — submit exitoso muestra toast
@@ -950,12 +950,12 @@ frontend/src/
 - [x] `test_DoctorFormModal_close_without_save` — cerrar sin guardar
 - [x] `test_ConfirmDeleteModal_confirm_deletes_doctor` — confirmar elimina
 - [x] `test_ConfirmDeleteModal_cancel_closes_modal` — cancelar cierra
-- [ ] `test_Navbar_button_visible_when_authenticated` — botón visible autenticado
-- [ ] `test_Navbar_button_hidden_when_not_authenticated` — botón oculto no autenticado
-- [ ] `test_Navbar_button_navigates_to_doctors_page` — botón navega a /doctors
+- [x] `test_Navbar_button_visible_when_authenticated` — botón visible autenticado
+- [x] `test_Navbar_button_hidden_when_not_authenticated` — botón oculto no autenticado
+- [x] `test_Navbar_button_navigates_to_doctors_page` — botón navega a /doctors
 - [x] `test_useDoctors_hook_loads_data_on_mount` — hook carga doctors
 - [x] `test_useDoctors_hook_create_sends_post_request` — hook crea
-- [ ] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
+- [x] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
 - [x] `test_useDoctors_hook_delete_sends_delete_request` — hook elimina
 
 ### QA — Test Plan y Casos Gherkin
