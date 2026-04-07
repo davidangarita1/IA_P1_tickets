@@ -56,6 +56,28 @@ describe('useDoctors', () => {
     expect(result.current.error).toBe('No autorizado. Inicie sesión nuevamente.');
   });
 
+  it('sets error when getAll throws HTTP_ERROR_403', async () => {
+    const service = mockDoctorService();
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_403'));
+
+    const { result } = renderHook(() => useDoctors(service));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBe('No tiene permisos para realizar esta acción.');
+  });
+
+  it('sets error when getAll throws HTTP_ERROR_409', async () => {
+    const service = mockDoctorService();
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_409'));
+
+    const { result } = renderHook(() => useDoctors(service));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBe('Conflicto con los datos existentes. Verifique la información.');
+  });
+
   it('sets error when getAll throws HTTP_ERROR_500', async () => {
     const service = mockDoctorService();
     service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_500'));

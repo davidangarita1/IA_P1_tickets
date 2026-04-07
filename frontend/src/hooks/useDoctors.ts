@@ -7,6 +7,8 @@ import type { DoctorService } from '@/domain/ports/DoctorService';
 function mapError(err: unknown): string {
   const message = err instanceof Error ? err.message : '';
   if (message.includes('401')) return 'No autorizado. Inicie sesión nuevamente.';
+  if (message.includes('403')) return 'No tiene permisos para realizar esta acción.';
+  if (message.includes('409')) return 'Conflicto con los datos existentes. Verifique la información.';
   if (message.includes('500')) return 'Error del servidor. Intente más tarde.';
   return 'Error al cargar médicos.';
 }
