@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IDoctorRepository } from '../../domain/ports/doctor.repository';
-import { DOCTOR_REPOSITORY_TOKEN } from '@/domain/ports/tokens';
+import { DOCTOR_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
 import { Shift } from '../../domain/entities/doctor.entity';
 
 export interface GetAvailableShiftsData {
