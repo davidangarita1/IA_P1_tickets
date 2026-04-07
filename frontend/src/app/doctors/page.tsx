@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard/AuthGuard";
 import DoctorFormModal from "@/components/DoctorFormModal/DoctorFormModal";
 import DoctorEditModal from "@/components/DoctorEditModal/DoctorEditModal";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal/ConfirmDeleteModal";
 import Toast from "@/components/Toast/Toast";
 import { useDoctors } from "@/hooks/useDoctors";
 import { useToast } from "@/hooks/useToast";
@@ -30,10 +31,12 @@ export default function DoctorsPage() {
 
 function DoctorsContent() {
   const { doctorService } = useDeps();
-  const { doctors, loading, error, refresh } = useDoctors(doctorService);
+  const { doctors, loading, error, remove, refresh } = useDoctors(doctorService);
   const toast = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+  const [deletingDoctor, setDeletingDoctor] = useState<Doctor | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   return (
     <main className={styles.container}>
@@ -83,6 +86,30 @@ function DoctorsContent() {
         />
       )}
 
+      {deletingDoctor && (
+        <ConfirmDeleteModal
+          doctorName={deletingDoctor.name}
+          loading={deleteLoading}
+          onCancel={() => setDeletingDoctor(null)}
+          onConfirm={async () => {
+            setDeleteLoading(true);
+            try {
+              await remove(deletingDoctor._id);
+              toast.show("Médico dado de baja exitosamente", "success", 5000);
+              setDeletingDoctor(null);
+              refresh();
+            } catch (err: unknown) {
+              const message =
+                err instanceof Error ? err.message : "Error al dar de baja";
+              toast.show(message, "error", 5000);
+              setDeletingDoctor(null);
+            } finally {
+              setDeleteLoading(false);
+            }
+          }}
+        />
+      )}
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -110,6 +137,13 @@ function DoctorsContent() {
                   aria-label={`Editar Dr. ${doctor.name}`}
                 >
                   <EditOutlined />
+                </button>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => setDeletingDoctor(doctor)}
+                  aria-label={`Dar de baja Dr. ${doctor.name}`}
+                >
+                  <DeleteOutlined />
                 </button>
               </td>
             </tr>

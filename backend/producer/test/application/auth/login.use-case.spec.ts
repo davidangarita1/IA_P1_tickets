@@ -4,9 +4,9 @@ import {
   LoginDependencies,
   LoginResult,
   ITokenService,
-} from '../../../src/application/use-cases/login.use-case';
-import { IUserRecord, IUserRepository } from '../../../src/domain/ports/IUserRepository';
-import { IPasswordHasher } from '../../../src/application/ports/IPasswordHasher';
+} from '@/application/use-cases/login.use-case';
+import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
+import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
 
 // Valida el contrato esperado para el caso de uso de login antes de implementarlo.
 describe('LoginUseCase (red tests)', () => {

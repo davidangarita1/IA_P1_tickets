@@ -241,7 +241,7 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
 - **Escenario:** Al hacer clic en el ícono de dar de baja aparece un modal de confirmación
   Dado que existen médicos activos creados en el sistema
   Cuando el usuario “Empleado/Administrador” hace clic en el ícono de dar de baja en la fila del “Dr. Juan García” con Número de cédula “12345678”
-  Entonces aparece un modal con el mensaje “¿Está seguro de que desea dar de baja al Dr. Juan García? Esta acción lo ocultará de la lista de médicos activos.”
+  Entonces aparece un modal con el mensaje "¿Está seguro de que desea dar de baja al Dr. Juan García? Esta acción lo eliminará de la lista de médicos activos."
   Y el modal muestra los botones “Cancelar” y “Aceptar”.
 
 - **Escenario:** Cancelar la baja desde el modal

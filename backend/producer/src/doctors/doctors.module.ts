@@ -7,13 +7,16 @@ import { CreateDoctorUseCase } from './application/use-cases/create-doctor.use-c
 import { GetAllDoctorsUseCase } from './application/use-cases/get-all-doctors.use-case';
 import { GetAvailableShiftsUseCase } from './application/use-cases/get-available-shifts.use-case';
 import { UpdateDoctorUseCase } from './application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from './application/use-cases/delete-doctor.use-case';
 import { DoctorController } from './presentation/controllers/doctor.controller';
 import { AuthGuard } from '../presentation/auth.guard';
 import { HmacTokenService } from '../infrastructure/adapters/hmac-token.service';
+import { TurnosModule } from '../turnos/turnos.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: DoctorSchemaClass.name, schema: DoctorSchema }]),
+        TurnosModule,
     ],
     controllers: [DoctorController],
     providers: [
@@ -25,6 +28,7 @@ import { HmacTokenService } from '../infrastructure/adapters/hmac-token.service'
         GetAllDoctorsUseCase,
         GetAvailableShiftsUseCase,
         UpdateDoctorUseCase,
+        DeleteDoctorUseCase,
         {
             provide: TOKEN_SERVICE_TOKEN,
             useClass: HmacTokenService,

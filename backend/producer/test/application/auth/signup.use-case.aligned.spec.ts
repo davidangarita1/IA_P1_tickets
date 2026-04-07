@@ -1,12 +1,12 @@
-import { IUserRecord, IUserRepository } from '../../../src/domain/ports/IUserRepository';
-import { IPasswordHasher } from '../../../src/application/ports/IPasswordHasher';
+import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
+import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
 import {
   SignupCredentials,
   SignupDependencies,
   SignupUseCase,
   SignupResult,
-} from '../../../src/application/use-cases/signup.use-case';
-import { ITokenService } from '../../../src/application/use-cases/login.use-case';
+} from '@/application/use-cases/signup.use-case';
+import { ITokenService } from '@/application/use-cases/login.use-case';
 
 // Valida que SignupUseCase retorna token + usuario para la respuesta del front.
 describe('SignupUseCase — aligned with frontend contract', () => {

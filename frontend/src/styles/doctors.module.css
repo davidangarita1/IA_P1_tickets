@@ -112,6 +112,25 @@
   color: #c6a96b;
 }
 
+.deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.deleteButton:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
 @media (prefers-color-scheme: dark) {
   .container {
     background: linear-gradient(180deg, #0a0a0a, #111111);

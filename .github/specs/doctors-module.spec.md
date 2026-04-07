@@ -808,16 +808,16 @@ frontend/src/
 - [x] Crear DTOs en `presentation/dtos/`: `CreateDoctorDto`, `UpdateDoctorDto`, `DoctorResponseDto`
 - [x] Crear use-cases:
   - [x] `CreateDoctorUseCase` — validar unicidad cedula / consultorio+franja, persistir
-  - [ ] `UpdateDoctorUseCase` — validar opciones, evitar cambios de cedula, liberar franja anterior
-  - [ ] `DeleteDoctorUseCase` — verificar sin turnos activos, soft delete
+  - [x] `UpdateDoctorUseCase` — validar opciones, evitar cambios de cedula, liberar franja anterior
+  - [x] `DeleteDoctorUseCase` — verificar sin turnos activos, soft delete
   - [x] `GetAllDoctorsUseCase` — listar activos con paginación
   - [x] `GetAvailableShiftsUseCase` — retornar franjas libres por consultorio
 - [x] Crear controller REST `DoctorController` en `presentation/controllers/doctor.controller.ts` con endpoints:
   - [x] `POST /api/v1/doctors` — create
   - [x] `GET /api/v1/doctors` — list con paginación
-  - [ ] `GET /api/v1/doctors/{id}` — detail
-  - [ ] `PUT /api/v1/doctors/{id}` — update
-  - [ ] `DELETE /api/v1/doctors/{id}` — soft delete
+  - [x] `GET /api/v1/doctors/{id}` — detail
+  - [x] `PUT /api/v1/doctors/{id}` — update
+  - [x] `DELETE /api/v1/doctors/{id}` — soft delete
   - [x] `GET /api/v1/doctors/available-shifts` — franjas libres
 - [x] Crear módulo NestJS `DoctorsModule` en `doctors/doctors.module.ts` con wiring:
   - [x] Importar `MongooseModule.forFeature([{ name: Doctor.name, schema: DoctorSchema }])`
@@ -826,8 +826,8 @@ frontend/src/
   - [x] Registrar controller
   - [x] Exportar `DOCTOR_REPOSITORY_TOKEN` para tests
 - [x] Registrar `DoctorsModule` en `app.module.ts`
-- [ ] Agregar tag "Doctors" en Swagger de `main.ts`
-- [ ] Validar que todos los endpoints aparecen en OpenAPI
+- [x] Agregar tag "Doctors" en Swagger de `main.ts`
+- [x] Validar que todos los endpoints aparecen en OpenAPI
 
 ### Backend — Validaciones y Reglas
 
@@ -837,7 +837,7 @@ frontend/src/
 - [x] Validación de consultorio: puede ser null, pero si se asigna franja debe ser válida
 - [x] Validación cruzada: si se asigna consultorio, la franja horaria es obligatoria (400 si consultorio presente y franja ausente)
 - [x] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
-- [ ] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
+- [x] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
 - [ ] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors
 - [ ] Auditoría: `created_at`, `updated_at`, `created_by`, `updated_by` se registran automáticamente
 
@@ -850,10 +850,10 @@ frontend/src/
 - [x] `test_create_doctor_use_case_shift_occupied_throws_conflict` — franja ocupada
 - [x] `test_create_doctor_use_case_invalid_name_throws_validation_error` — nombre < 3 chars
 - [x] `test_create_doctor_use_case_invalid_cedula_throws_validation_error` — cedula inválida
-- [ ] `test_update_doctor_use_case_changes_shift` — libera franja anterior
-- [ ] `test_update_doctor_use_case_cedula_immutable` — no actualiza cedula
-- [ ] `test_delete_doctor_use_case_success_no_active_turnos` — soft delete exitoso
-- [ ] `test_delete_doctor_use_case_blocked_active_turno` — bloqueo por turno activo
+- [x] `test_update_doctor_use_case_changes_shift` — libera franja anterior
+- [x] `test_update_doctor_use_case_cedula_immutable` — no actualiza cedula
+- [x] `test_delete_doctor_use_case_success_no_active_turnos` — soft delete exitoso
+- [x] `test_delete_doctor_use_case_blocked_active_turno` — bloqueo por turno activo
 - [x] `test_doctor_mongoose_adapter_insert_creates_document` — adapter persiste
 - [x] `test_doctor_mongoose_adapter_find_by_cedula_returns_doctor` — búsqueda por cedula
 - [x] `test_doctor_mongoose_adapter_find_available_shifts` — franjas libres
@@ -861,22 +861,22 @@ frontend/src/
 - [x] `test_doctor_controller_post_returns_409_duplicate_cedula` — conflicto cedula
 - [x] `test_doctor_controller_post_returns_401_no_token` — sin autenticación
 - [x] `test_doctor_controller_get_returns_200` — listado retorna 200
-- [ ] `test_doctor_controller_delete_returns_204` — eliminación retorna 204
-- [ ] `test_doctor_controller_delete_returns_409_active_turno` — bloqueo activo
+- [x] `test_doctor_controller_delete_returns_204` — eliminación retorna 204
+- [x] `test_doctor_controller_delete_returns_409_active_turno` — bloqueo activo
 
 ### Frontend — Página y Componentes
 
 - [x] Crear `DoctorsPage` (app/doctors/page.tsx) con ProtectedRoute
-- [ ] Crear `DoctorTable` componente que:
-  - [ ] Renderiza tabla con columnas: Nombre (Dr. Nombre), Cédula, Consultorio, Franja, Acciones
-  - [ ] Muestra "No hay médicos creados" cuando lista vacía
-  - [ ] Tiene ícono de edición (lápiz) en cada fila
-  - [ ] Tiene ícono de eliminación (basura) en cada fila
-  - [ ] State loading/error con skeleton o spinner
-  - [ ] Botón "Crear médico" en superior derecha
+- [x] Crear `DoctorTable` componente que:
+  - [x] Renderiza tabla con columnas: Nombre (Dr. Nombre), Cédula, Consultorio, Franja, Acciones
+  - [x] Muestra "No hay médicos creados" cuando lista vacía
+  - [x] Tiene ícono de edición (lápiz) en cada fila
+  - [x] Tiene ícono de eliminación (basura) en cada fila
+  - [x] State loading/error con skeleton o spinner
+  - [x] Botón "Crear médico" en superior derecha
 - [x] Crear `DoctorFormModal` que:
   - [x] Modo create: campos vacíos, botones "Cerrar" y "Guardar"
-  - [ ] Modo edit: campos precargados con datos del médico, mismos botones
+  - [x] Modo edit: campos precargados con datos del médico, mismos botones
   - [x] Campo nombre: validación mín. 3 caracteres en tiempo real, mensaje de error
   - [x] Campo cédula: acepta solo números 7-10 dígitos, validación en tiempo real
   - [x] Desplegable consultorio: solo consultorios válidos
@@ -886,11 +886,11 @@ frontend/src/
   - [x] Manejo de loading durante request (spinner en botón)
   - [x] Cierre del modal con "Cerrar" sin guardar
   - [x] Prevención de cierre accidental (clic fuera NO cierra, Escape NO cierra)
-- [ ] Crear `ConfirmDeleteModal` que:
-  - [ ] Muestra nombre del médico: "¿Desea eliminar al médico Dr. {nombre}?"
-  - [ ] Botones "Cancelar" y "Aceptar"
-  - [ ] "Aceptar" dispara eliminación, muestra spinner
-  - [ ] "Cancelar" cierra modal sin eliminar
+- [x] Crear `ConfirmDeleteModal` que:
+  - [x] Muestra nombre del médico: "¿Desea eliminar al médico Dr. {nombre}?"
+  - [x] Botones "Cancelar" y "Aceptar"
+  - [x] "Aceptar" dispara eliminación, muestra spinner
+  - [x] "Cancelar" cierra modal sin eliminar
 - [x] Crear/actualizar `Toast/Notification` componente para mensajes flotantes:
   - [x] Soporta tipos: success, error, info
   - [x] Auto-desaparece tras duración especificada (default 5s)
@@ -908,8 +908,8 @@ frontend/src/
 - [x] Crear `services/doctorService.ts` con funciones:
   - [x] `getAllDoctors(token, page?, limit?)` — GET /api/v1/doctors
   - [x] `createDoctor(data, token)` — POST /api/v1/doctors
-  - [ ] `updateDoctor(doctorId, data, token)` — PUT /api/v1/doctors/{id}
-  - [ ] `deleteDoctor(doctorId, token)` — DELETE /api/v1/doctors/{id}
+  - [x] `updateDoctor(doctorId, data, token)` — PUT /api/v1/doctors/{id}
+  - [x] `deleteDoctor(doctorId, token)` — DELETE /api/v1/doctors/{id}
   - [x] `getAvailableShifts(consultorio, excludeDoctorId?, token)` — GET /api/v1/doctors/available-shifts
   - [x] Manejo de errores: lanzar excepciones descriptivas
   - [x] Headers: `Authorization: Bearer {token}`
@@ -937,26 +937,26 @@ frontend/src/
 
 ### Frontend — Tests
 
-- [ ] `test_DoctorTable_renders_list_correctly` — tabla renderiza médicos
-- [ ] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
-- [ ] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
+- [x] `test_DoctorTable_renders_list_correctly` — tabla renderiza médicos
+- [x] `test_DoctorTable_shows_empty_message` — tabla vacía muestra "No hay..."
+- [x] `test_DoctorTable_edit_icon_opens_modal` — ícono edición abre modal
 - [ ] `test_DoctorTable_delete_icon_opens_confirm_modal` — ícono eliminación abre confirm
 - [x] `test_DoctorFormModal_mode_create_shows_empty_fields` — modal create campos vacíos
-- [ ] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
+- [x] `test_DoctorFormModal_mode_edit_loads_data` — modal edit precarga datos
 - [x] `test_DoctorFormModal_cedula_field_only_accepts_numbers` — validación cedula
 - [x] `test_DoctorFormModal_nombre_field_min_3_chars` — validación nombre
 - [x] `test_DoctorFormModal_submit_success_shows_toast` — submit exitoso muestra toast
 - [x] `test_DoctorFormModal_submit_error_shows_error_message` — error muestra mensaje
 - [x] `test_DoctorFormModal_close_without_save` — cerrar sin guardar
-- [ ] `test_ConfirmDeleteModal_confirm_deletes_doctor` — confirmar elimina
-- [ ] `test_ConfirmDeleteModal_cancel_closes_modal` — cancelar cierra
-- [ ] `test_Navbar_button_visible_when_authenticated` — botón visible autenticado
-- [ ] `test_Navbar_button_hidden_when_not_authenticated` — botón oculto no autenticado
-- [ ] `test_Navbar_button_navigates_to_doctors_page` — botón navega a /doctors
+- [x] `test_ConfirmDeleteModal_confirm_deletes_doctor` — confirmar elimina
+- [x] `test_ConfirmDeleteModal_cancel_closes_modal` — cancelar cierra
+- [x] `test_Navbar_button_visible_when_authenticated` — botón visible autenticado
+- [x] `test_Navbar_button_hidden_when_not_authenticated` — botón oculto no autenticado
+- [x] `test_Navbar_button_navigates_to_doctors_page` — botón navega a /doctors
 - [x] `test_useDoctors_hook_loads_data_on_mount` — hook carga doctors
 - [x] `test_useDoctors_hook_create_sends_post_request` — hook crea
-- [ ] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
-- [ ] `test_useDoctors_hook_delete_sends_delete_request` — hook elimina
+- [x] `test_useDoctors_hook_update_sends_put_request` — hook actualiza
+- [x] `test_useDoctors_hook_delete_sends_delete_request` — hook elimina
 
 ### QA — Test Plan y Casos Gherkin
 

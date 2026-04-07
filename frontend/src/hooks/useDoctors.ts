@@ -47,9 +47,16 @@ export function useDoctors(doctorService: DoctorService) {
     [doctorService]
   );
 
+  const remove = useCallback(
+    async (id: string): Promise<void> => {
+      return doctorService.remove(id);
+    },
+    [doctorService]
+  );
+
   const refresh = useCallback(async () => {
     await loadDoctors();
   }, [loadDoctors]);
 
-  return { doctors, loading, error, create, update, refresh };
+  return { doctors, loading, error, create, update, remove, refresh };
 }

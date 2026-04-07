@@ -4,9 +4,9 @@ import { GetAllDoctorsUseCase } from '@/doctors/application/use-cases/get-all-do
 import { GetAvailableShiftsUseCase } from '@/doctors/application/use-cases/get-available-shifts.use-case';
 import { UpdateDoctorUseCase } from '@/doctors/application/use-cases/update-doctor.use-case';
 import { DeleteDoctorUseCase } from '@/doctors/application/use-cases/delete-doctor.use-case';
-import { Doctor } from '@/doctors/domain/entities/doctor.entity';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
-describe('DoctorController - updateDoctor (Presentation)', () => {
+describe('DoctorController - deleteDoctor (Presentation)', () => {
     const createDoctorUseCase: Pick<CreateDoctorUseCase, 'execute'> = { execute: jest.fn() };
     const getAllDoctorsUseCase: Pick<GetAllDoctorsUseCase, 'execute'> = { execute: jest.fn() };
     const getAvailableShiftsUseCase: Pick<GetAvailableShiftsUseCase, 'execute'> = { execute: jest.fn() };
@@ -14,19 +14,6 @@ describe('DoctorController - updateDoctor (Presentation)', () => {
     const deleteDoctorUseCase: Pick<DeleteDoctorUseCase, 'execute'> = { execute: jest.fn() };
 
     let controller: DoctorController;
-
-    const makeDoctor = (overrides: Partial<ConstructorParameters<typeof Doctor>[0]> = {}): Doctor =>
-        new Doctor({
-            id: 'doc-1',
-            name: 'Juan García',
-            documentId: '12345678',
-            office: '2',
-            shift: '06:00-14:00',
-            status: 'active',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            ...overrides,
-        });
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -39,25 +26,27 @@ describe('DoctorController - updateDoctor (Presentation)', () => {
         );
     });
 
-    it('updates a doctor and returns the updated doctor', async () => {
-        const updated = makeDoctor({ name: 'Pedro López', office: '4', shift: '14:00-22:00' });
-        (updateDoctorUseCase.execute as jest.Mock).mockResolvedValue(updated);
-        const dto = { name: 'Pedro López', office: '4', shift: '14:00-22:00' as const };
+    it('deletes a doctor and returns void', async () => {
+        (deleteDoctorUseCase.execute as jest.Mock).mockResolvedValue(undefined);
 
-        const result = await controller.updateDoctor('doc-1', dto);
+        await controller.deleteDoctor('doc-1');
 
-        expect(updateDoctorUseCase.execute).toHaveBeenCalledWith('doc-1', dto);
-        expect(result).toEqual(updated);
+        expect(deleteDoctorUseCase.execute).toHaveBeenCalledWith('doc-1');
     });
 
-    it('updates only the name without office and shift', async () => {
-        const updated = makeDoctor({ name: 'Nuevo Nombre' });
-        (updateDoctorUseCase.execute as jest.Mock).mockResolvedValue(updated);
-        const dto = { name: 'Nuevo Nombre' };
+    it('propagates NotFoundException when doctor does not exist', async () => {
+        (deleteDoctorUseCase.execute as jest.Mock).mockRejectedValue(
+            new NotFoundException('Médico no encontrado'),
+        );
 
-        const result = await controller.updateDoctor('doc-1', dto);
+        await expect(controller.deleteDoctor('non-existent')).rejects.toThrow(NotFoundException);
+    });
 
-        expect(updateDoctorUseCase.execute).toHaveBeenCalledWith('doc-1', dto);
-        expect(result.name).toBe('Nuevo Nombre');
+    it('propagates ConflictException when doctor has active turno', async () => {
+        (deleteDoctorUseCase.execute as jest.Mock).mockRejectedValue(
+            new ConflictException('No se puede dar de baja a un médico que se encuentra atendiendo un turno en este momento'),
+        );
+
+        await expect(controller.deleteDoctor('doc-1')).rejects.toThrow(ConflictException);
     });
 });

@@ -6,13 +6,13 @@ import { Given, When, Then, Before, After, setDefaultTimeout } from '@cucumber/c
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AuthController } from '../../../src/presentation/auth.controller';
-import { SignupUseCase } from '../../../src/application/use-cases/signup.use-case';
-import { LoginUseCase } from '../../../src/application/use-cases/login.use-case';
-import { GetAllTurnosUseCase } from '../../../src/application/use-cases/get-all-turnos.use-case';
-import { InMemoryUserRepository } from '../../../src/infrastructure/adapters/in-memory-user.repository';
-import { ScryptPasswordHasherAdapter } from '../../../src/infrastructure/adapters/scrypt-password-hasher.adapter';
-import { HmacTokenService } from '../../../src/infrastructure/adapters/hmac-token.service';
+import { AuthController } from '@/presentation/auth.controller';
+import { SignupUseCase } from '@/application/use-cases/signup.use-case';
+import { LoginUseCase } from '@/application/use-cases/login.use-case';
+import { GetAllTurnosUseCase } from '@/application/use-cases/get-all-turnos.use-case';
+import { InMemoryUserRepository } from '@/infrastructure/adapters/in-memory-user.repository';
+import { ScryptPasswordHasherAdapter } from '@/infrastructure/adapters/scrypt-password-hasher.adapter';
+import { HmacTokenService } from '@/infrastructure/adapters/hmac-token.service';
 import {
     EVENT_PUBLISHER_TOKEN,
     PASSWORD_HASHER_TOKEN,
@@ -20,8 +20,8 @@ import {
     USER_REPOSITORY_TOKEN,
     TURNO_REPOSITORY_TOKEN,
     ACCESS_TOKEN_VERIFIER_TOKEN,
-} from '../../../src/domain/ports/tokens';
-import { IEventPublisher } from '../../../src/domain/ports/IEventPublisher';
+} from '@/domain/ports/tokens';
+import { IEventPublisher } from '@/domain/ports/IEventPublisher';
 import { ConfigModule } from '@nestjs/config';
 
 setDefaultTimeout(30_000);

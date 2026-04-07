@@ -76,4 +76,18 @@ export class HttpDoctorAdapter implements DoctorService {
     if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
     return res.json();
   }
+
+  async remove(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
+      method: "DELETE",
+      headers: this.buildHeaders(),
+    });
+
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.message || "CONFLICT");
+    }
+
+    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+  }
 }
