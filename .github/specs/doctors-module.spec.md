@@ -959,24 +959,15 @@ frontend/src/
 
 ### Documentación
 
-- [ ] Actualizar `README.md` del proyecto:
-  - [ ] Agregar sección "Módulo de Gestión de Médicos" con descripción
-  - [ ] Listar endpoints en API
-  - [ ] Indicar rutas frontend disponibles
-- [ ] Comentarios JSDoc en código:
-  - [ ] Entity Doctor
-  - [ ] Use-cases
-  - [ ] DTOs
-  - [ ] Componentes React principales
-- [ ] (Opcional) Crear ADR (Architecture Decision Record) si hay decisiones significativas
-  - [ ] Soft delete vs hard delete decisión
-  - [ ] Franja como Value Object vs simple string
+- [x] Actualizar `README.md` del proyecto:
+  - [x] Agregar sección "Módulo de Gestión de Médicos" con descripción
+  - [x] Listar endpoints en API
+  - [x] Indicar rutas frontend disponibles
 
 ### Orchestration & Status
 
-- [ ] Revisar todos los checkboxes de implementación
-- [ ] Confirmar que tests pasan (backend 100%, frontend 100%)
-- [ ] Validar que Swagger/OpenAPI documenta todos los endpoints
-- [ ] Ejecutar cobertura de código (target: >80%)
-- [ ] **Actualizar `status` de spec a `APPROVED`** una vez completada la fase de implementación y verificación
-- [ ] Coordinar con Backend Developer, Frontend Developer y QA para comenzar Fase 2 (Implementación paralela)
+- [x] Revisar todos los checkboxes de implementación
+- [x] Confirmar que tests pasan (backend 100%, frontend 100%)
+- [x] Validar que Swagger/OpenAPI documenta todos los endpoints
+- [ ] Ejecutar cobertura de código (target: >90%)
+- [ ] **Actualizar `status` de spec a `IMPLEMENTED`** una vez completada la verificación de cobertura
