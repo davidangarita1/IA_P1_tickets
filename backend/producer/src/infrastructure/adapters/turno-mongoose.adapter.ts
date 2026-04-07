@@ -25,6 +25,13 @@ export class TurnoMongooseAdapter implements ITurnoRepository {
     return docs.map((doc) => this.toDomain(doc));
   }
 
+  async findActiveByOffice(office: string): Promise<Turno[]> {
+    const docs = await this.turnoModel
+      .find({ consultorio: office, estado: { $in: ['llamado', 'atendido'] } })
+      .exec();
+    return docs.map((doc) => this.toDomain(doc));
+  }
+
   private toDomain(doc: TurnoDocument): Turno {
     return new Turno({
       id: String(doc._id),
