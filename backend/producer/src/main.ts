@@ -8,62 +8,67 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import 'reflect-metadata';
 
 async function bootstrap(): Promise<void> {
-    const logger = new Logger('Bootstrap');
-    const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule);
 
-    app.enableCors({
-        origin: '*',
-    });
+  app.enableCors({
+    origin: '*',
+  });
 
-    app.use(helmet());
+  app.use(helmet());
 
-    app.useGlobalPipes(new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-    }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-    const config = new DocumentBuilder()
-        .setTitle('API de Turnos Médicos')
-        .setDescription(
-            'API para la gestión de turnos médicos. ' +
-            'Recibe solicitudes de turno y las envía a una cola RabbitMQ para procesamiento asíncrono. ' +
-            'El turno es asignado a un consultorio por un scheduler cada 15 segundos. ' +
-            'Los cambios se emiten en tiempo real via WebSocket en /ws/turnos.'
-        )
-        .setVersion('2.0')
-        .addTag('Turnos', 'Operaciones de gestión de turnos médicos')
-        .build();
+  const config = new DocumentBuilder()
+    .setTitle('API de Turnos Médicos')
+    .setDescription(
+      'API para la gestión de turnos médicos. ' +
+        'Recibe solicitudes de turno y las envía a una cola RabbitMQ para procesamiento asíncrono. ' +
+        'El turno es asignado a un consultorio por un scheduler cada 15 segundos. ' +
+        'Los cambios se emiten en tiempo real via WebSocket en /ws/turnos.',
+    )
+    .setVersion('2.0')
+    .addTag('Turnos', 'Operaciones de gestión de turnos médicos')
+    .build();
 
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
-    const configService = app.get(ConfigService);
-    const port = configService.get<number>('PORT') ?? 3000;
-    const host = configService.get<string>('HOST') ?? '0.0.0.0';
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT') ?? 3000;
+  const host = configService.get<string>('HOST') ?? '0.0.0.0';
 
-    const rabbitUrl = configService.get<string>('RABBITMQ_URL');
-    if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
-    const notificationsQueue = configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE', 'turnos_notifications');
+  const rabbitUrl = configService.get<string>('RABBITMQ_URL');
+  if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
+  const notificationsQueue = configService.get<string>(
+    'RABBITMQ_NOTIFICATIONS_QUEUE',
+    'turnos_notifications',
+  );
 
-    app.connectMicroservice<MicroserviceOptions>({
-        transport: Transport.RMQ,
-        options: {
-            urls: [rabbitUrl],
-            queue: notificationsQueue,
-            queueOptions: {
-                durable: true,
-            },
-            noAck: true,
-        },
-    });
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [rabbitUrl],
+      queue: notificationsQueue,
+      queueOptions: {
+        durable: true,
+      },
+      noAck: true,
+    },
+  });
 
-    await app.startAllMicroservices();
-    await app.listen(port, host);
+  await app.startAllMicroservices();
+  await app.listen(port, host);
 
-    logger.log(`Producer running on http://${host}:${port}`);
-    logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
-    logger.log(`WebSocket: ws://localhost:${port}/ws/turnos`);
-    logger.log(`Listening for notifications on queue: ${notificationsQueue}`);
+  logger.log(`Producer running on http://${host}:${port}`);
+  logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
+  logger.log(`WebSocket: ws://localhost:${port}/ws/turnos`);
+  logger.log(`Listening for notifications on queue: ${notificationsQueue}`);
 }
 bootstrap();

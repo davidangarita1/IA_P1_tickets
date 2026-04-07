@@ -1,4 +1,4 @@
-import type { Ticket } from "@/domain/Ticket";
+import type { Ticket } from '@/domain/Ticket';
 
 export type RealTimeCallbacks = {
   onSnapshot: (tickets: Ticket[]) => void;

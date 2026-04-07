@@ -1,5 +1,5 @@
-declare module "@ant-design/icons" {
-  import type { FC, SVGProps } from "react";
+declare module '@ant-design/icons' {
+  import type { FC, SVGProps } from 'react';
 
   export interface AntdIconProps extends SVGProps<SVGSVGElement> {
     className?: string;

@@ -1,5 +1,3 @@
-
-
 export interface IUserRecord {
   id: string;
   email: string;
@@ -11,5 +9,10 @@ export interface IUserRecord {
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<IUserRecord | null>;
-  create(params: { email: string; passwordHash: string; nombre: string; rol: string }): Promise<IUserRecord>;
+  create(params: {
+    email: string;
+    passwordHash: string;
+    nombre: string;
+    rol: string;
+  }): Promise<IUserRecord>;
 }

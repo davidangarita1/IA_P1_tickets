@@ -1,33 +1,33 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import Navbar from "@/components/Navbar/Navbar";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import Navbar from '@/components/Navbar/Navbar';
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/styles/Navbar.module.css", () => ({
-  navbar: "navbar",
-  logo: "logo",
-  links: "links",
-  link: "link",
-  linkActive: "linkActive",
+jest.mock('@/styles/Navbar.module.css', () => ({
+  navbar: 'navbar',
+  logo: 'logo',
+  links: 'links',
+  link: 'link',
+  linkActive: 'linkActive',
 }));
 
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 function setupAuth(isAuthenticated: boolean) {
   mockUseAuth.mockReturnValue({
-    user: isAuthenticated ? { id: "1", email: "u@u.com", name: "User", role: "employee" } : null,
+    user: isAuthenticated ? { id: '1', email: 'u@u.com', name: 'User', role: 'employee' } : null,
     loading: false,
     error: null,
     signIn: jest.fn(),
@@ -38,156 +38,160 @@ function setupAuth(isAuthenticated: boolean) {
   });
 }
 
-describe("Navbar", () => {
+describe('Navbar', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupAuth(true);
   });
 
-  it("renders all navigation items", () => {
-    mockUsePathname.mockReturnValue("/");
+  it('renders all navigation items', () => {
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.getByRole("link", { name: "Turnos" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Registro" })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Registro' })).toBeInTheDocument();
   });
 
-  it("renders logo text", () => {
-    mockUsePathname.mockReturnValue("/");
+  it('renders logo text', () => {
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
     expect(screen.getByText(/Sistema de/i)).toBeInTheDocument();
   });
 
-  it("logo is a link that navigates to /", () => {
-    mockUsePathname.mockReturnValue("/dashboard");
+  it('logo is a link that navigates to /', () => {
+    mockUsePathname.mockReturnValue('/dashboard');
 
     render(<Navbar />);
 
-    const logoLink = screen.getByRole("link", { name: /sistema de turnos/i });
-    expect(logoLink).toHaveAttribute("href", "/");
+    const logoLink = screen.getByRole('link', { name: /sistema de turnos/i });
+    expect(logoLink).toHaveAttribute('href', '/');
   });
 
-  it("renders correct href for each nav item", () => {
-    mockUsePathname.mockReturnValue("/");
+  it('renders correct href for each nav item', () => {
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    const links = screen.getAllByRole("link");
-    const hrefs = links.map((l) => l.getAttribute("href"));
-    expect(hrefs).toContain("/");
-    expect(hrefs).toContain("/dashboard");
-    expect(hrefs).toContain("/register");
+    const links = screen.getAllByRole('link');
+    const hrefs = links.map((l) => l.getAttribute('href'));
+    expect(hrefs).toContain('/');
+    expect(hrefs).toContain('/dashboard');
+    expect(hrefs).toContain('/register');
   });
 
-  it("applies active class to the link matching current pathname", () => {
-    mockUsePathname.mockReturnValue("/dashboard");
+  it('applies active class to the link matching current pathname', () => {
+    mockUsePathname.mockReturnValue('/dashboard');
 
     render(<Navbar />);
 
-    const dashboardLink = screen.getByRole("link", { name: "Dashboard" });
-    expect(dashboardLink.className).toBe("linkActive");
+    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
+    expect(dashboardLink.className).toBe('linkActive');
   });
 
-  it("applies inactive class to links not matching current pathname", () => {
-    mockUsePathname.mockReturnValue("/dashboard");
+  it('applies inactive class to links not matching current pathname', () => {
+    mockUsePathname.mockReturnValue('/dashboard');
 
     render(<Navbar />);
 
-    const turnosLink = screen.getByRole("link", { name: "Turnos" });
-    expect(turnosLink.className).toBe("link");
+    const turnosLink = screen.getByRole('link', { name: 'Turnos' });
+    expect(turnosLink.className).toBe('link');
   });
 
-  it("does not render navigation links when user is not authenticated", () => {
+  it('does not render navigation links when user is not authenticated', () => {
     setupAuth(false);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.queryByRole("link", { name: "Turnos" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Registro" })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Turnos' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Registro' })).not.toBeInTheDocument();
   });
 
-  it("renders navigation links when user is authenticated", () => {
+  it('renders navigation links when user is authenticated', () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.getByRole("link", { name: "Turnos" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Registro" })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Registro' })).toBeInTheDocument();
   });
 
-  it("renders SignOutButton when user is authenticated", () => {
+  it('renders SignOutButton when user is authenticated', () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.getByRole("button", { name: /cerrar sesión|sign out|logout/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /cerrar sesión|sign out|logout/i }),
+    ).toBeInTheDocument();
   });
 
-  it("does not render SignOutButton when user is not authenticated", () => {
+  it('does not render SignOutButton when user is not authenticated', () => {
     setupAuth(false);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.queryByRole("button", { name: /cerrar sesión|sign out|logout/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /cerrar sesión|sign out|logout/i }),
+    ).not.toBeInTheDocument();
   });
 
-  it("renders Iniciar sesión link when user is not authenticated", () => {
+  it('renders Iniciar sesión link when user is not authenticated', () => {
     setupAuth(false);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    const link = screen.getByRole("link", { name: /iniciar sesión/i });
+    const link = screen.getByRole('link', { name: /iniciar sesión/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "/signin");
+    expect(link).toHaveAttribute('href', '/signin');
   });
 
-  it("does not render Iniciar sesión link when user is authenticated", () => {
+  it('does not render Iniciar sesión link when user is authenticated', () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.queryByRole("link", { name: /iniciar sesión/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /iniciar sesión/i })).not.toBeInTheDocument();
   });
 
   it("renders 'Gestión Médicos' link for authenticated users", () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    const link = screen.getByRole("link", { name: /gestión médicos/i });
+    const link = screen.getByRole('link', { name: /gestión médicos/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "/doctors");
+    expect(link).toHaveAttribute('href', '/doctors');
   });
 
   it("does not render 'Gestión Médicos' link for unauthenticated users", () => {
     setupAuth(false);
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    expect(screen.queryByRole("link", { name: /gestión médicos/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /gestión médicos/i })).not.toBeInTheDocument();
   });
 
   it("applies active class to 'Gestión Médicos' when on /doctors", () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue("/doctors");
+    mockUsePathname.mockReturnValue('/doctors');
 
     render(<Navbar />);
 
-    const link = screen.getByRole("link", { name: /gestión médicos/i });
-    expect(link.className).toBe("linkActive");
+    const link = screen.getByRole('link', { name: /gestión médicos/i });
+    expect(link.className).toBe('linkActive');
   });
 });

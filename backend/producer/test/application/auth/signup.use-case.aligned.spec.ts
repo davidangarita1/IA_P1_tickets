@@ -8,7 +8,6 @@ import {
 } from '@/application/use-cases/signup.use-case';
 import { ITokenService } from '@/application/use-cases/login.use-case';
 
-// Valida que SignupUseCase retorna token + usuario para la respuesta del front.
 describe('SignupUseCase — aligned with frontend contract', () => {
   const credentials: SignupCredentials = {
     email: 'luis@example.com',
@@ -39,27 +38,22 @@ describe('SignupUseCase — aligned with frontend contract', () => {
   });
 
   it('should error when the email is already registered', async () => {
-    // Arrange
     repository.findByEmail.mockResolvedValue(createdUser);
     const useCase = new SignupUseCase(dependencies);
 
-    // Act & Assert
     await expect(useCase.execute(credentials)).rejects.toThrow('Email already in use');
     expect(repository.findByEmail).toHaveBeenCalledWith(credentials.email);
   });
 
   it('should return token + usuario on valid signup', async () => {
-    // Arrange
     repository.findByEmail.mockResolvedValue(null);
     passwordHasher.hash.mockResolvedValue(hashedSecret);
     repository.create.mockResolvedValue(createdUser);
     tokenService.generateToken.mockReturnValue('new-token');
     const useCase = new SignupUseCase(dependencies);
 
-    // Act
     const result: SignupResult = await useCase.execute(credentials);
 
-    // Assert — frontend needs token + full user data immediately after signup
     expect(result).toEqual({
       token: 'new-token',
       usuario: {

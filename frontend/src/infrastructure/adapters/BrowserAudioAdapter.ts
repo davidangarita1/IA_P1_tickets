@@ -1,4 +1,4 @@
-import { AudioNotifier } from "@/domain/ports/AudioNotifier";
+import { AudioNotifier } from '@/domain/ports/AudioNotifier';
 
 export class BrowserAudioAdapter implements AudioNotifier {
   private audio: HTMLAudioElement | null = null;
@@ -10,9 +10,9 @@ export class BrowserAudioAdapter implements AudioNotifier {
 
     this.audio = new Audio(src);
     this.audio.volume = volume;
-    this.audio.preload = "auto";
+    this.audio.preload = 'auto';
 
-    this.audio.addEventListener("canplaythrough", () => {
+    this.audio.addEventListener('canplaythrough', () => {
       this.ready = true;
     });
   }

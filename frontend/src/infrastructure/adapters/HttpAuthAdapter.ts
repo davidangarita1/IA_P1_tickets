@@ -1,13 +1,17 @@
-import type { AuthService } from "@/domain/ports/AuthService";
-import type { AuthCredentials, SignUpData, AuthResult } from "@/domain/AuthCredentials";
-import type { User, UserRole } from "@/domain/User";
-import { httpPost } from "@/infrastructure/http/httpClient";
-import { toAuthResult, toUser } from "@/infrastructure/mappers/authMapper";
-import { setAuthCookie, getAuthCookie, removeAuthCookie } from "@/infrastructure/cookies/cookieUtils";
+import type { AuthService } from '@/domain/ports/AuthService';
+import type { AuthCredentials, SignUpData, AuthResult } from '@/domain/AuthCredentials';
+import type { User, UserRole } from '@/domain/User';
+import { httpPost } from '@/infrastructure/http/httpClient';
+import { toAuthResult, toUser } from '@/infrastructure/mappers/authMapper';
+import {
+  setAuthCookie,
+  getAuthCookie,
+  removeAuthCookie,
+} from '@/infrastructure/cookies/cookieUtils';
 
 const ROLE_TO_BACKEND: Record<UserRole, string> = {
-  admin: "admin",
-  employee: "empleado",
+  admin: 'admin',
+  employee: 'empleado',
 };
 
 interface BackendAuthResponse {
@@ -29,43 +33,38 @@ export class HttpAuthAdapter implements AuthService {
 
   async signIn(credentials: AuthCredentials): Promise<AuthResult> {
     try {
-      const raw = await httpPost<BackendAuthResponse>(
-        `${this.baseUrl}/auth/signIn`,
-        { email: credentials.email, password: credentials.password },
-      );
+      const raw = await httpPost<BackendAuthResponse>(`${this.baseUrl}/auth/signIn`, {
+        email: credentials.email,
+        password: credentials.password,
+      });
       if (raw.success && raw.token) {
         setAuthCookie(raw.token);
       }
       return toAuthResult(raw);
     } catch (err: unknown) {
-      return { success: false, message: err instanceof Error ? err.message : "Error en login" };
+      return { success: false, message: err instanceof Error ? err.message : 'Error en login' };
     }
   }
 
   async signUp(data: SignUpData): Promise<AuthResult> {
     try {
-      const raw = await httpPost<BackendAuthResponse>(
-        `${this.baseUrl}/auth/signUp`,
-        {
-          email: data.email,
-          password: data.password,
-          nombre: data.name,
-          rol: ROLE_TO_BACKEND[data.role] ?? "empleado",
-        },
-      );
+      const raw = await httpPost<BackendAuthResponse>(`${this.baseUrl}/auth/signUp`, {
+        email: data.email,
+        password: data.password,
+        nombre: data.name,
+        rol: ROLE_TO_BACKEND[data.role] ?? 'empleado',
+      });
 
       return toAuthResult(raw);
     } catch (err: unknown) {
-      return { success: false, message: err instanceof Error ? err.message : "Error en registro" };
+      return { success: false, message: err instanceof Error ? err.message : 'Error en registro' };
     }
   }
 
   async signOut(): Promise<void> {
     try {
       await httpPost(`${this.baseUrl}/auth/signOut`, {});
-    } catch {
-
-    }
+    } catch {}
     removeAuthCookie();
   }
 
@@ -75,9 +74,9 @@ export class HttpAuthAdapter implements AuthService {
 
     try {
       const res = await fetch(`${this.baseUrl}/auth/me`, {
-        method: "GET",
+        method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
+        cache: 'no-store',
       });
       if (!res.ok) {
         removeAuthCookie();

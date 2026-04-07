@@ -5,12 +5,10 @@ import { TURNO_REPOSITORY_TOKEN } from '../../domain/ports/tokens';
 
 @Injectable()
 export class GetTurnosByCedulaUseCase {
-    constructor(
-        @Inject(TURNO_REPOSITORY_TOKEN) private readonly turnoRepository: ITurnoRepository,
-    ) {}
+  constructor(@Inject(TURNO_REPOSITORY_TOKEN) private readonly turnoRepository: ITurnoRepository) {}
 
-    async execute(cedula: number): Promise<TurnoEventPayload[]> {
-        const turnos: Turno[] = await this.turnoRepository.findByCedula(cedula);
-        return turnos.map(t => t.toEventPayload());
-    }
+  async execute(cedula: number): Promise<TurnoEventPayload[]> {
+    const turnos: Turno[] = await this.turnoRepository.findByCedula(cedula);
+    return turnos.map((t) => t.toEventPayload());
+  }
 }

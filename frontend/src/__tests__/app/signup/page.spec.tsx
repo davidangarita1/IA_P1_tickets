@@ -1,21 +1,21 @@
-import SignUpPage from "@/app/signup/page";
-import { render, screen } from "@testing-library/react";
+import SignUpPage from '@/app/signup/page';
+import { render, screen } from '@testing-library/react';
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-import { mockSanitizer, mockDoctorService } from "@/__tests__/mocks/factories";
-import { useAuth } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
+import { mockSanitizer, mockDoctorService } from '@/__tests__/mocks/factories';
+import { useAuth } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
@@ -27,7 +27,12 @@ beforeEach(() => {
     realTime: { connect: jest.fn(), disconnect: jest.fn(), isConnected: jest.fn() },
     audio: { init: jest.fn(), unlock: jest.fn(), play: jest.fn(), isEnabled: jest.fn() },
     sanitizer: mockSanitizer(),
-    authService: { signIn: jest.fn(), signUp: jest.fn(), signOut: jest.fn(), getSession: jest.fn() },
+    authService: {
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      getSession: jest.fn(),
+    },
     doctorService: mockDoctorService(),
   });
 
@@ -43,8 +48,8 @@ beforeEach(() => {
   });
 });
 
-describe("SignUpPage", () => {
-  it("renders the SignUpForm", () => {
+describe('SignUpPage', () => {
+  it('renders the SignUpForm', () => {
     render(<SignUpPage />);
 
     expect(screen.getByPlaceholderText(/nombre|name/i)).toBeInTheDocument();
@@ -52,21 +57,21 @@ describe("SignUpPage", () => {
     expect(screen.getByPlaceholderText(/contraseña|password/i)).toBeInTheDocument();
   });
 
-  it("does not render a role selector (role is always employee)", () => {
+  it('does not render a role selector (role is always employee)', () => {
     render(<SignUpPage />);
 
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
-  it("renders the submit button from SignUpForm", () => {
+  it('renders the submit button from SignUpForm', () => {
     render(<SignUpPage />);
 
-    expect(screen.getByRole("button", { name: /registrarse|sign up/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /registrarse|sign up/i })).toBeInTheDocument();
   });
 
-  it("renders the form heading", () => {
+  it('renders the form heading', () => {
     render(<SignUpPage />);
 
-    expect(screen.getByRole("heading", { name: /crear cuenta/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /crear cuenta/i })).toBeInTheDocument();
   });
 });

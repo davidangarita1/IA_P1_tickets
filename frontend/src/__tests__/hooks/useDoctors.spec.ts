@@ -1,9 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { useDoctors } from "@/hooks/useDoctors";
-import { mockDoctorService, buildDoctor } from "../mocks/factories";
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useDoctors } from '@/hooks/useDoctors';
+import { mockDoctorService, buildDoctor } from '../mocks/factories';
 
-describe("useDoctors", () => {
-  it("starts with empty doctors and no error", () => {
+describe('useDoctors', () => {
+  it('starts with empty doctors and no error', () => {
     const service = mockDoctorService([]);
 
     const { result } = renderHook(() => useDoctors(service));
@@ -12,7 +12,7 @@ describe("useDoctors", () => {
     expect(result.current.error).toBeNull();
   });
 
-  it("loads doctors on mount", async () => {
+  it('loads doctors on mount', async () => {
     const doctor = buildDoctor();
     const service = mockDoctorService([doctor]);
 
@@ -25,13 +25,13 @@ describe("useDoctors", () => {
     expect(service.getAll).toHaveBeenCalledTimes(1);
   });
 
-  it("sets loading to true while fetching", async () => {
+  it('sets loading to true while fetching', async () => {
     let resolveGetAll!: (val: ReturnType<typeof buildDoctor>[]) => void;
     const service = mockDoctorService([]);
     service.getAll.mockReturnValueOnce(
       new Promise((res) => {
         resolveGetAll = res;
-      })
+      }),
     );
 
     const { result } = renderHook(() => useDoctors(service));
@@ -45,53 +45,51 @@ describe("useDoctors", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("sets error when getAll throws HTTP_ERROR_401", async () => {
+  it('sets error when getAll throws HTTP_ERROR_401', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error("HTTP_ERROR_401"));
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_401'));
 
     const { result } = renderHook(() => useDoctors(service));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe(
-      "No autorizado. Inicie sesión nuevamente."
-    );
+    expect(result.current.error).toBe('No autorizado. Inicie sesión nuevamente.');
   });
 
-  it("sets error when getAll throws HTTP_ERROR_500", async () => {
+  it('sets error when getAll throws HTTP_ERROR_500', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error("HTTP_ERROR_500"));
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_500'));
 
     const { result } = renderHook(() => useDoctors(service));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe("Error del servidor. Intente más tarde.");
+    expect(result.current.error).toBe('Error del servidor. Intente más tarde.');
   });
 
-  it("sets generic error message for unknown errors", async () => {
+  it('sets generic error message for unknown errors', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error("SOME_UNKNOWN"));
+    service.getAll.mockRejectedValueOnce(new Error('SOME_UNKNOWN'));
 
     const { result } = renderHook(() => useDoctors(service));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe("Error al cargar médicos.");
+    expect(result.current.error).toBe('Error al cargar médicos.');
   });
 
-  it("sets generic error message for non-Error throw", async () => {
+  it('sets generic error message for non-Error throw', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce("plain string error");
+    service.getAll.mockRejectedValueOnce('plain string error');
 
     const { result } = renderHook(() => useDoctors(service));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe("Error al cargar médicos.");
+    expect(result.current.error).toBe('Error al cargar médicos.');
   });
 
-  it("create delegates to doctorService.create and returns the doctor", async () => {
+  it('create delegates to doctorService.create and returns the doctor', async () => {
     const doctor = buildDoctor();
     const service = mockDoctorService([doctor]);
     service.create.mockResolvedValueOnce(doctor);
@@ -99,14 +97,14 @@ describe("useDoctors", () => {
     const { result } = renderHook(() => useDoctors(service));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    const data = { name: "Test Doc", documentId: "12345678" };
+    const data = { name: 'Test Doc', documentId: '12345678' };
     const created = await result.current.create(data);
 
     expect(service.create).toHaveBeenCalledWith(data);
     expect(created).toEqual(doctor);
   });
 
-  it("refresh reloads the doctor list", async () => {
+  it('refresh reloads the doctor list', async () => {
     const service = mockDoctorService([]);
 
     const { result } = renderHook(() => useDoctors(service));
@@ -124,9 +122,9 @@ describe("useDoctors", () => {
     expect(result.current.doctors[0]).toEqual(newDoctor);
   });
 
-  it("clears previous error on refresh", async () => {
+  it('clears previous error on refresh', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error("HTTP_ERROR_500"));
+    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_500'));
 
     const { result } = renderHook(() => useDoctors(service));
     await waitFor(() => expect(result.current.loading).toBe(false));

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useEffect } from "react";
-import type { Doctor, CreateDoctorData, UpdateDoctorData } from "@/domain/Doctor";
-import type { DoctorService } from "@/domain/ports/DoctorService";
+import { useState, useCallback, useEffect } from 'react';
+import type { Doctor, CreateDoctorData, UpdateDoctorData } from '@/domain/Doctor';
+import type { DoctorService } from '@/domain/ports/DoctorService';
 
 function mapError(err: unknown): string {
-  const message = err instanceof Error ? err.message : "";
-  if (message.includes("401")) return "No autorizado. Inicie sesión nuevamente.";
-  if (message.includes("500")) return "Error del servidor. Intente más tarde.";
-  return "Error al cargar médicos.";
+  const message = err instanceof Error ? err.message : '';
+  if (message.includes('401')) return 'No autorizado. Inicie sesión nuevamente.';
+  if (message.includes('500')) return 'Error del servidor. Intente más tarde.';
+  return 'Error al cargar médicos.';
 }
 
 export function useDoctors(doctorService: DoctorService) {
@@ -37,21 +37,21 @@ export function useDoctors(doctorService: DoctorService) {
     async (data: CreateDoctorData): Promise<Doctor> => {
       return doctorService.create(data);
     },
-    [doctorService]
+    [doctorService],
   );
 
   const update = useCallback(
     async (id: string, data: UpdateDoctorData): Promise<Doctor> => {
       return doctorService.update(id, data);
     },
-    [doctorService]
+    [doctorService],
   );
 
   const remove = useCallback(
     async (id: string): Promise<void> => {
       return doctorService.remove(id);
     },
-    [doctorService]
+    [doctorService],
   );
 
   const refresh = useCallback(async () => {

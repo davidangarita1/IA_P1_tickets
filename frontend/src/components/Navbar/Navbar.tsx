@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
-import SignOutButton from "@/components/SignOutButton/SignOutButton";
-import styles from "@/styles/Navbar.module.css";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import SignOutButton from '@/components/SignOutButton/SignOutButton';
+import styles from '@/styles/Navbar.module.css';
 
 const NAV_ITEMS = [
-  { href: "/", label: "Turnos" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/doctors", label: "Gestión Médicos" },
-  { href: "/register", label: "Registro" },
+  { href: '/', label: 'Turnos' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/doctors', label: 'Gestión Médicos' },
+  { href: '/register', label: 'Registro' },
 ];
 
 export default function Navbar() {

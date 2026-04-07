@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
-import type { UserRole } from "@/domain/User";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import type { UserRole } from '@/domain/User';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -18,12 +18,12 @@ export default function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     if (loading) return;
 
     if (!isAuthenticated) {
-      router.push("/signin");
+      router.push('/signin');
       return;
     }
 
     if (allowedRoles && !allowedRoles.some((role) => hasRole(role))) {
-      router.push("/");
+      router.push('/');
     }
   }, [isAuthenticated, loading, allowedRoles, hasRole, router]);
 

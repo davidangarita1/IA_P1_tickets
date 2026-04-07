@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { type ReactNode } from "react";
-import { AuthProvider } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
+import { type ReactNode } from 'react';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
 
 export default function ConnectedAuthProvider({ children }: { children: ReactNode }) {
   const { authService } = useDeps();

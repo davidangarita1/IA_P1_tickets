@@ -1,4 +1,4 @@
-export type TicketStatus = "waiting" | "called" | "served";
+export type TicketStatus = 'waiting' | 'called' | 'served';
 
 export interface Ticket {
   id: string;

@@ -1,15 +1,15 @@
-import type { TicketWriter } from "@/domain/ports/TicketWriter";
-import type { TicketReader } from "@/domain/ports/TicketReader";
-import type { RealTimeProvider, RealTimeCallbacks } from "@/domain/ports/RealTimeProvider";
-import type { AudioNotifier } from "@/domain/ports/AudioNotifier";
-import type { InputSanitizer } from "@/domain/ports/InputSanitizer";
-import type { Ticket } from "@/domain/Ticket";
-import type { CreateTicketResponse } from "@/domain/CreateTicket";
-import type { User, UserRole } from "@/domain/User";
-import type { AuthResult } from "@/domain/AuthCredentials";
-import type { AuthService } from "@/domain/ports/AuthService";
-import type { Doctor } from "@/domain/Doctor";
-import type { DoctorService } from "@/domain/ports/DoctorService";
+import type { TicketWriter } from '@/domain/ports/TicketWriter';
+import type { TicketReader } from '@/domain/ports/TicketReader';
+import type { RealTimeProvider, RealTimeCallbacks } from '@/domain/ports/RealTimeProvider';
+import type { AudioNotifier } from '@/domain/ports/AudioNotifier';
+import type { InputSanitizer } from '@/domain/ports/InputSanitizer';
+import type { Ticket } from '@/domain/Ticket';
+import type { CreateTicketResponse } from '@/domain/CreateTicket';
+import type { User, UserRole } from '@/domain/User';
+import type { AuthResult } from '@/domain/AuthCredentials';
+import type { AuthService } from '@/domain/ports/AuthService';
+import type { Doctor } from '@/domain/Doctor';
+import type { DoctorService } from '@/domain/ports/DoctorService';
 
 let idCounter = 0;
 
@@ -21,22 +21,20 @@ export function buildTicket(overrides: Partial<Ticket> = {}): Ticket {
     documentId: 1000000 + idCounter,
     office: null,
     timestamp: Date.now(),
-    status: "waiting",
+    status: 'waiting',
     ...overrides,
   };
 }
 
 export function mockTicketWriter(
-  response: CreateTicketResponse = { status: "accepted", message: "OK" }
+  response: CreateTicketResponse = { status: 'accepted', message: 'OK' },
 ): jest.Mocked<TicketWriter> {
   return {
     createTicket: jest.fn().mockResolvedValue(response),
   };
 }
 
-export function mockTicketReader(
-  tickets: Ticket[] = []
-): jest.Mocked<TicketReader> {
+export function mockTicketReader(tickets: Ticket[] = []): jest.Mocked<TicketReader> {
   return {
     getTickets: jest.fn().mockResolvedValue(tickets),
   };
@@ -93,7 +91,6 @@ export function mockAudioNotifier(): jest.Mocked<AudioNotifier> {
 
 export function mockSanitizer(): jest.Mocked<InputSanitizer> {
   return {
-    // istanbul ignore next
     sanitize: jest.fn((input: string) => input.trim()),
   };
 }
@@ -106,14 +103,19 @@ export function buildUser(overrides: Partial<User> = {}): User {
     id: `user-${userIdCounter}`,
     email: `user${userIdCounter}@example.com`,
     name: `User ${userIdCounter}`,
-    role: "employee" as UserRole,
+    role: 'employee' as UserRole,
     ...overrides,
   };
 }
 
 export function mockAuthService(
-  signInResult: AuthResult = { success: true, message: "OK", user: undefined, token: "jwt-token" },
-  signUpResult: AuthResult = { success: true, message: "Created", user: undefined, token: "jwt-token" }
+  signInResult: AuthResult = { success: true, message: 'OK', user: undefined, token: 'jwt-token' },
+  signUpResult: AuthResult = {
+    success: true,
+    message: 'Created',
+    user: undefined,
+    token: 'jwt-token',
+  },
 ): jest.Mocked<AuthService> {
   return {
     signIn: jest.fn().mockResolvedValue(signInResult),
@@ -125,29 +127,27 @@ export function mockAuthService(
 
 export function buildDoctor(overrides: Partial<Doctor> = {}): Doctor {
   return {
-    _id: "doc-1",
-    name: "Juan García",
-    documentId: "12345678",
-    office: "2",
-    shift: "06:00-14:00",
-    status: "active",
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-01-01T00:00:00Z",
+    _id: 'doc-1',
+    name: 'Juan García',
+    documentId: '12345678',
+    office: '2',
+    shift: '06:00-14:00',
+    status: 'active',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
     ...overrides,
   };
 }
 
-export function mockDoctorService(
-  doctors: Doctor[] = []
-): jest.Mocked<DoctorService> {
+export function mockDoctorService(doctors: Doctor[] = []): jest.Mocked<DoctorService> {
   return {
     getAll: jest.fn().mockResolvedValue(doctors),
     create: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     update: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     remove: jest.fn().mockResolvedValue(undefined),
     getAvailableShifts: jest.fn().mockResolvedValue({
-      office: "1",
-      availableShifts: ["06:00-14:00", "14:00-22:00"],
+      office: '1',
+      availableShifts: ['06:00-14:00', '14:00-22:00'],
       occupiedShifts: [],
     }),
   };

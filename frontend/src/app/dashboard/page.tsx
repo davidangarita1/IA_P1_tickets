@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
-import { useAudioNotification } from "@/hooks/useAudioNotification";
-import { useDeps } from "@/providers/DependencyProvider";
-import AuthGuard from "@/components/AuthGuard/AuthGuard";
-import styles from "@/styles/page.module.css";
+import { useEffect, useRef } from 'react';
+import { useTicketsWebSocket } from '@/hooks/useTicketsWebSocket';
+import { useAudioNotification } from '@/hooks/useAudioNotification';
+import { useDeps } from '@/providers/DependencyProvider';
+import AuthGuard from '@/components/AuthGuard/AuthGuard';
+import styles from '@/styles/page.module.css';
 
 const formatTime = (timestamp: number): string =>
-  new Date(timestamp).toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+  new Date(timestamp).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   });
 
 export default function ServedDashboard() {
@@ -25,14 +25,13 @@ export default function ServedDashboard() {
 function ServedDashboardContent() {
   const { realTime, audio } = useDeps();
   const { tickets, error, connected } = useTicketsWebSocket(realTime);
-  const { audioEnabled, showToast, toastMessage, notify } =
-    useAudioNotification(audio);
+  const { audioEnabled, showToast, toastMessage, notify } = useAudioNotification(audio);
 
   const lastCountRef = useRef(0);
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    const servedCount = tickets.filter((t) => t.status === "served").length;
+    const servedCount = tickets.filter((t) => t.status === 'served').length;
 
     if (!initializedRef.current) {
       lastCountRef.current = servedCount;
@@ -43,14 +42,14 @@ function ServedDashboardContent() {
     }
 
     if (servedCount > lastCountRef.current) {
-      notify("✅ Turno completado");
+      notify('✅ Turno completado');
     }
 
     lastCountRef.current = servedCount;
   }, [tickets, notify]);
 
   const servedTickets = tickets
-    .filter((t) => t.status === "served")
+    .filter((t) => t.status === 'served')
     .sort((a, b) => b.timestamp - a.timestamp);
 
   return (
@@ -58,24 +57,18 @@ function ServedDashboardContent() {
       <h1 className={styles.title}>Historial de Turnos Atendidos</h1>
 
       <p className={connected ? styles.connected : styles.disconnected}>
-        {connected
-          ? "🟢 Conectado en tiempo real"
-          : "🔴 Desconectado — reconectando..."}
+        {connected ? '🟢 Conectado en tiempo real' : '🔴 Desconectado — reconectando...'}
       </p>
 
       {!audioEnabled && (
-        <p className={styles.audioHint}>
-          Toca la pantalla para habilitar el sonido 🔔
-        </p>
+        <p className={styles.audioHint}>Toca la pantalla para habilitar el sonido 🔔</p>
       )}
 
       {error && <p className={styles.error}>{error}</p>}
 
       {servedTickets.length > 0 && (
         <>
-          <h2 className={styles.sectionTitle}>
-            ✅ Atendidos ({servedTickets.length})
-          </h2>
+          <h2 className={styles.sectionTitle}>✅ Atendidos ({servedTickets.length})</h2>
           <ul className={styles.list}>
             {servedTickets.map((t) => (
               <li key={t.id} className={`${styles.item} ${styles.served}`}>

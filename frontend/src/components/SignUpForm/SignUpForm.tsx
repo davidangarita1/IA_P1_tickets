@@ -1,25 +1,24 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
-import styles from "@/styles/SignUpForm.module.css";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
+import styles from '@/styles/SignUpForm.module.css';
 
 export const WEAK_PASSWORD_MSG =
-  "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
+  'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.';
 
-export const SUCCESS_SIGNUP_MSG = "¡Cuenta creada exitosamente! Inicia sesión para continuar.";
-export const SIGNUP_SUCCESS_KEY = "signup_success";
+export const SUCCESS_SIGNUP_MSG = '¡Cuenta creada exitosamente! Inicia sesión para continuar.';
+export const SIGNUP_SUCCESS_KEY = 'signup_success';
 
-const STRONG_PASSWORD_RE =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+const STRONG_PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
 
 export default function SignUpForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const { signUp, loading, error } = useAuth();
   const { sanitizer } = useDeps();
@@ -38,10 +37,15 @@ export default function SignUpForm() {
       return;
     }
 
-    const ok = await signUp({ name: sanitizedName, email: sanitizedEmail, password: trimmedPassword, role: "employee" });
+    const ok = await signUp({
+      name: sanitizedName,
+      email: sanitizedEmail,
+      password: trimmedPassword,
+      role: 'employee',
+    });
     if (ok) {
       sessionStorage.setItem(SIGNUP_SUCCESS_KEY, SUCCESS_SIGNUP_MSG);
-      router.push("/signin");
+      router.push('/signin');
     }
   };
 
@@ -49,7 +53,11 @@ export default function SignUpForm() {
     <div className={styles.wrapper}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Crear cuenta</h2>
-        {(formError || error) && <p role="alert" className={styles.error}>{formError ?? error}</p>}
+        {(formError || error) && (
+          <p role="alert" className={styles.error}>
+            {formError ?? error}
+          </p>
+        )}
         <input
           type="text"
           placeholder="Nombre"
@@ -72,7 +80,7 @@ export default function SignUpForm() {
           className={styles.input}
         />
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Registrando..." : "Registrarse"}
+          {loading ? 'Registrando...' : 'Registrarse'}
         </button>
         <p className={styles.footer}>
           ¿Ya tienes cuenta? <Link href="/signin">Inicia sesión</Link>
