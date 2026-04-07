@@ -56,7 +56,7 @@ describe('CreateTurnoUseCase (Application)', () => {
         );
     });
 
-    it('crea turno, notifica, publica evento y dispara asignación inmediata', async () => {
+    it('creates turno, notifies, publishes event and triggers immediate assignment', async () => {
         // Arrange: repositorio retorna el turno persistido.
         turnoRepository.findActivoPorCedula.mockResolvedValue(null);
         turnoRepository.save.mockResolvedValue(turnoCreado);
@@ -82,7 +82,7 @@ describe('CreateTurnoUseCase (Application)', () => {
         expect(result.turno).toEqual(turnoCreado);
     });
 
-    it('no falla si la asignación inmediata lanza error no-Error (best-effort)', async () => {
+    it('does not fail when immediate assignment throws non-Error (best-effort)', async () => {
         turnoRepository.findActivoPorCedula.mockResolvedValue(null);
         turnoRepository.save.mockResolvedValue(turnoCreado);
         notificationGateway.sendNotification.mockResolvedValue(undefined);
@@ -96,7 +96,7 @@ describe('CreateTurnoUseCase (Application)', () => {
         });
     });
 
-    it('no falla si la asignación inmediata lanza error (best-effort)', async () => {
+    it('does not fail when immediate assignment throws error (best-effort)', async () => {
         // Arrange: creación exitosa pero falla la asignación posterior.
         turnoRepository.findActivoPorCedula.mockResolvedValue(null);
         turnoRepository.save.mockResolvedValue(turnoCreado);
@@ -112,7 +112,7 @@ describe('CreateTurnoUseCase (Application)', () => {
         });
     });
 
-    it('rechaza creación si la cédula ya tiene un turno activo', async () => {
+    it('rejects creation when cedula already has an active turno', async () => {
         // Arrange: ya existe un turno en espera para la cédula.
         turnoRepository.findActivoPorCedula.mockResolvedValue(turnoCreado);
 
@@ -123,7 +123,7 @@ describe('CreateTurnoUseCase (Application)', () => {
         expect(turnoRepository.save).not.toHaveBeenCalled();
     });
 
-    it('usa 5 consultorios por defecto cuando la variable de entorno no existe', async () => {
+    it('uses 5 offices by default when environment variable is not set', async () => {
         const emptyConfigService: Pick<ConfigService, 'get'> = {
             get: jest.fn(() => undefined),
         };

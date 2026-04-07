@@ -20,7 +20,7 @@ describe('HmacTokenService (Infrastructure)', () => {
   };
 
   describe('generateToken', () => {
-    it('genera un token con formato data.signature', () => {
+    it('generates a token with data.signature format', () => {
       const payload = { userId: '123', email: 'test@test.com' };
 
       const token = service.generateToken(payload);
@@ -31,7 +31,7 @@ describe('HmacTokenService (Infrastructure)', () => {
   });
 
   describe('verifyToken', () => {
-    it('verifica un token válido y retorna el payload', () => {
+    it('verifies a valid token and returns the payload', () => {
       const payload = { userId: '123', email: 'test@test.com' };
       const token = service.generateToken(payload);
 
@@ -40,7 +40,7 @@ describe('HmacTokenService (Infrastructure)', () => {
       expect(result).toEqual(payload);
     });
 
-    it('retorna null si el token tiene formato inválido', () => {
+    it('returns null when token has invalid format', () => {
       const invalidToken = 'invalid-token-without-dot';
 
       const result = service.verifyToken(invalidToken);
@@ -48,7 +48,7 @@ describe('HmacTokenService (Infrastructure)', () => {
       expect(result).toBeNull();
     });
 
-    it('retorna null si la firma no coincide', () => {
+    it('returns null when signature does not match', () => {
       const payload = { userId: '123' };
       const token = service.generateToken(payload);
       const [data] = token.split('.');
@@ -59,7 +59,7 @@ describe('HmacTokenService (Infrastructure)', () => {
       expect(result).toBeNull();
     });
 
-    it('retorna null si el payload no es JSON válido', () => {
+    it('returns null when payload is not valid JSON', () => {
       const notJsonData = Buffer.from('not-valid-json', 'utf8').toString('base64url');
       const validSignature = signData(notJsonData);
       const tokenWithInvalidJson = `${notJsonData}.${validSignature}`;

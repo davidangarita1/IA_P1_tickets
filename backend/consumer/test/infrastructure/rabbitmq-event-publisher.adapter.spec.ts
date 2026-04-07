@@ -15,7 +15,7 @@ describe('RabbitMQEventPublisher (Infrastructure)', () => {
     });
 
     describe('publish', () => {
-        it('emite el evento al ClientProxy con el payload', () => {
+        it('emits the event to ClientProxy with the payload', () => {
             // Arrange
             const event = 'turno_actualizado';
             const payload = { id: 'turno-1', nombre: 'Test', estado: 'llamado' };
@@ -29,7 +29,7 @@ describe('RabbitMQEventPublisher (Infrastructure)', () => {
     });
 
     describe('onModuleDestroy', () => {
-        it('cierra la conexión del ClientProxy', async () => {
+        it('closes the ClientProxy connection', async () => {
             // Act
             await publisher.onModuleDestroy();
 

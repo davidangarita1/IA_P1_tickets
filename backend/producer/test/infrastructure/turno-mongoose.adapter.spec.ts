@@ -26,7 +26,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
   });
 
   describe('findAll', () => {
-    it('retorna todos los turnos ordenados por timestamp', async () => {
+    it('returns all turnos sorted by timestamp', async () => {
       const docs = [mockTurnoDoc(), mockTurnoDoc({ _id: 'turno-id-2', cedula: 67890 })];
       mockModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
@@ -40,7 +40,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
       expect(mockModel.find).toHaveBeenCalled();
     });
 
-    it('retorna array vacío si no hay turnos', async () => {
+    it('returns empty array when no turnos exist', async () => {
       mockModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue([]),
@@ -54,7 +54,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
   });
 
   describe('findByCedula', () => {
-    it('retorna turnos filtrados por cédula', async () => {
+    it('returns turnos filtered by cedula', async () => {
       const cedula = 12345;
       const docs = [mockTurnoDoc({ cedula })];
       mockModel.find.mockReturnValue({
@@ -70,7 +70,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
       expect(mockModel.find).toHaveBeenCalledWith({ cedula });
     });
 
-    it('lanza NotFoundException si no hay turnos para la cédula', async () => {
+    it('throws NotFoundException when no turnos exist for the cedula', async () => {
       const cedula = 99999;
       mockModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({

@@ -38,7 +38,7 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     gateway.server = mockServer as Server;
   });
 
-  it('envía snapshot de turnos al cliente al conectarse', async () => {
+  it('sends turnos snapshot to client on connection', async () => {
     turnoRepository.findAll.mockResolvedValue([turno1]);
 
     await gateway.handleConnection(mockClient as Socket);
@@ -50,7 +50,7 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     });
   });
 
-  it('envía snapshot vacío si no hay turnos', async () => {
+  it('sends empty snapshot when no turnos exist', async () => {
     turnoRepository.findAll.mockResolvedValue([]);
 
     await gateway.handleConnection(mockClient as Socket);
@@ -61,7 +61,7 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     });
   });
 
-  it('hace broadcast de actualización a todos los clientes', () => {
+  it('broadcasts update to all clients', () => {
     const payload = turno1.toEventPayload();
 
     gateway.broadcastTurnoActualizado(payload);
@@ -72,7 +72,7 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     });
   });
 
-  it('hace broadcast con consultorio null sin fallar', () => {
+  it('broadcasts with null consultorio without failing', () => {
     const turnoSinConsultorio = new Turno({
       id: 't2',
       nombre: 'Paciente B',
@@ -93,21 +93,21 @@ describe('TurnosGateway (Presentation - WebSocket)', () => {
     });
   });
 
-  it('no falla si el repositorio lanza error al conectar cliente', async () => {
+  it('does not fail when repository throws error on client connection', async () => {
     turnoRepository.findAll.mockRejectedValue(new Error('DB connection lost'));
 
     await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
     expect(mockClient.emit).not.toHaveBeenCalled();
   });
 
-  it('maneja error no-instancia de Error al conectar cliente', async () => {
+  it('handles non-Error instance on client connection', async () => {
     turnoRepository.findAll.mockRejectedValue('string error');
 
     await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
     expect(mockClient.emit).not.toHaveBeenCalled();
   });
 
-  it('maneja desconexión del cliente correctamente', () => {
+  it('handles client disconnection correctly', () => {
     gateway.handleDisconnect(mockClient as Socket);
 
     expect(true).toBe(true);

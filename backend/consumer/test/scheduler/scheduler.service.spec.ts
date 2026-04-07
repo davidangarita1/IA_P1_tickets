@@ -46,7 +46,7 @@ describe('SchedulerService', () => {
         expect(service).toBeDefined();
     });
 
-    it('registra el intervalo al inicializarse', () => {
+    it('registers the interval on initialization', () => {
         // Verifica que el scheduler quede conectado al registro de Nest.
         expect(schedulerRegistry.addInterval).toHaveBeenCalledWith(
             'scheduler-asignacion-turnos',
@@ -67,7 +67,7 @@ describe('SchedulerService', () => {
         expect(assignRoomUseCase.executeAll).toHaveBeenCalledWith(5);
     });
 
-    it('no propaga error cuando falla un caso de uso', async () => {
+    it('does not propagate error when a use case fails', async () => {
         // Arrange: falla de infraestructura simulada.
         (finalizeTurnosUseCase.execute as jest.Mock).mockRejectedValue(
             new Error('DB connection failed'),
@@ -77,7 +77,7 @@ describe('SchedulerService', () => {
         await expect(service.handleSchedulerTick()).resolves.not.toThrow();
     });
 
-    it('elimina el intervalo en onModuleDestroy', () => {
+    it('removes the interval on onModuleDestroy', () => {
         // Act: simular apagado ordenado del módulo.
         service.onModuleDestroy();
 
@@ -87,7 +87,7 @@ describe('SchedulerService', () => {
         );
     });
 
-    it('ejecuta el tick automáticamente cuando pasa el intervalo', async () => {
+    it('executes tick automatically when interval elapses', async () => {
         // Arrange: los casos de uso responden correctamente.
         (finalizeTurnosUseCase.execute as jest.Mock).mockResolvedValue([]);
         (assignRoomUseCase.executeAll as jest.Mock).mockResolvedValue([]);
@@ -101,7 +101,7 @@ describe('SchedulerService', () => {
         expect(finalizeTurnosUseCase.execute).toHaveBeenCalled();
     });
 
-    it('loguea error como string cuando no es instancia de Error', async () => {
+    it('logs error as string when not an Error instance', async () => {
         // Arrange: error que no es instancia de Error.
         (finalizeTurnosUseCase.execute as jest.Mock).mockRejectedValue('string error');
 
@@ -109,7 +109,7 @@ describe('SchedulerService', () => {
         await expect(service.handleSchedulerTick()).resolves.not.toThrow();
     });
 
-    it('usa valores por defecto cuando las variables de entorno son falsy', () => {
+    it('uses default values when environment variables are falsy', () => {
         const emptyConfigService: Pick<ConfigService, 'get'> = {
             get: jest.fn(() => undefined),
         };

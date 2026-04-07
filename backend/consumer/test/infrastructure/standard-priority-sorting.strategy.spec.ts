@@ -2,7 +2,7 @@ import { StandardPrioritySortingStrategy } from '../../src/infrastructure/adapte
 import { Turno } from '../../src/domain/entities/turno.entity';
 
 describe('StandardPrioritySortingStrategy (Infrastructure)', () => {
-    it('ordena por prioridad y luego por timestamp (FIFO)', () => {
+    it('sorts by priority then by timestamp (FIFO)', () => {
         // Arrange: misma cola con prioridades mezcladas y diferentes timestamps.
         const turnos: Turno[] = [
             new Turno({
@@ -56,7 +56,7 @@ describe('StandardPrioritySortingStrategy (Infrastructure)', () => {
         expect(sorted.map(turno => turno.id)).toEqual(['3', '2', '1', '4']);
     });
 
-    it('usa prioridad media como fallback para prioridades desconocidas', () => {
+    it('uses media priority as fallback for unknown priorities', () => {
         const turnos: Turno[] = [
             new Turno({
                 id: '1',

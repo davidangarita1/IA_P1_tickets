@@ -8,7 +8,7 @@ describe('InMemoryUserRepository (Infrastructure)', () => {
   });
 
   describe('findByEmail', () => {
-    it('retorna null si el usuario no existe', async () => {
+    it('returns null when user does not exist', async () => {
       const email = 'nonexistent@test.com';
 
       const result = await repository.findByEmail(email);
@@ -16,7 +16,7 @@ describe('InMemoryUserRepository (Infrastructure)', () => {
       expect(result).toBeNull();
     });
 
-    it('retorna el usuario si existe', async () => {
+    it('returns the user when it exists', async () => {
       const userData = {
         email: 'test@test.com',
         passwordHash: 'hash123',
@@ -34,7 +34,7 @@ describe('InMemoryUserRepository (Infrastructure)', () => {
   });
 
   describe('create', () => {
-    it('crea un usuario con ID secuencial', async () => {
+    it('creates a user with sequential ID', async () => {
       const userData = {
         email: 'new@test.com',
         passwordHash: 'hash',
@@ -49,7 +49,7 @@ describe('InMemoryUserRepository (Infrastructure)', () => {
       expect(user.isActive).toBe(true);
     });
 
-    it('asigna IDs únicos a usuarios consecutivos', async () => {
+    it('assigns unique IDs to consecutive users', async () => {
       const userData1 = { email: 'user1@test.com', passwordHash: 'h1', nombre: 'U1', rol: 'r' };
       const userData2 = { email: 'user2@test.com', passwordHash: 'h2', nombre: 'U2', rol: 'r' };
 

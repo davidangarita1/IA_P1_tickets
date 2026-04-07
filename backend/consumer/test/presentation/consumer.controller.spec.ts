@@ -38,7 +38,7 @@ describe('ConsumerController (Presentation)', () => {
         expect(channel.nack).not.toHaveBeenCalled();
     });
 
-    it('NACK sin requeue cuando hay BadRequestException', async () => {
+    it('NACKs without requeue on BadRequestException', async () => {
         // Arrange: error de validación/negocio no recuperable.
         (createTurnoUseCase.execute as jest.Mock).mockRejectedValue(
             new BadRequestException('invalid payload'),
@@ -52,7 +52,7 @@ describe('ConsumerController (Presentation)', () => {
         expect(channel.ack).not.toHaveBeenCalled();
     });
 
-    it('NACK con requeue cuando hay error transitorio', async () => {
+    it('NACKs with requeue on transient error', async () => {
         // Arrange: simular falla temporal (ej. base de datos no disponible).
         (createTurnoUseCase.execute as jest.Mock).mockRejectedValue(new Error('db down'));
 
@@ -64,7 +64,7 @@ describe('ConsumerController (Presentation)', () => {
         expect(channel.ack).not.toHaveBeenCalled();
     });
 
-    it('NACK con requeue cuando el error no es instancia de Error', async () => {
+    it('NACKs with requeue when error is not an Error instance', async () => {
         (createTurnoUseCase.execute as jest.Mock).mockRejectedValue('string error');
 
         await controller.handleCrearTurno({ cedula: 123, nombre: 'Paciente' } as never, context as never);
