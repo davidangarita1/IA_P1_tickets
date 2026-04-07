@@ -4,6 +4,7 @@ export interface DoctorService {
   getAll(): Promise<Doctor[]>;
   create(data: CreateDoctorData): Promise<Doctor>;
   update(id: string, data: UpdateDoctorData): Promise<Doctor>;
+  remove(id: string): Promise<void>;
   getAvailableShifts(
     office: string,
     excludeDoctorId?: string

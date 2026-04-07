@@ -144,6 +144,7 @@ export function mockDoctorService(
     getAll: jest.fn().mockResolvedValue(doctors),
     create: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
     update: jest.fn().mockResolvedValue(doctors[0] ?? buildDoctor()),
+    remove: jest.fn().mockResolvedValue(undefined),
     getAvailableShifts: jest.fn().mockResolvedValue({
       office: "1",
       availableShifts: ["06:00-14:00", "14:00-22:00"],

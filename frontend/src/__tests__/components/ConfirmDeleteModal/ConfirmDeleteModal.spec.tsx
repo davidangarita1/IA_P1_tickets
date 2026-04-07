@@ -19,7 +19,7 @@ describe("ConfirmDeleteModal", () => {
 
     expect(
       screen.getByText(
-        /esta seguro de que desea dar de baja al Dr\. Juan García/i
+        /Está seguro de que desea dar de baja al Dr\. Juan García/i
       )
     ).toBeInTheDocument();
   });
