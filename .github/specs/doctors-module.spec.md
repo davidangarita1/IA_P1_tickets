@@ -1,6 +1,6 @@
 ---
 id: SPEC-001
-status: IN_PROGRESS
+status: IMPLEMENTED
 feature: doctors-module
 created: 2026-04-06
 updated: 2026-04-06
@@ -11,7 +11,7 @@ related-specs: []
 
 # Spec: Módulo de Gestión de Médicos y Consultorios
 
-> **Estado:** `IN_PROGRESS` → implementación en curso.
+> **Estado:** `IMPLEMENTED` → implementación completa. Cobertura BE >97% · FE >94%.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---
@@ -969,5 +969,5 @@ frontend/src/
 - [x] Revisar todos los checkboxes de implementación
 - [x] Confirmar que tests pasan (backend 100%, frontend 100%)
 - [x] Validar que Swagger/OpenAPI documenta todos los endpoints
-- [ ] Ejecutar cobertura de código (target: >90%)
-- [ ] **Actualizar `status` de spec a `IMPLEMENTED`** una vez completada la verificación de cobertura
+- [x] Ejecutar cobertura de código (target: >90%) — BE: 99.32% stmts / 97.16% branches · FE: 97.98% stmts / 94.76% branches
+- [x] **Actualizar `status` de spec a `IMPLEMENTED`**
