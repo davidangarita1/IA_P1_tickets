@@ -802,7 +802,7 @@ frontend/src/
 - [ ] Crear Value Object `DoctorShift` para franjas horarias (`06:00-14:00`, `14:00-22:00`)
 - [x] Crear interfaz `IDoctorRepository` en `domain/ports/doctor.repository.ts`
 - [x] Crear token de inyección `DOCTOR_REPOSITORY_TOKEN` en `domain/ports/tokens.ts`
-- [ ] Crear eventos de dominio: `DoctorCreatedEvent`, `DoctorUpdatedEvent`, `DoctorDeletedEvent`
+`DoctorUpdatedEvent`, `DoctorDeletedEvent`
 - [x] Crear schema Mongoose `DoctorSchema` en `infrastructure/schemas/doctor.schema.ts` con índices (único en cedula, único en consultorio+franja, índice en status)
 - [x] Crear adapter `DoctorMongooseAdapter` en `infrastructure/adapters/doctor-mongoose.adapter.ts` implementando `IDoctorRepository`
 - [x] Crear DTOs en `presentation/dtos/`: `CreateDoctorDto`, `UpdateDoctorDto`, `DoctorResponseDto`
