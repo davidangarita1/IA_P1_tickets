@@ -839,7 +839,7 @@ frontend/src/
 - [x] Verificación de disponibilidad: consultorio + franja no está asignado a otro médico activo
 - [x] Verificación de bloqueo de delete: médico sin turnos en estado "llamado" o "atendido"
 - [x] Validación de rol de usuario: solo Empleado/Administrador pueden CRUD doctors
-- [ ] Auditoría: `created_at`, `updated_at`, `created_by`, `updated_by` se registran automáticamente
+- [x] Auditoría: `created_at`, `updated_at`, `created_by`, `updated_by` se registran automáticamente
 
 ### Backend — Tests
 
