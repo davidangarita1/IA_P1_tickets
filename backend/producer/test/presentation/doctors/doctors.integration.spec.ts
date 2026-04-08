@@ -94,8 +94,6 @@ describe('DoctorsModule Integration', () => {
     mockTokenVerifier.verifyToken.mockReturnValue({ uid: 'user-1', rol: 'empleado' });
   });
 
-  // --- Authentication & Authorization ---
-
   it('returns 401 when no Authorization header is provided', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/doctors')
@@ -122,8 +120,6 @@ describe('DoctorsModule Integration', () => {
       .send({ name: 'Juan García', documentId: '12345678' })
       .expect(403);
   });
-
-  // --- POST /api/v1/doctors - DTO Validation (business rules at API boundary) ---
 
   it('returns 400 when name is missing', async () => {
     await request(app.getHttpServer())
@@ -205,8 +201,6 @@ describe('DoctorsModule Integration', () => {
       .expect(400);
   });
 
-  // --- POST /api/v1/doctors - Business rules (use case level) ---
-
   it('returns 201 when creating a doctor with valid data', async () => {
     mockDoctorRepository.findActiveByDocumentId.mockResolvedValue(null);
     const created = makeDoctor();
@@ -280,8 +274,6 @@ describe('DoctorsModule Integration', () => {
       .expect(400);
   });
 
-  // --- GET /api/v1/doctors - Pagination ---
-
   it('returns 200 with paginated active doctors', async () => {
     mockDoctorRepository.findAllPaginated.mockResolvedValue({
       data: [makeDoctor()],
@@ -298,8 +290,6 @@ describe('DoctorsModule Integration', () => {
     expect(response.body.data).toHaveLength(1);
     expect(response.body.total).toBe(1);
   });
-
-  // --- PUT /api/v1/doctors/:id - Update ---
 
   it('returns 200 when updating a doctor with valid data', async () => {
     const existing = makeDoctor();
@@ -333,8 +323,6 @@ describe('DoctorsModule Integration', () => {
       .send({ name: 'AB' })
       .expect(400);
   });
-
-  // --- DELETE /api/v1/doctors/:id - Soft delete ---
 
   it('returns 204 when soft-deleting a doctor without active turnos', async () => {
     const doctor = makeDoctor();
@@ -372,8 +360,6 @@ describe('DoctorsModule Integration', () => {
       .expect(404);
   });
 
-  // --- GET /api/v1/doctors/available-shifts ---
-
   it('returns 200 with available shifts for an office', async () => {
     mockDoctorRepository.findAvailableShifts.mockResolvedValue({
       availableShifts: ['14:00-22:00'],
@@ -388,8 +374,6 @@ describe('DoctorsModule Integration', () => {
     expect(response.body.availableShifts).toContain('14:00-22:00');
     expect(response.body.occupiedShifts).toContain('06:00-14:00');
   });
-
-  // --- Role: Administrador also has access ---
 
   it('allows access with Administrador role', async () => {
     mockTokenVerifier.verifyToken.mockReturnValue({ uid: 'admin-1', rol: 'Administrador' });

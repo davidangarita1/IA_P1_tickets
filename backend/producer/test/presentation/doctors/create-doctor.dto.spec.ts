@@ -7,8 +7,6 @@ describe('CreateDoctorDto (Presentation - DTO)', () => {
     return plainToInstance(CreateDoctorDto, plain);
   }
 
-  // --- Happy path ---
-
   it('passes validation with all valid fields', async () => {
     const dto = toDto({
       name: 'Juan García',
@@ -118,8 +116,6 @@ describe('CreateDoctorDto (Presentation - DTO)', () => {
     }
   });
 
-  // --- Name validation (business rule: required, min 3, max 100) ---
-
   it('rejects empty name', async () => {
     const dto = toDto({
       name: '',
@@ -167,8 +163,6 @@ describe('CreateDoctorDto (Presentation - DTO)', () => {
     expect(errors.length).toBeGreaterThan(0);
     expect(errors[0].property).toBe('name');
   });
-
-  // --- DocumentId validation (business rule: required, only digits, 7-10 length) ---
 
   it('rejects empty documentId', async () => {
     const dto = toDto({
@@ -241,8 +235,6 @@ describe('CreateDoctorDto (Presentation - DTO)', () => {
     expect(errors[0].property).toBe('documentId');
   });
 
-  // --- Office validation (business rule: optional, must be 1-10 if provided) ---
-
   it('rejects invalid office value', async () => {
     const dto = toDto({
       name: 'Juan García',
@@ -268,8 +260,6 @@ describe('CreateDoctorDto (Presentation - DTO)', () => {
     expect(errors.length).toBeGreaterThan(0);
     expect(errors[0].property).toBe('office');
   });
-
-  // --- Shift validation (business rule: optional, fixed values only) ---
 
   it('rejects invalid shift value', async () => {
     const dto = toDto({
