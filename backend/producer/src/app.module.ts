@@ -4,11 +4,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProducerController } from './presentation/producer.controller';
 import { AuthController } from './presentation/auth.controller';
-import { TurnosModule } from './turnos/turnos.module';
+import { DoctorController } from './presentation/doctor.controller';
 import { EventsModule } from './events/events.module';
 import { RabbitMQEventPublisher } from './infrastructure/adapters/rabbitmq-event-publisher.adapter';
+import { DoctorMongooseAdapter } from './infrastructure/adapters/doctor-mongoose.adapter';
+import { DoctorSchemaClass, DoctorSchema } from './infrastructure/schemas/doctor.schema';
 import {
   ACCESS_TOKEN_VERIFIER_TOKEN,
+  DOCTOR_REPOSITORY_TOKEN,
   EVENT_PUBLISHER_TOKEN,
   PASSWORD_HASHER_TOKEN,
   TOKEN_SERVICE_TOKEN,
@@ -17,13 +20,18 @@ import {
 import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
 import { GetAllTurnosUseCase } from './application/use-cases/get-all-turnos.use-case';
 import { GetTurnosByCedulaUseCase } from './application/use-cases/get-turnos-by-cedula.use-case';
+import { CreateDoctorUseCase } from './application/use-cases/create-doctor.use-case';
+import { GetAllDoctorsUseCase } from './application/use-cases/get-all-doctors.use-case';
+import { GetAvailableShiftsUseCase } from './application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from './application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from './application/use-cases/delete-doctor.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { SignupUseCase } from './application/use-cases/signup.use-case';
 import { InMemoryUserRepository } from './infrastructure/adapters/in-memory-user.repository';
 import { ScryptPasswordHasherAdapter } from './infrastructure/adapters/scrypt-password-hasher.adapter';
 import { HmacTokenService } from './infrastructure/adapters/hmac-token.service';
 import { AuthGuard } from './presentation/auth.guard';
-import { DoctorsModule } from './doctors/doctors.module';
+import { DoctorRoleGuard } from './presentation/doctor-role.guard';
 
 @Module({
   imports: [
@@ -62,17 +70,25 @@ import { DoctorsModule } from './doctors/doctors.module';
         inject: [ConfigService],
       },
     ]),
-    TurnosModule,
-
+    MongooseModule.forFeature([{ name: DoctorSchemaClass.name, schema: DoctorSchema }]),
     EventsModule,
-    DoctorsModule,
   ],
-  controllers: [ProducerController, AuthController],
+  controllers: [ProducerController, AuthController, DoctorController],
 
   providers: [
     CreateTurnoUseCase,
     GetAllTurnosUseCase,
     GetTurnosByCedulaUseCase,
+    {
+      provide: DOCTOR_REPOSITORY_TOKEN,
+      useClass: DoctorMongooseAdapter,
+    },
+    CreateDoctorUseCase,
+    GetAllDoctorsUseCase,
+    GetAvailableShiftsUseCase,
+    UpdateDoctorUseCase,
+    DeleteDoctorUseCase,
+    DoctorRoleGuard,
     {
       provide: EVENT_PUBLISHER_TOKEN,
       useClass: RabbitMQEventPublisher,
