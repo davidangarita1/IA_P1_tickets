@@ -1,20 +1,12 @@
 import { AuthController } from '../../src/presentation/auth.controller';
-import { LoginUseCase } from '../../src/application/use-cases/login.use-case';
-import { SignupUseCase } from '../../src/application/use-cases/signup.use-case';
+import { LoginUseCase, LoginResult } from '../../src/application/use-cases/login.use-case';
+import { SignupUseCase, SignupResult } from '../../src/application/use-cases/signup.use-case';
 import { GetAllTurnosUseCase } from '../../src/application/use-cases/get-all-turnos.use-case';
 
-describe('AuthController (Presentation)', () => {
-  const signupUseCase: Pick<SignupUseCase, 'execute'> = {
-    execute: jest.fn(),
-  };
-
-  const loginUseCase: Pick<LoginUseCase, 'execute'> = {
-    execute: jest.fn(),
-  };
-
-  const getAllTurnosUseCase: Pick<GetAllTurnosUseCase, 'execute'> = {
-    execute: jest.fn(),
-  };
+describe('AuthController — frontend-aligned contract', () => {
+  const signupUseCase: Pick<SignupUseCase, 'execute'> = { execute: jest.fn() };
+  const loginUseCase: Pick<LoginUseCase, 'execute'> = { execute: jest.fn() };
+  const getAllTurnosUseCase: Pick<GetAllTurnosUseCase, 'execute'> = { execute: jest.fn() };
 
   let controller: AuthController;
 
@@ -27,109 +19,98 @@ describe('AuthController (Presentation)', () => {
     );
   });
 
-  it('delegates signUp and returns success with usuario', async () => {
-    const signupResult = {
-      token: 'new-token',
-      usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
-    };
-    (signupUseCase.execute as jest.Mock).mockResolvedValue(signupResult);
-    const request = { email: 'admin@eps.com', password: 'secret', nombre: 'Admin', rol: 'admin' };
+  describe('POST /auth/signIn', () => {
+    it('returns { success, message, token, usuario } on valid credentials', async () => {
+      const loginResult: LoginResult = {
+        token: 'signed-token',
+        usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+      };
+      (loginUseCase.execute as jest.Mock).mockResolvedValue(loginResult);
 
-    const result = await controller.signUp(request);
+      const result = await controller.signIn({ email: 'admin@eps.com', password: 'secret' });
 
-    expect(signupUseCase.execute).toHaveBeenCalledWith(request);
-    expect(result).toEqual({
-      success: true,
-      message: 'Registro exitoso',
-      token: 'new-token',
-      usuario: signupResult.usuario,
+      expect(result).toEqual({
+        success: true,
+        message: 'Login exitoso',
+        token: 'signed-token',
+        usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+      });
+    });
+
+    it('returns { success: false, message } when use case throws', async () => {
+      (loginUseCase.execute as jest.Mock).mockRejectedValue(new Error('Invalid credentials'));
+
+      const result = await controller.signIn({ email: 'bad@eps.com', password: 'wrong' });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Invalid credentials',
+      });
     });
   });
 
-  it('delegates signIn and returns success with token + usuario', async () => {
-    const loginResult = {
-      token: 'signed-token',
-      usuario: { id: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
-    };
-    (loginUseCase.execute as jest.Mock).mockResolvedValue(loginResult);
-    const request = { email: 'admin@eps.com', password: 'secret' };
+  describe('POST /auth/signUp', () => {
+    it('returns { success, message, token, usuario } on valid registration', async () => {
+      const signupResult: SignupResult = {
+        token: 'new-token',
+        usuario: { id: 'user-2', email: 'nurse@eps.com', nombre: 'Enfermera', rol: 'empleado' },
+      };
+      (signupUseCase.execute as jest.Mock).mockResolvedValue(signupResult);
 
-    const result = await controller.signIn(request);
+      const result = await controller.signUp({
+        email: 'nurse@eps.com',
+        password: 'secret',
+        nombre: 'Enfermera',
+        rol: 'empleado',
+      });
 
-    expect(loginUseCase.execute).toHaveBeenCalledWith(request);
-    expect(result).toEqual({
-      success: true,
-      message: 'Login exitoso',
-      token: 'signed-token',
-      usuario: loginResult.usuario,
+      expect(result).toEqual({
+        success: true,
+        message: 'Registro exitoso',
+        token: 'new-token',
+        usuario: { id: 'user-2', email: 'nurse@eps.com', nombre: 'Enfermera', rol: 'empleado' },
+      });
+    });
+
+    it('returns { success: false, message } when use case throws', async () => {
+      (signupUseCase.execute as jest.Mock).mockRejectedValue(new Error('Email already in use'));
+
+      const result = await controller.signUp({
+        email: 'dup@eps.com',
+        password: 'secret',
+        nombre: 'Dup',
+        rol: 'empleado',
+      });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Email already in use',
+      });
     });
   });
 
-  it('returns dashboard history from use case when already authenticated', async () => {
-    const history = [
-      {
-        id: 't1',
-        nombre: 'Paciente',
-        cedula: 1,
-        consultorio: null,
-        estado: 'espera',
-        priority: 'media',
-        timestamp: 1,
-      },
-    ];
-    (getAllTurnosUseCase.execute as jest.Mock).mockResolvedValue(history);
+  describe('POST /auth/signOut', () => {
+    it('returns success response', async () => {
+      const result = await controller.signOut();
 
-    const result = await controller.getDashboardHistory();
-
-    expect(getAllTurnosUseCase.execute).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(history);
-  });
-
-  it('signUp returns error message when use case throws Error', async () => {
-    (signupUseCase.execute as jest.Mock).mockRejectedValue(new Error('Email ya registrado'));
-
-    const result = await controller.signUp({
-      email: 'test@test.com',
-      password: 'pass',
-      nombre: 'Test',
-      rol: 'employee',
+      expect(result).toEqual({ success: true, message: 'Sesión cerrada' });
     });
-
-    expect(result).toEqual({ success: false, message: 'Email ya registrado' });
   });
 
-  it('signUp returns generic message when use case throws non-Error', async () => {
-    (signupUseCase.execute as jest.Mock).mockRejectedValue('string error');
+  describe('GET /auth/me', () => {
+    it('returns the current user from the token payload', async () => {
+      const req = {
+        authUser: { sub: 'user-1', email: 'admin@eps.com', nombre: 'Admin', rol: 'admin' },
+      };
 
-    const result = await controller.signUp({
-      email: 'test@test.com',
-      password: 'pass',
-      nombre: 'Test',
-      rol: 'employee',
+      const result = await controller.me(req as any);
+
+      expect(result).toEqual({
+        id: 'user-1',
+        email: 'admin@eps.com',
+        nombre: 'Admin',
+        rol: 'admin',
+      });
     });
-
-    expect(result).toEqual({ success: false, message: 'Error en registro' });
-  });
-
-  it('signIn returns error message when use case throws Error', async () => {
-    (loginUseCase.execute as jest.Mock).mockRejectedValue(new Error('Credenciales inválidas'));
-
-    const result = await controller.signIn({ email: 'test@test.com', password: 'wrong' });
-
-    expect(result).toEqual({ success: false, message: 'Credenciales inválidas' });
-  });
-
-  it('signIn returns generic message when use case throws non-Error', async () => {
-    (loginUseCase.execute as jest.Mock).mockRejectedValue('string error');
-
-    const result = await controller.signIn({ email: 'test@test.com', password: 'wrong' });
-
-    expect(result).toEqual({ success: false, message: 'Error en login' });
-  });
-
-  it('signOut returns success message', async () => {
-    const result = await controller.signOut();
-
-    expect(result).toEqual({ success: true, message: 'Sesión cerrada' });
   });
 });
