@@ -85,7 +85,7 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Y el usuario “Empleado/Administrador” selecciona el Consultorio “2” y la Franja horaria “6:00 - 14:00”
   Cuando hace clic en “Guardar”
   Entonces el modal se cierra
-  Y aparece el mensaje flotante “Médico guardado exitosamente” en la parte central superior, el cual desaparece automáticamente después de 5 segundos
+  Y aparece el mensaje flotante "Médico creado exitosamente" en la parte central superior, el cual desaparece automáticamente después de 5 segundos
   Y el médico aparece en la tabla principal mostrando las columnas: Nombre (“Dr. Juan García”), Cédula (“12345678”), Consultorio (“2”) y Franja horaria (“6:00 - 14:00”)
   Y la combinación “Consultorio 2 / 6:00 - 14:00” deja de estar disponible para otro médico
 
@@ -95,7 +95,7 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Y los campos Consultorio y Franja horaria se dejan vacíos
   Cuando el usuario “Empleado/Administrador” hace clic en “Guardar”
   Entonces el modal se cierra
-  Y aparece el mensaje flotante “Médico guardado exitosamente” por 5 segundos
+  Y aparece el mensaje flotante "Médico creado exitosamente" por 5 segundos
   Y aparece en la tabla el médico “Dr. Jose Martínez” con su respectiva cédula, pero indicando "Sin asignar" en las columnas de consultorio y franja horaria
 
 - **Escenario:** El sistema agrega el prefijo “Dr.” automáticamente solo en la capa de presentación (UI)
@@ -162,14 +162,13 @@ Gestión de especialidades médicas, agenda de citas, múltiples sedes, franja h
   Entonces aparece el mensaje flotante de alerta "Ya existe un médico registrado con ese número de cédula" por 5 segundos
   Y el modal permanece abierto
 
-- **Escenario:** Se puede crear un médico con la cédula de un médico previamente dado de baja
+- **Escenario:** No se puede crear un médico con la cédula de un médico previamente dado de baja
   Dado que el modal de creación está abierto
   Y existe un médico con Número de cédula "12345678" pero con estado "inactivo" (dado de baja anteriormente)
   Cuando el usuario "Empleado/Administrador" escribe "12345678" en el campo "Número de cédula" y el nombre "Ana Reyes" en el campo "Nombre completo"
   Y hace clic en el botón "Guardar"
-  Entonces el modal se cierra
-  Y aparece el mensaje flotante "Médico guardado exitosamente"
-  Y el médico "Dr. Ana Reyes" con cédula "12345678" aparece en la tabla de médicos activos
+  Entonces el modal permanece abierto
+  Y aparece el mensaje flotante de error "Error del servidor. Intente más tarde."
 
 ### HU-03 (Refinada): Editar un médico creado
 

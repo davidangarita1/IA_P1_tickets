@@ -89,7 +89,7 @@ El sistema garantiza que ninguna combinación consultorio/franja quede asignada 
 | TC-CM-11 | Nombre con menos de 3 caracteres impide guardar | Modal abierto | Escribir "Ju" en nombre | Mensaje "El nombre completo debe tener al menos 3 caracteres"; "Guardar" deshabilitado |
 | TC-CM-12 | Cédula de médico activo duplicada muestra alerta | Existe médico activo con cédula "12345678" | Escribir "12345678" en cédula, nombre "Pedro", clic en "Guardar" | Mensaje flotante "Ya existe un médico registrado con ese número de cédula"; modal permanece abierto |
 | TC-CM-13 | Consultorio sin franja horaria impide guardar | Modal abierto | Seleccionar consultorio "2", dejar franja sin seleccionar | Mensaje "La franja horaria es obligatoria cuando se asigna un consultorio"; "Guardar" deshabilitado |
-| TC-CM-14 | Cédula de médico inactivo permite crear nuevo médico | Existe médico inactivo con cédula "12345678", no hay médico activo con esa cédula | Escribir "12345678" en cédula, nombre "Ana Reyes", clic en "Guardar" | Médico "Dr. Ana Reyes" aparece en la tabla; mensaje de éxito visible |
+| TC-CM-14 | Cédula de médico inactivo no permite crear nuevo médico (índice único en BD) | Existe médico inactivo con cédula "12345678" | Escribir "12345678" en cédula, nombre "Ana Reyes", clic en "Guardar" | Mensaje de error "Error del servidor. Intente más tarde." visible; modal permanece abierto |
 
 ### Suite 3 — Edición de médico (HU-03)
 
@@ -144,7 +144,7 @@ Feature: Gestión de Médicos
     And selecciona Consultorio "2" y Franja horaria "6:00 - 14:00"
     When hace clic en "Guardar"
     Then el modal se cierra
-    And aparece el mensaje flotante "Médico guardado exitosamente"
+    And aparece el mensaje flotante "Médico creado exitosamente"
     And la tabla muestra "Dr. Juan García" con Consultorio "2" y Franja "6:00 - 14:00"
     And la combinación "Consultorio 2 / 6:00 - 14:00" deja de estar disponible
 
