@@ -1,6 +1,6 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import ServedDashboard from "@/app/dashboard/page";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import ServedDashboard from '@/app/dashboard/page';
 import {
   buildTicket,
   mockRealTimeProvider,
@@ -9,34 +9,35 @@ import {
   mockTicketReader,
   mockSanitizer,
   mockAuthService,
-} from "@/__tests__/mocks/factories";
+  mockDoctorService,
+} from '@/__tests__/mocks/factories';
 
 const mockPush = jest.fn();
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock("@/providers/AuthProvider", () => ({
+jest.mock('@/providers/AuthProvider', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/hooks/useTicketsWebSocket", () => ({
+jest.mock('@/hooks/useTicketsWebSocket', () => ({
   useTicketsWebSocket: jest.fn(),
 }));
 
-jest.mock("@/hooks/useAudioNotification", () => ({
+jest.mock('@/hooks/useAudioNotification', () => ({
   useAudioNotification: jest.fn(),
 }));
 
-import { useDeps } from "@/providers/DependencyProvider";
-import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
-import { useAudioNotification } from "@/hooks/useAudioNotification";
-import { useAuth } from "@/providers/AuthProvider";
+import { useDeps } from '@/providers/DependencyProvider';
+import { useTicketsWebSocket } from '@/hooks/useTicketsWebSocket';
+import { useAudioNotification } from '@/hooks/useAudioNotification';
+import { useAuth } from '@/providers/AuthProvider';
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseTicketsWebSocket = useTicketsWebSocket as jest.MockedFunction<
@@ -62,6 +63,7 @@ function setupMocks(options: {
     audio: mockAudioNotifier(),
     sanitizer: mockSanitizer(),
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseTicketsWebSocket.mockReturnValue({
@@ -73,16 +75,16 @@ function setupMocks(options: {
   mockUseAudioNotification.mockReturnValue({
     audioEnabled: options.audioEnabled ?? false,
     showToast: options.showToast ?? false,
-    toastMessage: options.toastMessage ?? "",
+    toastMessage: options.toastMessage ?? '',
     notify: jest.fn(),
   });
 }
 
-describe("ServedDashboard", () => {
+describe('ServedDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAuth.mockReturnValue({
-      user: { id: "1", email: "a@a.com", name: "Test", role: "admin" },
+      user: { id: '1', email: 'a@a.com', name: 'Test', role: 'admin' },
       loading: false,
       error: null,
       signIn: jest.fn(),
@@ -94,76 +96,66 @@ describe("ServedDashboard", () => {
     setupMocks({});
   });
 
-  it("renders page heading", () => {
+  it('renders page heading', () => {
     render(<ServedDashboard />);
 
-    expect(
-      screen.getByText("Historial de Turnos Atendidos")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Historial de Turnos Atendidos')).toBeInTheDocument();
   });
 
-  it("shows disconnected indicator when not connected", () => {
+  it('shows disconnected indicator when not connected', () => {
     render(<ServedDashboard />);
 
-    expect(
-      screen.getByText(/Desconectado — reconectando\.\.\./i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Desconectado — reconectando\.\.\./i)).toBeInTheDocument();
   });
 
-  it("shows connected indicator when connected", () => {
+  it('shows connected indicator when connected', () => {
     setupMocks({ connected: true });
 
     render(<ServedDashboard />);
 
-    expect(
-      screen.getByText(/Conectado en tiempo real/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Conectado en tiempo real/i)).toBeInTheDocument();
   });
 
-  it("shows audio hint when audio is disabled", () => {
+  it('shows audio hint when audio is disabled', () => {
     render(<ServedDashboard />);
 
-    expect(
-      screen.getByText(/Toca la pantalla para habilitar el sonido/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Toca la pantalla para habilitar el sonido/i)).toBeInTheDocument();
   });
 
-  it("shows empty state when there are no served tickets", () => {
-    const waitingTicket = buildTicket({ status: "waiting" });
+  it('shows empty state when there are no served tickets', () => {
+    const waitingTicket = buildTicket({ status: 'waiting' });
     setupMocks({ tickets: [waitingTicket] });
 
     render(<ServedDashboard />);
 
-    expect(
-      screen.getByText("No hay turnos atendidos")
-    ).toBeInTheDocument();
+    expect(screen.getByText('No hay turnos atendidos')).toBeInTheDocument();
   });
 
-  it("renders error message when error is present", () => {
-    setupMocks({ error: "Real-time error" });
+  it('renders error message when error is present', () => {
+    setupMocks({ error: 'Real-time error' });
 
     render(<ServedDashboard />);
 
-    expect(screen.getByText("Real-time error")).toBeInTheDocument();
+    expect(screen.getByText('Real-time error')).toBeInTheDocument();
   });
 
-  it("renders served tickets with name and office", () => {
+  it('renders served tickets with name and office', () => {
     const ticket = buildTicket({
-      status: "served",
-      office: "B2",
-      timestamp: new Date("2026-02-24T10:30:00").getTime(),
+      status: 'served',
+      office: 'B2',
+      timestamp: new Date('2026-02-24T10:30:00').getTime(),
     });
     setupMocks({ tickets: [ticket] });
 
     render(<ServedDashboard />);
 
     expect(screen.getByText(ticket.name)).toBeInTheDocument();
-    expect(screen.getByText("Consultorio B2")).toBeInTheDocument();
+    expect(screen.getByText('Consultorio B2')).toBeInTheDocument();
   });
 
-  it("does not render waiting or called tickets", () => {
-    const waiting = buildTicket({ status: "waiting" });
-    const called = buildTicket({ status: "called" });
+  it('does not render waiting or called tickets', () => {
+    const waiting = buildTicket({ status: 'waiting' });
+    const called = buildTicket({ status: 'called' });
     setupMocks({ tickets: [waiting, called] });
 
     render(<ServedDashboard />);
@@ -172,10 +164,10 @@ describe("ServedDashboard", () => {
     expect(screen.queryByText(called.name)).not.toBeInTheDocument();
   });
 
-  it("shows served count in section heading", () => {
+  it('shows served count in section heading', () => {
     const tickets = [
-      buildTicket({ status: "served", office: "A1" }),
-      buildTicket({ status: "served", office: "A2" }),
+      buildTicket({ status: 'served', office: 'A1' }),
+      buildTicket({ status: 'served', office: 'A2' }),
     ];
     setupMocks({ tickets });
 
@@ -184,15 +176,15 @@ describe("ServedDashboard", () => {
     expect(screen.getByText(/Atendidos \(2\)/i)).toBeInTheDocument();
   });
 
-  it("renders toast when showToast is true", () => {
-    setupMocks({ showToast: true, toastMessage: "✅ Turno completado" });
+  it('renders toast when showToast is true', () => {
+    setupMocks({ showToast: true, toastMessage: '✅ Turno completado' });
 
     render(<ServedDashboard />);
 
-    expect(screen.getByText("✅ Turno completado")).toBeInTheDocument();
+    expect(screen.getByText('✅ Turno completado')).toBeInTheDocument();
   });
 
-  it("[Validate] redirects to /signin when user is not authenticated", () => {
+  it('[Validate] redirects to /signin when user is not authenticated', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,
@@ -206,10 +198,10 @@ describe("ServedDashboard", () => {
 
     render(<ServedDashboard />);
 
-    expect(mockPush).toHaveBeenCalledWith("/signin");
+    expect(mockPush).toHaveBeenCalledWith('/signin');
   });
 
-  it("[Validate] does not render content when not authenticated", () => {
+  it('[Validate] does not render content when not authenticated', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,
@@ -223,10 +215,10 @@ describe("ServedDashboard", () => {
 
     render(<ServedDashboard />);
 
-    expect(screen.queryByText("Historial de Turnos Atendidos")).not.toBeInTheDocument();
+    expect(screen.queryByText('Historial de Turnos Atendidos')).not.toBeInTheDocument();
   });
 
-  it("calls notify when served ticket count increases after initialization", () => {
+  it('calls notify when served ticket count increases after initialization', () => {
     const notify = jest.fn();
 
     mockUseDeps.mockReturnValue({
@@ -236,12 +228,13 @@ describe("ServedDashboard", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
       audioEnabled: false,
       showToast: false,
-      toastMessage: "",
+      toastMessage: '',
       notify,
     });
 
@@ -253,7 +246,7 @@ describe("ServedDashboard", () => {
 
     const { rerender } = render(<ServedDashboard />);
 
-    const t1 = buildTicket({ status: "served", office: "A1" });
+    const t1 = buildTicket({ status: 'served', office: 'A1' });
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [t1],
       connected: false,
@@ -261,7 +254,7 @@ describe("ServedDashboard", () => {
     });
     rerender(<ServedDashboard />);
 
-    const t2 = buildTicket({ status: "served", office: "A2" });
+    const t2 = buildTicket({ status: 'served', office: 'A2' });
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [t1, t2],
       connected: false,
@@ -269,10 +262,10 @@ describe("ServedDashboard", () => {
     });
     rerender(<ServedDashboard />);
 
-    expect(notify).toHaveBeenCalledWith("✅ Turno completado");
+    expect(notify).toHaveBeenCalledWith('✅ Turno completado');
   });
 
-  it("does not call notify when served count does not increase after initialization", () => {
+  it('does not call notify when served count does not increase after initialization', () => {
     const notify = jest.fn();
 
     mockUseDeps.mockReturnValue({
@@ -282,16 +275,17 @@ describe("ServedDashboard", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
       audioEnabled: false,
       showToast: false,
-      toastMessage: "",
+      toastMessage: '',
       notify,
     });
 
-    const t1 = buildTicket({ status: "served", office: "A1" });
+    const t1 = buildTicket({ status: 'served', office: 'A1' });
 
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [],

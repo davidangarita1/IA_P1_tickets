@@ -36,7 +36,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('findActivoPorCedula', () => {
-        it('retorna turno si existe uno activo para la cédula', async () => {
+        it('returns turno when an active one exists for the cedula', async () => {
             // Arrange
             const doc = mockTurnoDoc({ estado: 'espera' });
             mockModel.findOne.mockReturnValue({
@@ -51,7 +51,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
             expect(result?.cedula).toBe(12345);
         });
 
-        it('retorna null si no hay turno activo', async () => {
+        it('returns null when no active turno exists', async () => {
             // Arrange
             mockModel.findOne.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(null),
@@ -66,7 +66,22 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('save', () => {
-        it('crea y guarda un nuevo turno', async () => {
+        it('uses media as default priority when not provided', async () => {
+            const data = { cedula: 12345, nombre: 'Nuevo Paciente' };
+            const savedDoc = mockTurnoDoc({ ...data, _id: 'new-id', priority: 'media' });
+
+            const mockSave = jest.fn().mockResolvedValue(savedDoc);
+            (adapter as any).turnoModel = function (docData: any) {
+                return { ...savedDoc, ...docData, save: mockSave };
+            };
+
+            const result = await adapter.save(data as any);
+
+            expect(result).toBeInstanceOf(Turno);
+            expect(mockSave).toHaveBeenCalled();
+        });
+
+        it('creates and saves a new turno', async () => {
             // Arrange
             const data = { cedula: 12345, nombre: 'Nuevo Paciente', priority: 'alta' as const };
             const savedDoc = mockTurnoDoc({ ...data, _id: 'new-id' });
@@ -87,7 +102,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('findPacientesEnEspera', () => {
-        it('retorna pacientes ordenados por prioridad', async () => {
+        it('returns patients sorted by priority', async () => {
             // Arrange
             const docs = [mockTurnoDoc(), mockTurnoDoc({ _id: 'id-2', cedula: 67890 })];
             mockModel.find.mockReturnValue({
@@ -104,7 +119,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('getConsultoriosOcupados', () => {
-        it('retorna lista de consultorios ocupados', async () => {
+        it('returns list of occupied offices', async () => {
             // Arrange
             const docs = [{ consultorio: '1' }, { consultorio: '2' }];
             mockModel.find.mockReturnValue({
@@ -122,7 +137,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
             expect(result).toEqual(['1', '2']);
         });
 
-        it('filtra consultorios null o undefined', async () => {
+        it('filters null or undefined offices', async () => {
             // Arrange
             const docs = [{ consultorio: '1' }, { consultorio: null }, { consultorio: undefined }];
             mockModel.find.mockReturnValue({
@@ -142,7 +157,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('asignarConsultorio', () => {
-        it('asigna consultorio y retorna turno actualizado', async () => {
+        it('assigns office and returns updated turno', async () => {
             // Arrange
             const updatedDoc = mockTurnoDoc({ consultorio: '3', estado: 'llamado' });
             mockModel.findOneAndUpdate.mockReturnValue({
@@ -157,7 +172,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
             expect(result?.consultorio).toBe('3');
         });
 
-        it('retorna null si el turno no está en espera', async () => {
+        it('returns null when turno is not in waiting state', async () => {
             // Arrange
             mockModel.findOneAndUpdate.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(null),
@@ -172,7 +187,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
     });
 
     describe('finalizarTurnosLlamados', () => {
-        it('finaliza turnos expirados y retorna lista', async () => {
+        it('finalizes expired turnos and returns list', async () => {
             // Arrange
             const expirados = [mockTurnoDoc({ estado: 'llamado' })];
             mockModel.find.mockReturnValue({
@@ -190,7 +205,7 @@ describe('TurnoMongooseAdapter (Infrastructure)', () => {
             expect(result[0].estado).toBe('atendido');
         });
 
-        it('retorna array vacío si no hay turnos expirados', async () => {
+        it('returns empty array when no expired turnos exist', async () => {
             // Arrange
             mockModel.find.mockReturnValue({
                 exec: jest.fn().mockResolvedValue([]),

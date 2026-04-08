@@ -1,0 +1,119 @@
+import type {
+  Doctor,
+  CreateDoctorData,
+  UpdateDoctorData,
+  AvailableShiftsResponse,
+  PaginationParams,
+  PaginatedResult,
+} from '@/domain/Doctor';
+import type { DoctorService } from '@/domain/ports/DoctorService';
+import { getAuthCookie } from '@/infrastructure/cookies/cookieUtils';
+
+const HTTP_ERROR_MESSAGES: Record<number, string> = {
+  400: 'Datos inválidos. Verifique la información ingresada.',
+  401: 'No autorizado. Inicie sesión nuevamente.',
+  403: 'No tiene permisos para realizar esta acción.',
+  404: 'Médico no encontrado.',
+  500: 'Error del servidor. Intente más tarde.',
+};
+
+function httpError(status: number): Error {
+  return new Error(HTTP_ERROR_MESSAGES[status] ?? `Error inesperado (código ${status}).`);
+}
+
+export class HttpDoctorAdapter implements DoctorService {
+  constructor(private readonly baseUrl: string) {}
+
+  private buildHeaders(): Record<string, string> {
+    const token = getAuthCookie();
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+  }
+
+  async getAll(params?: PaginationParams): Promise<PaginatedResult<Doctor>> {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.set('page', String(params.page));
+    if (params?.limit !== undefined) query.set('limit', String(params.limit));
+
+    const url = query.toString()
+      ? `${this.baseUrl}/api/v1/doctors?${query}`
+      : `${this.baseUrl}/api/v1/doctors`;
+
+    const res = await fetch(url, {
+      headers: this.buildHeaders(),
+    });
+    if (!res.ok) throw httpError(res.status);
+    return res.json();
+  }
+
+  async create(data: CreateDoctorData): Promise<Doctor> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...this.buildHeaders(),
+    };
+
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.message || 'CONFLICT');
+    }
+
+    if (!res.ok) throw httpError(res.status);
+    return res.json();
+  }
+
+  async update(id: string, data: UpdateDoctorData): Promise<Doctor> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...this.buildHeaders(),
+    };
+
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.message || 'CONFLICT');
+    }
+
+    if (!res.ok) throw httpError(res.status);
+    return res.json();
+  }
+
+  async getAvailableShifts(
+    office: string,
+    excludeDoctorId?: string,
+  ): Promise<AvailableShiftsResponse> {
+    const params = new URLSearchParams({ office });
+    if (excludeDoctorId) params.set('exclude_doctor_id', excludeDoctorId);
+
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/available-shifts?${params}`, {
+      headers: this.buildHeaders(),
+    });
+
+    if (!res.ok) throw httpError(res.status);
+    return res.json();
+  }
+
+  async remove(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/api/v1/doctors/${id}`, {
+      method: 'DELETE',
+      headers: this.buildHeaders(),
+    });
+
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.message || 'CONFLICT');
+    }
+
+    if (!res.ok) throw httpError(res.status);
+  }
+}

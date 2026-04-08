@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
-import { useDeps } from "@/providers/DependencyProvider";
-import { SIGNUP_SUCCESS_KEY } from "@/components/SignUpForm/SignUpForm";
-import styles from "@/styles/SignInForm.module.css";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import { useDeps } from '@/providers/DependencyProvider';
+import { SIGNUP_SUCCESS_KEY } from '@/components/SignUpForm/SignUpForm';
+import styles from '@/styles/SignInForm.module.css';
 
 export default function SignInForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const { signIn, loading, error } = useAuth();
   const { sanitizer } = useDeps();
@@ -35,7 +35,7 @@ export default function SignInForm() {
 
     const success = await signIn({ email: sanitizedEmail, password: trimmedPassword });
     if (success) {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   };
 
@@ -43,8 +43,16 @@ export default function SignInForm() {
     <div className={styles.wrapper}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Iniciar sesión</h2>
-        {toast && <p role="status" className={styles.success}>{toast}</p>}
-        {error && <p role="alert" className={styles.error}>{error}</p>}
+        {toast && (
+          <p role="status" className={styles.success}>
+            {toast}
+          </p>
+        )}
+        {error && (
+          <p role="alert" className={styles.error}>
+            {error}
+          </p>
+        )}
         <input
           type="email"
           placeholder="Email"
@@ -60,7 +68,7 @@ export default function SignInForm() {
           className={styles.input}
         />
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Ingresando..." : "Iniciar sesión"}
+          {loading ? 'Ingresando...' : 'Iniciar sesión'}
         </button>
         <p className={styles.footer}>
           ¿No tienes cuenta? <Link href="/signup">Regístrate</Link>

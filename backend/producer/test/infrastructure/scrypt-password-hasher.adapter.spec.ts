@@ -1,72 +1,57 @@
 import { ScryptPasswordHasherAdapter } from '../../src/infrastructure/adapters/scrypt-password-hasher.adapter';
 
 describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
-    let hasher: ScryptPasswordHasherAdapter;
+  let hasher: ScryptPasswordHasherAdapter;
 
-    beforeEach(() => {
-        hasher = new ScryptPasswordHasherAdapter();
+  beforeEach(() => {
+    hasher = new ScryptPasswordHasherAdapter();
+  });
+
+  describe('hash', () => {
+    it('generates a hash with salt:digest format', async () => {
+      const password = 'mySecurePassword123';
+
+      const hashed = await hasher.hash(password);
+
+      expect(hashed).toContain(':');
+      expect(hashed.split(':')).toHaveLength(2);
     });
 
-    describe('hash', () => {
-        it('genera un hash con formato salt:digest', async () => {
-            // Arrange
-            const password = 'mySecurePassword123';
+    it('generates different hashes for the same password (random salt)', async () => {
+      const password = 'samePassword';
 
-            // Act
-            const hashed = await hasher.hash(password);
+      const hash1 = await hasher.hash(password);
+      const hash2 = await hasher.hash(password);
 
-            // Assert
-            expect(hashed).toContain(':');
-            expect(hashed.split(':')).toHaveLength(2);
-        });
+      expect(hash1).not.toBe(hash2);
+    });
+  });
 
-        it('genera hashes diferentes para el mismo password (salt aleatorio)', async () => {
-            // Arrange
-            const password = 'samePassword';
+  describe('compare', () => {
+    it('returns true for correct password', async () => {
+      const password = 'correctPassword';
+      const hashed = await hasher.hash(password);
 
-            // Act
-            const hash1 = await hasher.hash(password);
-            const hash2 = await hasher.hash(password);
+      const result = await hasher.compare(password, hashed);
 
-            // Assert
-            expect(hash1).not.toBe(hash2);
-        });
+      expect(result).toBe(true);
     });
 
-    describe('compare', () => {
-        it('retorna true para password correcto', async () => {
-            // Arrange
-            const password = 'correctPassword';
-            const hashed = await hasher.hash(password);
+    it('returns false for incorrect password', async () => {
+      const password = 'correctPassword';
+      const hashed = await hasher.hash(password);
 
-            // Act
-            const result = await hasher.compare(password, hashed);
+      const result = await hasher.compare('wrongPassword', hashed);
 
-            // Assert
-            expect(result).toBe(true);
-        });
-
-        it('retorna false para password incorrecto', async () => {
-            // Arrange
-            const password = 'correctPassword';
-            const hashed = await hasher.hash(password);
-
-            // Act
-            const result = await hasher.compare('wrongPassword', hashed);
-
-            // Assert
-            expect(result).toBe(false);
-        });
-
-        it('retorna false si el hash tiene formato inválido', async () => {
-            // Arrange
-            const invalidHash = 'no-colon-here';
-
-            // Act
-            const result = await hasher.compare('anyPassword', invalidHash);
-
-            // Assert
-            expect(result).toBe(false);
-        });
+      expect(result).toBe(false);
     });
+
+    it('returns false when hash has invalid format', async () => {
+      const invalidHash = 'no-colon-here';
+
+      const result = await hasher.compare('anyPassword', invalidHash);
+
+      expect(result).toBe(false);
+    });
+  });
 });

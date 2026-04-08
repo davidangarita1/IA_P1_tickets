@@ -1,11 +1,20 @@
-import { IUserRecord, IUserRepository } from '../../../src/domain/ports/IUserRepository';
-import { IPasswordHasher } from '../../../src/application/ports/IPasswordHasher';
-import { SignupCredentials, SignupDependencies, SignupUseCase, SignupResult } from '../../../src/application/use-cases/signup.use-case';
-import { ITokenService } from '../../../src/application/use-cases/login.use-case';
+import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
+import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
+import {
+  SignupCredentials,
+  SignupDependencies,
+  SignupUseCase,
+  SignupResult,
+} from '@/application/use-cases/signup.use-case';
+import { ITokenService } from '@/application/use-cases/login.use-case';
 
-// Asegura que el contrato de signup lanza los errores esperados antes de implementarlo.
 describe('SignupUseCase (red tests)', () => {
-  const credentials: SignupCredentials = { email: 'luis@example.com', password: 'secret', nombre: 'Luis', rol: 'empleado' };
+  const credentials: SignupCredentials = {
+    email: 'luis@example.com',
+    password: 'secret',
+    nombre: 'Luis',
+    rol: 'empleado',
+  };
   const hashedSecret = '$argon2id$hashed-secret';
   const createdUser: IUserRecord = {
     id: 'user-2',
@@ -47,7 +56,12 @@ describe('SignupUseCase (red tests)', () => {
 
     expect(result).toEqual({
       token: 'new-token',
-      usuario: { id: createdUser.id, email: createdUser.email, nombre: createdUser.nombre, rol: createdUser.rol },
+      usuario: {
+        id: createdUser.id,
+        email: createdUser.email,
+        nombre: createdUser.nombre,
+        rol: createdUser.rol,
+      },
     });
     expect(passwordHasher.hash).toHaveBeenCalledWith(credentials.password);
     expect(repository.create).toHaveBeenCalledWith({

@@ -4,96 +4,112 @@ import { Turno } from '../../src/domain/entities/turno.entity';
 import { Server, Socket } from 'socket.io';
 
 describe('TurnosGateway (Presentation - WebSocket)', () => {
-    const turno1 = new Turno({
-        id: 't1',
-        nombre: 'Paciente A',
-        cedula: 123,
-        consultorio: '1',
-        estado: 'llamado',
-        priority: 'alta',
-        timestamp: 100,
-        finAtencionAt: null,
+  const turno1 = new Turno({
+    id: 't1',
+    nombre: 'Paciente A',
+    cedula: 123,
+    consultorio: '1',
+    estado: 'llamado',
+    priority: 'alta',
+    timestamp: 100,
+    finAtencionAt: null,
+  });
+
+  const turnoRepository: jest.Mocked<ITurnoRepository> = {
+    findAll: jest.fn(),
+    findByCedula: jest.fn(),
+    findActiveByOffice: jest.fn(),
+  };
+
+  const mockClient: Partial<Socket> = {
+    id: 'client-123',
+    emit: jest.fn(),
+  };
+
+  const mockServer: Partial<Server> = {
+    emit: jest.fn(),
+  };
+
+  let gateway: TurnosGateway;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    gateway = new TurnosGateway(turnoRepository);
+    gateway.server = mockServer as Server;
+  });
+
+  it('sends turnos snapshot to client on connection', async () => {
+    turnoRepository.findAll.mockResolvedValue([turno1]);
+
+    await gateway.handleConnection(mockClient as Socket);
+
+    expect(turnoRepository.findAll).toHaveBeenCalledTimes(1);
+    expect(mockClient.emit).toHaveBeenCalledWith('TURNOS_SNAPSHOT', {
+      type: 'TURNOS_SNAPSHOT',
+      data: [turno1.toEventPayload()],
     });
+  });
 
-    const turnoRepository: jest.Mocked<ITurnoRepository> = {
-        findAll: jest.fn(),
-        findByCedula: jest.fn(),
-    };
+  it('sends empty snapshot when no turnos exist', async () => {
+    turnoRepository.findAll.mockResolvedValue([]);
 
-    const mockClient: Partial<Socket> = {
-        id: 'client-123',
-        emit: jest.fn(),
-    };
+    await gateway.handleConnection(mockClient as Socket);
 
-    const mockServer: Partial<Server> = {
-        emit: jest.fn(),
-    };
-
-    let gateway: TurnosGateway;
-
-    beforeEach(() => {
-        jest.clearAllMocks();
-        gateway = new TurnosGateway(turnoRepository);
-        gateway.server = mockServer as Server;
+    expect(mockClient.emit).toHaveBeenCalledWith('TURNOS_SNAPSHOT', {
+      type: 'TURNOS_SNAPSHOT',
+      data: [],
     });
+  });
 
-    it('envía snapshot de turnos al cliente al conectarse', async () => {
-        // Arrange: repositorio tiene turnos disponibles.
-        turnoRepository.findAll.mockResolvedValue([turno1]);
+  it('broadcasts update to all clients', () => {
+    const payload = turno1.toEventPayload();
 
-        // Act: simular conexión de cliente.
-        await gateway.handleConnection(mockClient as Socket);
+    gateway.broadcastTurnoActualizado(payload);
 
-        // Assert: debe enviar snapshot con todos los turnos.
-        expect(turnoRepository.findAll).toHaveBeenCalledTimes(1);
-        expect(mockClient.emit).toHaveBeenCalledWith('TURNOS_SNAPSHOT', {
-            type: 'TURNOS_SNAPSHOT',
-            data: [turno1.toEventPayload()],
-        });
+    expect(mockServer.emit).toHaveBeenCalledWith('TURNO_ACTUALIZADO', {
+      type: 'TURNO_ACTUALIZADO',
+      data: payload,
     });
+  });
 
-    it('envía snapshot vacío si no hay turnos', async () => {
-        // Arrange: repositorio sin turnos.
-        turnoRepository.findAll.mockResolvedValue([]);
-
-        // Act: conexión de cliente.
-        await gateway.handleConnection(mockClient as Socket);
-
-        // Assert: debe enviar array vacío.
-        expect(mockClient.emit).toHaveBeenCalledWith('TURNOS_SNAPSHOT', {
-            type: 'TURNOS_SNAPSHOT',
-            data: [],
-        });
+  it('broadcasts with null consultorio without failing', () => {
+    const turnoSinConsultorio = new Turno({
+      id: 't2',
+      nombre: 'Paciente B',
+      cedula: 456,
+      consultorio: null,
+      estado: 'espera',
+      priority: 'media',
+      timestamp: 200,
+      finAtencionAt: null,
     });
+    const payload = turnoSinConsultorio.toEventPayload();
 
-    it('hace broadcast de actualización a todos los clientes', () => {
-        // Arrange: payload de turno actualizado.
-        const payload = turno1.toEventPayload();
+    gateway.broadcastTurnoActualizado(payload);
 
-        // Act: emitir actualización desde EventsController.
-        gateway.broadcastTurnoActualizado(payload);
-
-        // Assert: debe hacer broadcast sin filtros.
-        expect(mockServer.emit).toHaveBeenCalledWith('TURNO_ACTUALIZADO', {
-            type: 'TURNO_ACTUALIZADO',
-            data: payload,
-        });
+    expect(mockServer.emit).toHaveBeenCalledWith('TURNO_ACTUALIZADO', {
+      type: 'TURNO_ACTUALIZADO',
+      data: payload,
     });
+  });
 
-    it('no falla si el repositorio lanza error al conectar cliente', async () => {
-        // Arrange: simular falla de base de datos.
-        turnoRepository.findAll.mockRejectedValue(new Error('DB connection lost'));
+  it('does not fail when repository throws error on client connection', async () => {
+    turnoRepository.findAll.mockRejectedValue(new Error('DB connection lost'));
 
-        // Act + Assert: no debe propagar error (loguea internamente).
-        await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
-        expect(mockClient.emit).not.toHaveBeenCalled();
-    });
+    await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
+    expect(mockClient.emit).not.toHaveBeenCalled();
+  });
 
-    it('maneja desconexión del cliente correctamente', () => {
-        // Act: simular desconexión de cliente.
-        gateway.handleDisconnect(mockClient as Socket);
+  it('handles non-Error instance on client connection', async () => {
+    turnoRepository.findAll.mockRejectedValue('string error');
 
-        // Assert: no debe lanzar error (solo loguea).
-        expect(true).toBe(true);
-    });
+    await expect(gateway.handleConnection(mockClient as Socket)).resolves.toBeUndefined();
+    expect(mockClient.emit).not.toHaveBeenCalled();
+  });
+
+  it('handles client disconnection correctly', () => {
+    gateway.handleDisconnect(mockClient as Socket);
+
+    expect(true).toBe(true);
+  });
 });

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
-import styles from "@/styles/Navbar.module.css";
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
+import styles from '@/styles/Navbar.module.css';
 
 export default function SignOutButton() {
   const { signOut } = useAuth();
@@ -10,7 +10,7 @@ export default function SignOutButton() {
 
   const handleClick = async () => {
     await signOut();
-    router.push("/signin");
+    router.push('/signin');
   };
 
   return (

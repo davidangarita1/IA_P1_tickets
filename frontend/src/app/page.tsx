@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
-import { useAudioNotification } from "@/hooks/useAudioNotification";
-import { useDeps } from "@/providers/DependencyProvider";
-import styles from "@/styles/page.module.css";
+import { useEffect, useRef } from 'react';
+import { useTicketsWebSocket } from '@/hooks/useTicketsWebSocket';
+import { useAudioNotification } from '@/hooks/useAudioNotification';
+import { useDeps } from '@/providers/DependencyProvider';
+import styles from '@/styles/page.module.css';
 
 export default function TicketsScreen() {
   const { realTime, audio } = useDeps();
   const { tickets, error, connected } = useTicketsWebSocket(realTime);
-  const { audioEnabled, showToast, toastMessage, notify } =
-    useAudioNotification(audio);
+  const { audioEnabled, showToast, toastMessage, notify } = useAudioNotification(audio);
 
   const lastCountRef = useRef(0);
   const initializedRef = useRef(false);
@@ -25,29 +24,25 @@ export default function TicketsScreen() {
     }
 
     if (tickets.length > lastCountRef.current) {
-      notify("🔔 Nuevo turno llamado");
+      notify('🔔 Nuevo turno llamado');
     }
 
     lastCountRef.current = tickets.length;
   }, [tickets, notify]);
 
-  const calledTickets = tickets.filter((t) => t.status === "called");
-  const waitingTickets = tickets.filter((t) => t.status === "waiting");
+  const calledTickets = tickets.filter((t) => t.status === 'called');
+  const waitingTickets = tickets.filter((t) => t.status === 'waiting');
 
   return (
     <main className={styles.container}>
       <h1 className={styles.title}>Turnos Habilitados</h1>
 
       <p className={connected ? styles.connected : styles.disconnected}>
-        {connected
-          ? "🟢 Conectado en tiempo real"
-          : "🔴 Desconectado — reconectando..."}
+        {connected ? '🟢 Conectado en tiempo real' : '🔴 Desconectado — reconectando...'}
       </p>
 
       {!audioEnabled && (
-        <p className={styles.audioHint}>
-          Toca la pantalla para habilitar el sonido 🔔
-        </p>
+        <p className={styles.audioHint}>Toca la pantalla para habilitar el sonido 🔔</p>
       )}
 
       {error && <p className={styles.error}>{error}</p>}
@@ -80,9 +75,7 @@ export default function TicketsScreen() {
         </>
       )}
 
-      {tickets.length === 0 && !error && (
-        <p className={styles.empty}>No hay turnos registrados</p>
-      )}
+      {tickets.length === 0 && !error && <p className={styles.empty}>No hay turnos registrados</p>}
 
       {showToast && <div className={styles.toast}>{toastMessage}</div>}
     </main>

@@ -59,8 +59,6 @@ src/
 │   └── useAudioNotification.ts
 │
 ├── components/              ← UI components
-├── components/              ← UI components
-│   ├── AppointmentRegistrationForm/
 │   ├── CreateTicketForm/
 │   ├── Navbar/              ← Conditionally rendered (authenticated users only)
 │   ├── SignInForm/          ← Login form (email + password)
@@ -183,8 +181,8 @@ El botón **Registrar turno** permanece deshabilitado hasta que el formulario se
 ## Environment Variables
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
-NEXT_PUBLIC_WS_URL=http://localhost:3001
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_WS_URL=http://localhost:3000
 NEXT_PUBLIC_AUTH_COOKIE_NAME=auth_token          # name of the session cookie (client-accessible)
 NEXT_PUBLIC_AUTH_COOKIE_MAX_AGE=86400            # cookie lifetime in seconds (24h, client-accessible)
 ```

@@ -16,7 +16,7 @@ const buildTurnoEnEspera = (id: string, cedula: number, timestamp: number): Turn
     });
 
 describe('AssignRoomUseCase', () => {
-    it('asigna el primer consultorio libre al primer paciente en espera y publica evento', async () => {
+    it('assigns first free office to first waiting patient and publishes event', async () => {
         // Arrange: un paciente en espera y solo el consultorio "2" disponible.
         const paciente = buildTurnoEnEspera('t1', 101, 1);
         const turnoAsignado = new Turno({
@@ -52,7 +52,7 @@ describe('AssignRoomUseCase', () => {
         expect(resultado).toEqual(turnoAsignado);
     });
 
-    it('no asigna turno cuando no hay consultorios libres', async () => {
+    it('does not assign turno when no free offices available', async () => {
         // Arrange: todos los consultorios ocupados.
         const enEspera: Turno[] = [buildTurnoEnEspera('t1', 201, 1)];
         const repository: jest.Mocked<ITurnoRepository> = {
@@ -77,7 +77,7 @@ describe('AssignRoomUseCase', () => {
         expect(eventPublisher.publish).not.toHaveBeenCalled();
     });
 
-    it('no asigna turno cuando no hay pacientes en espera', async () => {
+    it('does not assign turno when no patients are waiting', async () => {
         // Arrange: consultorios disponibles pero ningún paciente esperando.
         const repository: jest.Mocked<ITurnoRepository> = {
             findActivoPorCedula: jest.fn(),
@@ -99,7 +99,7 @@ describe('AssignRoomUseCase', () => {
     });
 
     describe('executeAll', () => {
-        it('asigna múltiples turnos hasta agotar consultorios o pacientes', async () => {
+        it('assigns multiple turnos until offices or patients are exhausted', async () => {
             // Arrange: 2 pacientes y 2 consultorios libres.
             const paciente1 = buildTurnoEnEspera('t1', 101, 1);
             const paciente2 = buildTurnoEnEspera('t2', 102, 2);
@@ -137,7 +137,7 @@ describe('AssignRoomUseCase', () => {
             expect(asignados).toHaveLength(2);
         });
 
-        it('retorna array vacío con totalConsultorios inválido (negativo)', async () => {
+        it('returns empty array with invalid totalConsultorios (negative)', async () => {
             // Arrange
             const repository: jest.Mocked<ITurnoRepository> = {
                 findActivoPorCedula: jest.fn(),
@@ -157,7 +157,7 @@ describe('AssignRoomUseCase', () => {
             expect(resultado).toEqual([]);
         });
 
-        it('retorna array vacío con totalConsultorios no entero', async () => {
+        it('returns empty array with non-integer totalConsultorios', async () => {
             // Arrange
             const repository: jest.Mocked<ITurnoRepository> = {
                 findActivoPorCedula: jest.fn(),
@@ -177,7 +177,7 @@ describe('AssignRoomUseCase', () => {
             expect(resultado).toEqual([]);
         });
 
-        it('retorna array vacío con totalConsultorios cero', async () => {
+        it('returns empty array with zero totalConsultorios', async () => {
             // Arrange
             const repository: jest.Mocked<ITurnoRepository> = {
                 findActivoPorCedula: jest.fn(),

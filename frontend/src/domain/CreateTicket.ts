@@ -4,6 +4,6 @@ export interface CreateTicketDTO {
 }
 
 export interface CreateTicketResponse {
-  status: "accepted" | "error";
+  status: 'accepted' | 'error';
   message: string;
 }

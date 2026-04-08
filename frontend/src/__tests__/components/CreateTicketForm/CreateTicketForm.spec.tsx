@@ -1,28 +1,31 @@
-import { mockAuthService, mockSanitizer, mockTicketWriter } from "@/__tests__/mocks/factories";
-import CreateTicketForm from "@/components/CreateTicketForm/CreateTicketForm";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  mockAuthService,
+  mockSanitizer,
+  mockTicketWriter,
+  mockDoctorService,
+} from '@/__tests__/mocks/factories';
+import CreateTicketForm from '@/components/CreateTicketForm/CreateTicketForm';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 const mockPush = jest.fn();
 
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/hooks/useCreateTicket", () => ({
+jest.mock('@/hooks/useCreateTicket', () => ({
   useCreateTicket: jest.fn(),
 }));
 
-import { useCreateTicket } from "@/hooks/useCreateTicket";
-import { useDeps } from "@/providers/DependencyProvider";
+import { useCreateTicket } from '@/hooks/useCreateTicket';
+import { useDeps } from '@/providers/DependencyProvider';
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
-const mockUseCreateTicket = useCreateTicket as jest.MockedFunction<
-  typeof useCreateTicket
->;
+const mockUseCreateTicket = useCreateTicket as jest.MockedFunction<typeof useCreateTicket>;
 
 function setupMocks(overrides: {
   submit?: jest.Mock;
@@ -49,6 +52,7 @@ function setupMocks(overrides: {
     },
     sanitizer,
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseCreateTicket.mockReturnValue({
@@ -59,34 +63,32 @@ function setupMocks(overrides: {
   });
 }
 
-describe("CreateTicketForm", () => {
+describe('CreateTicketForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupMocks({});
   });
 
-  it("renders name and documentId inputs", () => {
+  it('renders name and documentId inputs', () => {
     render(<CreateTicketForm />);
 
-    expect(screen.getByPlaceholderText("Nombre completo")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Cédula")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Nombre completo')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Cédula')).toBeInTheDocument();
   });
 
-  it("renders the submit button", () => {
+  it('renders the submit button', () => {
     render(<CreateTicketForm />);
 
-    expect(
-      screen.getByRole("button", { name: "Registrar turno" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Registrar turno' })).toBeInTheDocument();
   });
 
-  it("does not call submit when name is empty", async () => {
+  it('does not call submit when name is empty', async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
     render(<CreateTicketForm />);
 
-    const form = screen.getByRole("button").closest("form")!;
+    const form = screen.getByRole('button').closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -94,20 +96,20 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("does not call submit when documentId is not a valid number", async () => {
+  it('does not call submit when documentId is not a valid number', async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
     render(<CreateTicketForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Nombre completo"), {
-      target: { value: "Maria" },
+    fireEvent.change(screen.getByPlaceholderText('Nombre completo'), {
+      target: { value: 'Maria' },
     });
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "abc" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: 'abc' },
     });
 
-    const form = screen.getByRole("button").closest("form")!;
+    const form = screen.getByRole('button').closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -115,143 +117,133 @@ describe("CreateTicketForm", () => {
     });
   });
 
-  it("calls submit with sanitized values on valid input", async () => {
+  it('calls submit with sanitized values on valid input', async () => {
     const submit = jest.fn().mockResolvedValue(true);
     setupMocks({ submit });
 
     render(<CreateTicketForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Nombre completo"), {
-      target: { value: "  Maria  " },
+    fireEvent.change(screen.getByPlaceholderText('Nombre completo'), {
+      target: { value: '  Maria  ' },
     });
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "98765432" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: '98765432' },
     });
 
-    const form = screen.getByRole("button").closest("form")!;
+    const form = screen.getByRole('button').closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
       expect(submit).toHaveBeenCalledWith({
-        name: "Maria",
+        name: 'Maria',
         documentId: 98765432,
       });
     });
   });
 
-  it("clears the form on successful submission", async () => {
+  it('clears the form on successful submission', async () => {
     const submit = jest.fn().mockResolvedValue(true);
     setupMocks({ submit });
 
     render(<CreateTicketForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Nombre completo"), {
-      target: { value: "Maria" },
+    fireEvent.change(screen.getByPlaceholderText('Nombre completo'), {
+      target: { value: 'Maria' },
     });
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "12345678" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: '12345678' },
     });
 
-    const form = screen.getByRole("button").closest("form")!;
+    const form = screen.getByRole('button').closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("");
-      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("");
+      expect(screen.getByPlaceholderText('Nombre completo')).toHaveValue('');
+      expect(screen.getByPlaceholderText('Cédula')).toHaveValue('');
     });
   });
 
-  it("does not clear the form when submission fails", async () => {
+  it('does not clear the form when submission fails', async () => {
     const submit = jest.fn().mockResolvedValue(false);
     setupMocks({ submit });
 
     render(<CreateTicketForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Nombre completo"), {
-      target: { value: "Maria" },
+    fireEvent.change(screen.getByPlaceholderText('Nombre completo'), {
+      target: { value: 'Maria' },
     });
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "12345678" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: '12345678' },
     });
 
-    const form = screen.getByRole("button").closest("form")!;
+    const form = screen.getByRole('button').closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Nombre completo")).toHaveValue("Maria");
-      expect(screen.getByPlaceholderText("Cédula")).toHaveValue("12345678");
+      expect(screen.getByPlaceholderText('Nombre completo')).toHaveValue('Maria');
+      expect(screen.getByPlaceholderText('Cédula')).toHaveValue('12345678');
     });
   });
 
-  it("shows inline error when documentId is not purely numeric", async () => {
+  it('shows inline error when documentId is not purely numeric', async () => {
     setupMocks({});
     render(<CreateTicketForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "abc" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: 'abc' },
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText("La cédula solo puede contener números")
-      ).toBeInTheDocument();
+      expect(screen.getByText('La cédula solo puede contener números')).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByPlaceholderText("Cédula"), {
-      target: { value: "12ab34" },
+    fireEvent.change(screen.getByPlaceholderText('Cédula'), {
+      target: { value: '12ab34' },
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText("La cédula solo puede contener números")
-      ).toBeInTheDocument();
+      expect(screen.getByText('La cédula solo puede contener números')).toBeInTheDocument();
     });
   });
 
-  it("submit button is disabled when form is incomplete", () => {
+  it('submit button is disabled when form is incomplete', () => {
     setupMocks({});
     render(<CreateTicketForm />);
 
-    const button = screen.getByRole("button", { name: "Registrar turno" });
+    const button = screen.getByRole('button', { name: 'Registrar turno' });
     expect(button).toBeDisabled();
   });
 
-  it("shows loading text on button when loading", () => {
+  it('shows loading text on button when loading', () => {
     setupMocks({ loading: true });
 
     render(<CreateTicketForm />);
 
-    expect(screen.getByRole("button")).toHaveTextContent("Enviando...");
-    expect(screen.getByRole("button")).toBeDisabled();
+    expect(screen.getByRole('button')).toHaveTextContent('Enviando...');
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  it("shows success message", () => {
-    setupMocks({ success: "Turno registrado correctamente" });
+  it('shows success message', () => {
+    setupMocks({ success: 'Turno registrado correctamente' });
 
     render(<CreateTicketForm />);
 
-    expect(
-      screen.getByText("Turno registrado correctamente")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Turno registrado correctamente')).toBeInTheDocument();
   });
 
-  it("shows error message", () => {
-    setupMocks({ error: "No se pudo registrar el turno." });
+  it('shows error message', () => {
+    setupMocks({ error: 'No se pudo registrar el turno.' });
 
     render(<CreateTicketForm />);
 
-    expect(
-      screen.getByText("No se pudo registrar el turno.")
-    ).toBeInTheDocument();
+    expect(screen.getByText('No se pudo registrar el turno.')).toBeInTheDocument();
   });
 
-  it("[Validate] shows duplicate-active error when the same documentId already has a waiting or called ticket", () => {
-    setupMocks({ error: "Ya existe un turno activo para esta cédula." });
+  it('[Validate] shows duplicate-active error when the same documentId already has a waiting or called ticket', () => {
+    setupMocks({ error: 'Ya existe un turno activo para esta cédula.' });
 
     render(<CreateTicketForm />);
 
-    expect(
-      screen.getByText("Ya existe un turno activo para esta cédula.")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Ya existe un turno activo para esta cédula.')).toBeInTheDocument();
   });
 });
