@@ -1,5 +1,5 @@
-import { CreateTurnoUseCase } from '../../src/application/use-cases/create-turno.use-case';
-import { IEventPublisher } from '../../src/domain/ports/IEventPublisher';
+import { CreateTurnoUseCase } from '../../../src/application/use-cases/create-turno.use-case';
+import { IEventPublisher } from '../../../src/domain/ports/IEventPublisher';
 
 describe('CreateTurnoUseCase (Application)', () => {
   const eventPublisher: jest.Mocked<IEventPublisher> = {

@@ -1,4 +1,4 @@
-import { InMemoryUserRepository } from '../../src/infrastructure/adapters/in-memory-user.repository';
+import { InMemoryUserRepository } from '../../../src/infrastructure/adapters/in-memory-user.repository';
 
 describe('InMemoryUserRepository (Infrastructure)', () => {
   let repository: InMemoryUserRepository;

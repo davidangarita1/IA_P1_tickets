@@ -1,4 +1,4 @@
-import { ScryptPasswordHasherAdapter } from '../../src/infrastructure/adapters/scrypt-password-hasher.adapter';
+import { ScryptPasswordHasherAdapter } from '../../../src/infrastructure/adapters/scrypt-password-hasher.adapter';
 
 describe('ScryptPasswordHasherAdapter (Infrastructure)', () => {
   let hasher: ScryptPasswordHasherAdapter;

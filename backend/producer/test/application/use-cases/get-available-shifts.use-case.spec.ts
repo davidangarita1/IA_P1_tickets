@@ -1,5 +1,5 @@
-import { GetAvailableShiftsUseCase } from '../../src/application/use-cases/get-available-shifts.use-case';
-import { IDoctorRepository } from '../../src/domain/ports/doctor.repository';
+import { GetAvailableShiftsUseCase } from '../../../src/application/use-cases/get-available-shifts.use-case';
+import { IDoctorRepository } from '../../../src/domain/ports/doctor.repository';
 
 describe('GetAvailableShiftsUseCase (Application)', () => {
   const mockRepository: jest.Mocked<IDoctorRepository> = {

@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { DoctorMongooseAdapter } from '../../src/infrastructure/adapters/doctor-mongoose.adapter';
+import { DoctorMongooseAdapter } from '../../../src/infrastructure/adapters/doctor-mongoose.adapter';
 
 const makeDoctorDoc = (overrides = {}) => ({
   _id: 'doc-id-1',

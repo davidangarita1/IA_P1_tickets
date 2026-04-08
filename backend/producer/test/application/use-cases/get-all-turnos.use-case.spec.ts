@@ -1,6 +1,6 @@
-import { GetAllTurnosUseCase } from '../../src/application/use-cases/get-all-turnos.use-case';
-import { ITurnoRepository } from '../../src/domain/ports/ITurnoRepository';
-import { Turno } from '../../src/domain/entities/turno.entity';
+import { GetAllTurnosUseCase } from '../../../src/application/use-cases/get-all-turnos.use-case';
+import { ITurnoRepository } from '../../../src/domain/ports/ITurnoRepository';
+import { Turno } from '../../../src/domain/entities/turno.entity';
 
 describe('GetAllTurnosUseCase (Application)', () => {
   const turno1 = new Turno({

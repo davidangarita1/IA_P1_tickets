@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { createHmac } from 'crypto';
-import { HmacTokenService } from '../../src/infrastructure/adapters/hmac-token.service';
+import { HmacTokenService } from '../../../src/infrastructure/adapters/hmac-token.service';
 
 describe('HmacTokenService (Infrastructure)', () => {
   const TEST_SECRET = 'test-secret';

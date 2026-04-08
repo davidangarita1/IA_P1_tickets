@@ -1,7 +1,7 @@
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { UpdateDoctorUseCase } from '../../src/application/use-cases/update-doctor.use-case';
-import { IDoctorRepository } from '../../src/domain/ports/doctor.repository';
-import { Doctor } from '../../src/domain/entities/doctor.entity';
+import { UpdateDoctorUseCase } from '../../../src/application/use-cases/update-doctor.use-case';
+import { IDoctorRepository } from '../../../src/domain/ports/doctor.repository';
+import { Doctor } from '../../../src/domain/entities/doctor.entity';
 
 describe('UpdateDoctorUseCase (Application)', () => {
   const mockRepository: jest.Mocked<IDoctorRepository> = {

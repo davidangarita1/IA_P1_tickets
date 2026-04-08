@@ -1,6 +1,6 @@
-import { GetTurnosByCedulaUseCase } from '../../src/application/use-cases/get-turnos-by-cedula.use-case';
-import { ITurnoRepository } from '../../src/domain/ports/ITurnoRepository';
-import { Turno } from '../../src/domain/entities/turno.entity';
+import { GetTurnosByCedulaUseCase } from '../../../src/application/use-cases/get-turnos-by-cedula.use-case';
+import { ITurnoRepository } from '../../../src/domain/ports/ITurnoRepository';
+import { Turno } from '../../../src/domain/entities/turno.entity';
 
 describe('GetTurnosByCedulaUseCase (Application)', () => {
   const turnoDelPaciente = new Turno({

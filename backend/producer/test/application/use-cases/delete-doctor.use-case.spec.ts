@@ -1,9 +1,9 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { DeleteDoctorUseCase } from '../../src/application/use-cases/delete-doctor.use-case';
-import { IDoctorRepository } from '../../src/domain/ports/doctor.repository';
-import { ITurnoRepository } from '../../src/domain/ports/ITurnoRepository';
-import { Doctor } from '../../src/domain/entities/doctor.entity';
-import { Turno } from '../../src/domain/entities/turno.entity';
+import { DeleteDoctorUseCase } from '../../../src/application/use-cases/delete-doctor.use-case';
+import { IDoctorRepository } from '../../../src/domain/ports/doctor.repository';
+import { ITurnoRepository } from '../../../src/domain/ports/ITurnoRepository';
+import { Doctor } from '../../../src/domain/entities/doctor.entity';
+import { Turno } from '../../../src/domain/entities/turno.entity';
 
 describe('DeleteDoctorUseCase (Application)', () => {
   const mockDoctorRepository: jest.Mocked<IDoctorRepository> = {

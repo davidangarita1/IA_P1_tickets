@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { TurnoMongooseAdapter } from '../../src/infrastructure/adapters/turno-mongoose.adapter';
+import { TurnoMongooseAdapter } from '../../../src/infrastructure/adapters/turno-mongoose.adapter';
 
 const mockTurnoDoc = (overrides = {}) => ({
   _id: 'turno-id-1',
