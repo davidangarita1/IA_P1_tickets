@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException } from '@nestjs/common';
-import { CreateDoctorUseCase } from '../../src/doctors/application/use-cases/create-doctor.use-case';
-import { IDoctorRepository } from '../../src/doctors/domain/ports/doctor.repository';
-import { Doctor } from '../../src/doctors/domain/entities/doctor.entity';
+import { CreateDoctorUseCase } from '../../src/application/use-cases/create-doctor.use-case';
+import { IDoctorRepository } from '../../src/domain/ports/doctor.repository';
+import { Doctor } from '../../src/domain/entities/doctor.entity';
 
 describe('CreateDoctorUseCase (Application)', () => {
   const mockRepository: jest.Mocked<IDoctorRepository> = {

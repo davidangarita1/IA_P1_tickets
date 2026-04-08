@@ -1,6 +1,6 @@
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { UpdateDoctorDto } from '../../../src/doctors/presentation/dtos/update-doctor.dto';
+import { UpdateDoctorDto } from '../../../src/presentation/dto/update-doctor.dto';
 
 describe('UpdateDoctorDto (Presentation - DTO)', () => {
   function toDto(plain: Record<string, unknown>): UpdateDoctorDto {

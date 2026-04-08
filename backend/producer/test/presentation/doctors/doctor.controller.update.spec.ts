@@ -1,10 +1,10 @@
-import { DoctorController } from '@/doctors/presentation/controllers/doctor.controller';
-import { CreateDoctorUseCase } from '@/doctors/application/use-cases/create-doctor.use-case';
-import { GetAllDoctorsUseCase } from '@/doctors/application/use-cases/get-all-doctors.use-case';
-import { GetAvailableShiftsUseCase } from '@/doctors/application/use-cases/get-available-shifts.use-case';
-import { UpdateDoctorUseCase } from '@/doctors/application/use-cases/update-doctor.use-case';
-import { DeleteDoctorUseCase } from '@/doctors/application/use-cases/delete-doctor.use-case';
-import { Doctor } from '@/doctors/domain/entities/doctor.entity';
+import { DoctorController } from '@/presentation/doctor.controller';
+import { CreateDoctorUseCase } from '@/application/use-cases/create-doctor.use-case';
+import { GetAllDoctorsUseCase } from '@/application/use-cases/get-all-doctors.use-case';
+import { GetAvailableShiftsUseCase } from '@/application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '@/application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from '@/application/use-cases/delete-doctor.use-case';
+import { Doctor } from '@/domain/entities/doctor.entity';
 
 describe('DoctorController - updateDoctor (Presentation)', () => {
   const createDoctorUseCase: Pick<CreateDoctorUseCase, 'execute'> = { execute: jest.fn() };

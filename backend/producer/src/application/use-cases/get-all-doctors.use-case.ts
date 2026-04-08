@@ -4,7 +4,7 @@ import {
   PaginationParams,
   PaginatedResult,
 } from '../../domain/ports/doctor.repository';
-import { DOCTOR_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
+import { DOCTOR_REPOSITORY_TOKEN } from '../../domain/ports/tokens';
 import { Doctor } from '../../domain/entities/doctor.entity';
 
 const DEFAULT_PAGE = 1;

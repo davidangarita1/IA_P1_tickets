@@ -1,6 +1,6 @@
-import { GetAllDoctorsUseCase } from '../../src/doctors/application/use-cases/get-all-doctors.use-case';
-import { IDoctorRepository } from '../../src/doctors/domain/ports/doctor.repository';
-import { Doctor } from '../../src/doctors/domain/entities/doctor.entity';
+import { GetAllDoctorsUseCase } from '../../src/application/use-cases/get-all-doctors.use-case';
+import { IDoctorRepository } from '../../src/domain/ports/doctor.repository';
+import { Doctor } from '../../src/domain/entities/doctor.entity';
 
 describe('GetAllDoctorsUseCase (Application)', () => {
   const mockRepository: jest.Mocked<IDoctorRepository> = {

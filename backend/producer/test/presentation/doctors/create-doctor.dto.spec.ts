@@ -1,6 +1,6 @@
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { CreateDoctorDto } from '../../../src/doctors/presentation/dtos/create-doctor.dto';
+import { CreateDoctorDto } from '../../../src/presentation/dto/create-doctor.dto';
 
 describe('CreateDoctorDto (Presentation - DTO)', () => {
   function toDto(plain: Record<string, unknown>): CreateDoctorDto {

@@ -1,6 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';
-import { DoctorRoleGuard } from '@/doctors/presentation/guards/doctor-role.guard';
+import { DoctorRoleGuard } from '@/presentation/doctor-role.guard';
 
 describe('DoctorRoleGuard', () => {
   let guard: DoctorRoleGuard;

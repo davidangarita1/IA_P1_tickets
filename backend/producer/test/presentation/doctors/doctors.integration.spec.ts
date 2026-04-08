@@ -1,22 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { CreateDoctorUseCase } from '@/doctors/application/use-cases/create-doctor.use-case';
-import { GetAllDoctorsUseCase } from '@/doctors/application/use-cases/get-all-doctors.use-case';
-import { GetAvailableShiftsUseCase } from '@/doctors/application/use-cases/get-available-shifts.use-case';
-import { UpdateDoctorUseCase } from '@/doctors/application/use-cases/update-doctor.use-case';
-import { DeleteDoctorUseCase } from '@/doctors/application/use-cases/delete-doctor.use-case';
-import { DoctorController } from '@/doctors/presentation/controllers/doctor.controller';
+import { CreateDoctorUseCase } from '@/application/use-cases/create-doctor.use-case';
+import { GetAllDoctorsUseCase } from '@/application/use-cases/get-all-doctors.use-case';
+import { GetAvailableShiftsUseCase } from '@/application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '@/application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from '@/application/use-cases/delete-doctor.use-case';
+import { DoctorController } from '@/presentation/doctor.controller';
 import { AuthGuard } from '@/presentation/auth.guard';
-import { DoctorRoleGuard } from '@/doctors/presentation/guards/doctor-role.guard';
+import { DoctorRoleGuard } from '@/presentation/doctor-role.guard';
 import {
   DOCTOR_REPOSITORY_TOKEN,
   TURNO_REPOSITORY_TOKEN,
   ACCESS_TOKEN_VERIFIER_TOKEN,
 } from '@/domain/ports/tokens';
-import { IDoctorRepository } from '@/doctors/domain/ports/doctor.repository';
+import { IDoctorRepository } from '@/domain/ports/doctor.repository';
 import { ITurnoRepository } from '@/domain/ports/ITurnoRepository';
-import { Doctor } from '@/doctors/domain/entities/doctor.entity';
+import { Doctor } from '@/domain/entities/doctor.entity';
 
 describe('DoctorsModule Integration', () => {
   let app: INestApplication;

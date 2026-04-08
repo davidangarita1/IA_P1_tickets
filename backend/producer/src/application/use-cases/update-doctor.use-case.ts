@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { IDoctorRepository, UpdateDoctorData } from '../../domain/ports/doctor.repository';
-import { DOCTOR_REPOSITORY_TOKEN } from '../../../domain/ports/tokens';
+import { DOCTOR_REPOSITORY_TOKEN } from '../../domain/ports/tokens';
 import { Doctor, Shift } from '../../domain/entities/doctor.entity';
 
 export interface UpdateDoctorInput {

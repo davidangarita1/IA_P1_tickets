@@ -1,4 +1,4 @@
-import { Doctor } from '../../src/doctors/domain/entities/doctor.entity';
+import { Doctor } from '../../src/domain/entities/doctor.entity';
 
 describe('Doctor (Domain)', () => {
   it('creates a doctor with all fields', () => {

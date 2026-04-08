@@ -18,20 +18,20 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateDoctorDto } from '../dtos/create-doctor.dto';
-import { UpdateDoctorDto } from '../dtos/update-doctor.dto';
-import { CreateDoctorUseCase } from '../../application/use-cases/create-doctor.use-case';
-import { GetAllDoctorsUseCase } from '../../application/use-cases/get-all-doctors.use-case';
+import { CreateDoctorDto } from './dto/create-doctor.dto';
+import { UpdateDoctorDto } from './dto/update-doctor.dto';
+import { CreateDoctorUseCase } from '../application/use-cases/create-doctor.use-case';
+import { GetAllDoctorsUseCase } from '../application/use-cases/get-all-doctors.use-case';
 import {
   GetAvailableShiftsUseCase,
   AvailableShiftsResponse,
-} from '../../application/use-cases/get-available-shifts.use-case';
-import { UpdateDoctorUseCase } from '../../application/use-cases/update-doctor.use-case';
-import { DeleteDoctorUseCase } from '../../application/use-cases/delete-doctor.use-case';
-import { AuthGuard } from '../../../presentation/auth.guard';
-import { DoctorRoleGuard } from '../guards/doctor-role.guard';
-import { Doctor } from '../../domain/entities/doctor.entity';
-import { PaginatedResult } from '../../domain/ports/doctor.repository';
+} from '../application/use-cases/get-available-shifts.use-case';
+import { UpdateDoctorUseCase } from '../application/use-cases/update-doctor.use-case';
+import { DeleteDoctorUseCase } from '../application/use-cases/delete-doctor.use-case';
+import { AuthGuard } from './auth.guard';
+import { DoctorRoleGuard } from './doctor-role.guard';
+import { Doctor } from '../domain/entities/doctor.entity';
+import { PaginatedResult } from '../domain/ports/doctor.repository';
 
 @ApiTags('Doctors')
 @ApiBearerAuth()
