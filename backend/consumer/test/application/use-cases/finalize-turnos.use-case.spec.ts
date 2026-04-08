@@ -1,7 +1,7 @@
-import { FinalizeTurnosUseCase } from '../../src/application/use-cases/finalize-turnos.use-case';
-import { ITurnoRepository } from '../../src/domain/ports/ITurnoRepository';
-import { IEventPublisher } from '../../src/domain/ports/IEventPublisher';
-import { Turno } from '../../src/domain/entities/turno.entity';
+import { FinalizeTurnosUseCase } from '../../../src/application/use-cases/finalize-turnos.use-case';
+import { ITurnoRepository } from '../../../src/domain/ports/ITurnoRepository';
+import { IEventPublisher } from '../../../src/domain/ports/IEventPublisher';
+import { Turno } from '../../../src/domain/entities/turno.entity';
 
 describe('FinalizeTurnosUseCase (Application)', () => {
     const turnoAtendido = new Turno({

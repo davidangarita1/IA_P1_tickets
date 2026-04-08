@@ -1,10 +1,10 @@
 import { ConfigService } from '@nestjs/config';
-import { CreateTurnoUseCase } from '../../src/application/use-cases/create-turno.use-case';
-import { AssignRoomUseCase } from '../../src/application/use-cases/assign-room.use-case';
-import { ITurnoRepository } from '../../src/domain/ports/ITurnoRepository';
-import { IEventPublisher } from '../../src/domain/ports/IEventPublisher';
-import { INotificationGateway } from '../../src/domain/ports/INotificationGateway';
-import { Turno } from '../../src/domain/entities/turno.entity';
+import { CreateTurnoUseCase } from '../../../src/application/use-cases/create-turno.use-case';
+import { AssignRoomUseCase } from '../../../src/application/use-cases/assign-room.use-case';
+import { ITurnoRepository } from '../../../src/domain/ports/ITurnoRepository';
+import { IEventPublisher } from '../../../src/domain/ports/IEventPublisher';
+import { INotificationGateway } from '../../../src/domain/ports/INotificationGateway';
+import { Turno } from '../../../src/domain/entities/turno.entity';
 
 describe('CreateTurnoUseCase (Application)', () => {
     const turnoCreado = new Turno({
