@@ -6,7 +6,7 @@ module.exports = {
         // Ubicación de los .feature
         paths: ['test/acceptance/features/**/*.feature'],
         // Step definitions en TypeScript
-        requireModule: ['ts-node/register'],
+        requireModule: ['ts-node/register', 'tsconfig-paths/register'],
         require: ['test/acceptance/steps/**/*.steps.ts'],
         // Formato de salida legible
         format: ['progress-bar', 'html:coverage/acceptance-report.html'],

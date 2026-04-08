@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAvailableShifts } from '@/hooks/useAvailableShifts';
 import { mockDoctorService } from '../mocks/factories';
 
