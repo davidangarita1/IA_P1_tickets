@@ -3,7 +3,7 @@
  */
 import { HttpAuthAdapter } from '@/infrastructure/adapters/HttpAuthAdapter';
 import type { AuthCredentials, SignUpData, AuthResult } from '@/domain/AuthCredentials';
-import type { User } from '@/domain/User';
+import type { User, UserRole } from '@/domain/User';
 import * as httpClient from '@/infrastructure/http/httpClient';
 import * as cookieUtils from '@/infrastructure/cookies/cookieUtils';
 
@@ -187,7 +187,7 @@ describe('HttpAuthAdapter', () => {
 
     it("falls back to 'empleado' when role is not in the map", async () => {
       mockedHttpPost.mockResolvedValue({ success: true, message: 'OK' });
-      await adapter.signUp({ email: 'a@b.com', password: 'x', name: 'Y', role: 'unknown' as string });
+      await adapter.signUp({ email: 'a@b.com', password: 'x', name: 'Y', role: 'unknown' as unknown as UserRole });
       expect(mockedHttpPost).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ rol: 'empleado' }),
