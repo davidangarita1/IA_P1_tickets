@@ -2,50 +2,43 @@ import { CreateTurnoUseCase } from '../../src/application/use-cases/create-turno
 import { IEventPublisher } from '../../src/domain/ports/IEventPublisher';
 
 describe('CreateTurnoUseCase (Application)', () => {
-    const eventPublisher: jest.Mocked<IEventPublisher> = {
-        publish: jest.fn(),
-    };
+  const eventPublisher: jest.Mocked<IEventPublisher> = {
+    publish: jest.fn(),
+  };
 
-    let useCase: CreateTurnoUseCase;
+  let useCase: CreateTurnoUseCase;
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-        useCase = new CreateTurnoUseCase(eventPublisher);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useCase = new CreateTurnoUseCase(eventPublisher);
+  });
+
+  it('publishes crear_turno event and returns accepted status', () => {
+    const data = { cedula: 123, nombre: 'Paciente Test', priority: 'media' as const };
+
+    const result = useCase.execute(data);
+
+    expect(eventPublisher.publish).toHaveBeenCalledWith('crear_turno', data);
+    expect(result).toEqual({
+      status: 'accepted',
+      message: 'Turno en proceso de asignación',
+    });
+  });
+
+  it('propagates error when publisher fails', () => {
+    const publishError = new Error('RabbitMQ connection lost');
+    eventPublisher.publish.mockImplementationOnce(() => {
+      throw publishError;
     });
 
-    it('publica evento crear_turno y retorna status accepted', () => {
-        // Arrange: datos válidos de entrada.
-        const data = { cedula: 123, nombre: 'Paciente Test', priority: 'media' as const };
+    expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow(publishError);
+  });
 
-        // Act: ejecutar el caso de uso.
-        const result = useCase.execute(data);
-
-        // Assert: debe publicar el evento y retornar confirmación.
-        expect(eventPublisher.publish).toHaveBeenCalledWith('crear_turno', data);
-        expect(result).toEqual({
-            status: 'accepted',
-            message: 'Turno en proceso de asignación',
-        });
+  it('propagates non-Error and logs it as string', () => {
+    eventPublisher.publish.mockImplementationOnce(() => {
+      throw 'connection timeout';
     });
 
-    it('propaga error si el publisher falla', () => {
-        // Arrange: simular falla del broker.
-        const publishError = new Error('RabbitMQ connection lost');
-        eventPublisher.publish.mockImplementationOnce(() => {
-            throw publishError;
-        });
-
-        // Act + Assert: el error debe propagarse al caller.
-        expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow(publishError);
-    });
-
-    it('propaga error no-Error y lo loguea como string', () => {
-        // Arrange: simular falla con un string en lugar de Error.
-        eventPublisher.publish.mockImplementationOnce(() => {
-            throw 'connection timeout';
-        });
-
-        // Act + Assert: el error string debe propagarse.
-        expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow('connection timeout');
-    });
+    expect(() => useCase.execute({ cedula: 123, nombre: 'Test' })).toThrow('connection timeout');
+  });
 });

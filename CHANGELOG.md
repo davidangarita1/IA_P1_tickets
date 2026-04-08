@@ -11,7 +11,7 @@ v1.0.0
 - Add `SignUpForm` and `SignInForm` components with input validation and sanitization.
 - Add `AuthGuard` component for route protection based on authentication status and user roles.
 - Add `HttpAuthAdapter` for HTTP communication with authentication endpoints.
-- Add comprehensive test plan (`TEST_PLAN_FRONT.md`) covering White-Box and Black-Box testing strategies.
+- Add comprehensive test plan (`TEST_PLAN.md`) covering White-Box and Black-Box testing strategies.
 - Add JWT token storage in secure HTTP-only cookies and session validation on page reload.
 - Fix Docker network configuration to isolate services properly.
 - Fix Dockerfile configurations with multi-stage builds and non-root user execution for security compliance.

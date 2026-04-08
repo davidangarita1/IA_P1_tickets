@@ -35,7 +35,7 @@ describe('FinalizeTurnosUseCase (Application)', () => {
         useCase = new FinalizeTurnosUseCase(turnoRepository, eventPublisher);
     });
 
-    it('publica evento por cada turno finalizado', async () => {
+    it('publishes event for each finalized turno', async () => {
         // Arrange: repositorio retorna turnos que acaban de pasar a atendido.
         turnoRepository.finalizarTurnosLlamados.mockResolvedValue([turnoAtendido]);
 

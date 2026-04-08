@@ -1,6 +1,6 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import TicketsScreen from "@/app/page";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import TicketsScreen from '@/app/page';
 import {
   buildTicket,
   mockRealTimeProvider,
@@ -9,23 +9,24 @@ import {
   mockTicketReader,
   mockSanitizer,
   mockAuthService,
-} from "@/__tests__/mocks/factories";
+  mockDoctorService,
+} from '@/__tests__/mocks/factories';
 
-jest.mock("@/providers/DependencyProvider", () => ({
+jest.mock('@/providers/DependencyProvider', () => ({
   useDeps: jest.fn(),
 }));
 
-jest.mock("@/hooks/useTicketsWebSocket", () => ({
+jest.mock('@/hooks/useTicketsWebSocket', () => ({
   useTicketsWebSocket: jest.fn(),
 }));
 
-jest.mock("@/hooks/useAudioNotification", () => ({
+jest.mock('@/hooks/useAudioNotification', () => ({
   useAudioNotification: jest.fn(),
 }));
 
-import { useDeps } from "@/providers/DependencyProvider";
-import { useTicketsWebSocket } from "@/hooks/useTicketsWebSocket";
-import { useAudioNotification } from "@/hooks/useAudioNotification";
+import { useDeps } from '@/providers/DependencyProvider';
+import { useTicketsWebSocket } from '@/hooks/useTicketsWebSocket';
+import { useAudioNotification } from '@/hooks/useAudioNotification';
 
 const mockUseDeps = useDeps as jest.MockedFunction<typeof useDeps>;
 const mockUseTicketsWebSocket = useTicketsWebSocket as jest.MockedFunction<
@@ -50,6 +51,7 @@ function setupMocks(options: {
     audio: mockAudioNotifier(),
     sanitizer: mockSanitizer(),
     authService: mockAuthService(),
+    doctorService: mockDoctorService(),
   });
 
   mockUseTicketsWebSocket.mockReturnValue({
@@ -61,119 +63,109 @@ function setupMocks(options: {
   mockUseAudioNotification.mockReturnValue({
     audioEnabled: options.audioEnabled ?? false,
     showToast: options.showToast ?? false,
-    toastMessage: options.toastMessage ?? "",
+    toastMessage: options.toastMessage ?? '',
     notify: jest.fn(),
   });
 }
 
-describe("TicketsScreen", () => {
+describe('TicketsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setupMocks({});
   });
 
-  it("renders page heading", () => {
+  it('renders page heading', () => {
     render(<TicketsScreen />);
 
-    expect(screen.getByText("Turnos Habilitados")).toBeInTheDocument();
+    expect(screen.getByText('Turnos Habilitados')).toBeInTheDocument();
   });
 
-  it("shows disconnected indicator when not connected", () => {
+  it('shows disconnected indicator when not connected', () => {
     render(<TicketsScreen />);
 
-    expect(
-      screen.getByText(/Desconectado — reconectando\.\.\./i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Desconectado — reconectando\.\.\./i)).toBeInTheDocument();
   });
 
-  it("shows connected indicator when connected", () => {
+  it('shows connected indicator when connected', () => {
     setupMocks({ connected: true });
 
     render(<TicketsScreen />);
 
-    expect(
-      screen.getByText(/Conectado en tiempo real/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Conectado en tiempo real/i)).toBeInTheDocument();
   });
 
-  it("shows audio hint when audio is disabled", () => {
+  it('shows audio hint when audio is disabled', () => {
     setupMocks({ audioEnabled: false });
 
     render(<TicketsScreen />);
 
-    expect(
-      screen.getByText(/Toca la pantalla para habilitar el sonido/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Toca la pantalla para habilitar el sonido/i)).toBeInTheDocument();
   });
 
-  it("hides audio hint when audio is enabled", () => {
+  it('hides audio hint when audio is enabled', () => {
     setupMocks({ audioEnabled: true });
 
     render(<TicketsScreen />);
 
     expect(
-      screen.queryByText(/Toca la pantalla para habilitar el sonido/i)
+      screen.queryByText(/Toca la pantalla para habilitar el sonido/i),
     ).not.toBeInTheDocument();
   });
 
-  it("shows empty state when there are no tickets", () => {
+  it('shows empty state when there are no tickets', () => {
     setupMocks({ tickets: [] });
 
     render(<TicketsScreen />);
 
-    expect(
-      screen.getByText("No hay turnos registrados")
-    ).toBeInTheDocument();
+    expect(screen.getByText('No hay turnos registrados')).toBeInTheDocument();
   });
 
-  it("renders error message when error is present", () => {
-    setupMocks({ error: "Connection lost" });
+  it('renders error message when error is present', () => {
+    setupMocks({ error: 'Connection lost' });
 
     render(<TicketsScreen />);
 
-    expect(screen.getByText("Connection lost")).toBeInTheDocument();
+    expect(screen.getByText('Connection lost')).toBeInTheDocument();
   });
 
-  it("renders called tickets section", () => {
-    const ticket = buildTicket({ status: "called", office: "A1" });
+  it('renders called tickets section', () => {
+    const ticket = buildTicket({ status: 'called', office: 'A1' });
     setupMocks({ tickets: [ticket] });
 
     render(<TicketsScreen />);
 
-    expect(screen.getByText("📢 Called")).toBeInTheDocument();
+    expect(screen.getByText('📢 Called')).toBeInTheDocument();
     expect(screen.getByText(ticket.name)).toBeInTheDocument();
-    expect(screen.getByText("Consultorio A1")).toBeInTheDocument();
+    expect(screen.getByText('Consultorio A1')).toBeInTheDocument();
   });
 
-  it("renders waiting tickets section", () => {
-    const ticket = buildTicket({ status: "waiting" });
+  it('renders waiting tickets section', () => {
+    const ticket = buildTicket({ status: 'waiting' });
     setupMocks({ tickets: [ticket] });
 
     render(<TicketsScreen />);
 
-    expect(screen.getByText("⏳ Waiting")).toBeInTheDocument();
+    expect(screen.getByText('⏳ Waiting')).toBeInTheDocument();
     expect(screen.getByText(ticket.name)).toBeInTheDocument();
   });
 
-  it("renders toast when showToast is true", () => {
-    setupMocks({ showToast: true, toastMessage: "🔔 Nuevo turno llamado" });
+  it('renders toast when showToast is true', () => {
+    setupMocks({ showToast: true, toastMessage: '🔔 Nuevo turno llamado' });
 
     render(<TicketsScreen />);
 
-    expect(screen.getByText("🔔 Nuevo turno llamado")).toBeInTheDocument();
+    expect(screen.getByText('🔔 Nuevo turno llamado')).toBeInTheDocument();
   });
 
-  it("does not render toast when showToast is false", () => {
+  it('does not render toast when showToast is false', () => {
     setupMocks({ showToast: false });
 
     render(<TicketsScreen />);
 
-    expect(
-      screen.queryByText("🔔 Nuevo turno llamado")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('🔔 Nuevo turno llamado')).not.toBeInTheDocument();
   });
 
-  it("calls notify when ticket count increases after initialization", () => {
+  it('calls notify when ticket count increases after initialization', () => {
     const notify = jest.fn();
 
     mockUseDeps.mockReturnValue({
@@ -183,12 +175,13 @@ describe("TicketsScreen", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
       audioEnabled: false,
       showToast: false,
-      toastMessage: "",
+      toastMessage: '',
       notify,
     });
 
@@ -200,7 +193,7 @@ describe("TicketsScreen", () => {
 
     const { rerender } = render(<TicketsScreen />);
 
-    const t1 = buildTicket({ status: "waiting" });
+    const t1 = buildTicket({ status: 'waiting' });
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [t1],
       connected: false,
@@ -208,7 +201,7 @@ describe("TicketsScreen", () => {
     });
     rerender(<TicketsScreen />);
 
-    const t2 = buildTicket({ status: "waiting" });
+    const t2 = buildTicket({ status: 'waiting' });
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [t1, t2],
       connected: false,
@@ -216,10 +209,10 @@ describe("TicketsScreen", () => {
     });
     rerender(<TicketsScreen />);
 
-    expect(notify).toHaveBeenCalledWith("🔔 Nuevo turno llamado");
+    expect(notify).toHaveBeenCalledWith('🔔 Nuevo turno llamado');
   });
 
-  it("does not call notify when ticket count stays the same after initialization", () => {
+  it('does not call notify when ticket count stays the same after initialization', () => {
     const notify = jest.fn();
 
     mockUseDeps.mockReturnValue({
@@ -229,16 +222,17 @@ describe("TicketsScreen", () => {
       audio: mockAudioNotifier(),
       sanitizer: mockSanitizer(),
       authService: mockAuthService(),
+      doctorService: mockDoctorService(),
     });
 
     mockUseAudioNotification.mockReturnValue({
       audioEnabled: false,
       showToast: false,
-      toastMessage: "",
+      toastMessage: '',
       notify,
     });
 
-    const t1 = buildTicket({ status: "waiting" });
+    const t1 = buildTicket({ status: 'waiting' });
 
     mockUseTicketsWebSocket.mockReturnValue({
       tickets: [],

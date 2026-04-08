@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import type { Ticket } from "@/domain/Ticket";
-import type { RealTimeProvider } from "@/domain/ports/RealTimeProvider";
+import { useEffect, useState, useCallback } from 'react';
+import type { Ticket } from '@/domain/Ticket';
+import type { RealTimeProvider } from '@/domain/ports/RealTimeProvider';
 
 export function useTicketsWebSocket(realTime: RealTimeProvider) {
   const [tickets, setTickets] = useState<Ticket[]>([]);

@@ -1,7 +1,7 @@
 import { Turno } from '../../src/domain/entities/turno.entity';
 
 describe('Turno (Domain)', () => {
-    it('incluye finAtencionAt en payload cuando existe', () => {
+    it('includes finAtencionAt in payload when present', () => {
         // Arrange: entidad en estado llamado con tiempo de finalización.
         const turno = new Turno({
             id: 't1',
@@ -30,7 +30,7 @@ describe('Turno (Domain)', () => {
         });
     });
 
-    it('omite finAtencionAt en payload cuando es null', () => {
+    it('omits finAtencionAt from payload when null', () => {
         // Arrange: entidad en espera sin tiempo de finalización.
         const turno = new Turno({
             id: 't2',

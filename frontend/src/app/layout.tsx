@@ -1,18 +1,18 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { DependencyProvider } from "@/providers/DependencyProvider";
-import ConnectedAuthProvider from "@/providers/ConnectedAuthProvider";
-import Navbar from "@/components/Navbar/Navbar";
-import "@/styles/globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { DependencyProvider } from '@/providers/DependencyProvider';
+import ConnectedAuthProvider from '@/providers/ConnectedAuthProvider';
+import Navbar from '@/components/Navbar/Navbar';
+import '@/styles/globals.css';
 
 const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Sistema de Turnos",
-  description: "Sistema de gestión y visualización de turnos en tiempo real",
+  title: 'Sistema de Turnos',
+  description: 'Sistema de gestión y visualización de turnos en tiempo real',
 };
 
 export default function RootLayout({

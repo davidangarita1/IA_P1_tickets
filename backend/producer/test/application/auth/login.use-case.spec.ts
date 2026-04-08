@@ -4,11 +4,10 @@ import {
   LoginDependencies,
   LoginResult,
   ITokenService,
-} from '../../../src/application/use-cases/login.use-case';
-import { IUserRecord, IUserRepository } from '../../../src/domain/ports/IUserRepository';
-import { IPasswordHasher } from '../../../src/application/ports/IPasswordHasher';
+} from '@/application/use-cases/login.use-case';
+import { IUserRecord, IUserRepository } from '@/domain/ports/IUserRepository';
+import { IPasswordHasher } from '@/application/ports/IPasswordHasher';
 
-// Valida el contrato esperado para el caso de uso de login antes de implementarlo.
 describe('LoginUseCase (red tests)', () => {
   const credentials: LoginCredentials = { email: 'luis@example.com', password: 'secret' };
   const storedUser: IUserRecord = {
@@ -46,7 +45,10 @@ describe('LoginUseCase (red tests)', () => {
     const useCase = new LoginUseCase(dependencies);
 
     await expect(useCase.execute(credentials)).rejects.toThrow('Invalid credentials');
-    expect(passwordHasher.compare).toHaveBeenCalledWith(credentials.password, storedUser.passwordHash);
+    expect(passwordHasher.compare).toHaveBeenCalledWith(
+      credentials.password,
+      storedUser.passwordHash,
+    );
   });
 
   it('should return a LoginResult with token and usuario when credentials are valid', async () => {
@@ -59,7 +61,12 @@ describe('LoginUseCase (red tests)', () => {
 
     expect(result).toEqual({
       token: 'valid-token',
-      usuario: { id: storedUser.id, email: storedUser.email, nombre: storedUser.nombre, rol: storedUser.rol },
+      usuario: {
+        id: storedUser.id,
+        email: storedUser.email,
+        nombre: storedUser.nombre,
+        rol: storedUser.rol,
+      },
     });
     expect(tokenService.generateToken).toHaveBeenCalled();
   });

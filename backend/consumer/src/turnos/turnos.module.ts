@@ -5,9 +5,6 @@ import { TurnoMongooseAdapter } from '../infrastructure/adapters/turno-mongoose.
 import { StandardPrioritySortingStrategy } from '../infrastructure/adapters/standard-priority-sorting.strategy';
 import { TURNO_REPOSITORY_TOKEN, PRIORITY_SORTING_STRATEGY_TOKEN } from '../domain/ports/tokens';
 
-// ⚕️ HUMAN CHECK - Adapter registrado con token de inyección (DIP)
-// Para tests, reemplazar useClass por TurnoInMemoryAdapter
-// Para nueva estrategia de prioridad, reemplazar StandardPrioritySortingStrategy
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Turno.name, schema: TurnoSchema }]),
