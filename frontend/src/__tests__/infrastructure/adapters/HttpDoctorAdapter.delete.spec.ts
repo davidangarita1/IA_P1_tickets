@@ -60,15 +60,15 @@ describe('HttpDoctorAdapter - remove()', () => {
     await expect(adapter.remove('doc-1')).rejects.toThrow('CONFLICT');
   });
 
-  it('throws HTTP_ERROR_404 when doctor not found', async () => {
+  it('throws user-friendly message when doctor not found', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse(404, {}));
 
-    await expect(adapter.remove('non-existent')).rejects.toThrow('HTTP_ERROR_404');
+    await expect(adapter.remove('non-existent')).rejects.toThrow('Médico no encontrado.');
   });
 
-  it('throws HTTP_ERROR_500 on server error', async () => {
+  it('throws user-friendly message on server error', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse(500, {}));
 
-    await expect(adapter.remove('doc-1')).rejects.toThrow('HTTP_ERROR_500');
+    await expect(adapter.remove('doc-1')).rejects.toThrow('Error del servidor. Intente más tarde.');
   });
 });

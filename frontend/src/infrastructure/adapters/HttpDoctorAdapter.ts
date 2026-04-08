@@ -9,6 +9,18 @@ import type {
 import type { DoctorService } from '@/domain/ports/DoctorService';
 import { getAuthCookie } from '@/infrastructure/cookies/cookieUtils';
 
+const HTTP_ERROR_MESSAGES: Record<number, string> = {
+  400: 'Datos inválidos. Verifique la información ingresada.',
+  401: 'No autorizado. Inicie sesión nuevamente.',
+  403: 'No tiene permisos para realizar esta acción.',
+  404: 'Médico no encontrado.',
+  500: 'Error del servidor. Intente más tarde.',
+};
+
+function httpError(status: number): Error {
+  return new Error(HTTP_ERROR_MESSAGES[status] ?? `Error inesperado (código ${status}).`);
+}
+
 export class HttpDoctorAdapter implements DoctorService {
   constructor(private readonly baseUrl: string) {}
 
@@ -30,7 +42,7 @@ export class HttpDoctorAdapter implements DoctorService {
     const res = await fetch(url, {
       headers: this.buildHeaders(),
     });
-    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    if (!res.ok) throw httpError(res.status);
     return res.json();
   }
 
@@ -51,7 +63,7 @@ export class HttpDoctorAdapter implements DoctorService {
       throw new Error(body.message || 'CONFLICT');
     }
 
-    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    if (!res.ok) throw httpError(res.status);
     return res.json();
   }
 
@@ -72,7 +84,7 @@ export class HttpDoctorAdapter implements DoctorService {
       throw new Error(body.message || 'CONFLICT');
     }
 
-    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    if (!res.ok) throw httpError(res.status);
     return res.json();
   }
 
@@ -87,7 +99,7 @@ export class HttpDoctorAdapter implements DoctorService {
       headers: this.buildHeaders(),
     });
 
-    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    if (!res.ok) throw httpError(res.status);
     return res.json();
   }
 
@@ -102,6 +114,6 @@ export class HttpDoctorAdapter implements DoctorService {
       throw new Error(body.message || 'CONFLICT');
     }
 
-    if (!res.ok) throw new Error(`HTTP_ERROR_${res.status}`);
+    if (!res.ok) throw httpError(res.status);
   }
 }

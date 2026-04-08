@@ -57,9 +57,9 @@ describe('useDoctors', () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it('sets error when getAll throws HTTP_ERROR_401', async () => {
+  it('sets error when getAll throws unauthorized error', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_401'));
+    service.getAll.mockRejectedValueOnce(new Error('No autorizado. Inicie sesión nuevamente.'));
 
     const { result } = renderHook(() => useDoctors(service));
 
@@ -68,9 +68,9 @@ describe('useDoctors', () => {
     expect(result.current.error).toBe('No autorizado. Inicie sesión nuevamente.');
   });
 
-  it('sets error when getAll throws HTTP_ERROR_403', async () => {
+  it('sets error when getAll throws forbidden error', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_403'));
+    service.getAll.mockRejectedValueOnce(new Error('No tiene permisos para realizar esta acción.'));
 
     const { result } = renderHook(() => useDoctors(service));
 
@@ -79,9 +79,9 @@ describe('useDoctors', () => {
     expect(result.current.error).toBe('No tiene permisos para realizar esta acción.');
   });
 
-  it('sets error when getAll throws HTTP_ERROR_409', async () => {
+  it('sets error when getAll throws conflict error', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_409'));
+    service.getAll.mockRejectedValueOnce(new Error('Conflicto con los datos existentes. Verifique la información.'));
 
     const { result } = renderHook(() => useDoctors(service));
 
@@ -90,9 +90,9 @@ describe('useDoctors', () => {
     expect(result.current.error).toBe('Conflicto con los datos existentes. Verifique la información.');
   });
 
-  it('sets error when getAll throws HTTP_ERROR_500', async () => {
+  it('sets error when getAll throws server error', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_500'));
+    service.getAll.mockRejectedValueOnce(new Error('Error del servidor. Intente más tarde.'));
 
     const { result } = renderHook(() => useDoctors(service));
 
@@ -101,15 +101,15 @@ describe('useDoctors', () => {
     expect(result.current.error).toBe('Error del servidor. Intente más tarde.');
   });
 
-  it('sets generic error message for unknown errors', async () => {
+  it('passes through error message from Error instances', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('SOME_UNKNOWN'));
+    service.getAll.mockRejectedValueOnce(new Error('Error inesperado (código 502).'));
 
     const { result } = renderHook(() => useDoctors(service));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe('Error al cargar médicos.');
+    expect(result.current.error).toBe('Error inesperado (código 502).');
   });
 
   it('sets generic error message for non-Error throw', async () => {
@@ -159,7 +159,7 @@ describe('useDoctors', () => {
 
   it('clears previous error on refresh', async () => {
     const service = mockDoctorService();
-    service.getAll.mockRejectedValueOnce(new Error('HTTP_ERROR_500'));
+    service.getAll.mockRejectedValueOnce(new Error('Error del servidor. Intente más tarde.'));
 
     const { result } = renderHook(() => useDoctors(service));
     await waitFor(() => expect(result.current.loading).toBe(false));

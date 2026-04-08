@@ -64,17 +64,17 @@ describe('HttpDoctorAdapter - update()', () => {
     await expect(adapter.update('doc-1', { name: 'Test' })).rejects.toThrow('CONFLICT');
   });
 
-  it('throws HTTP_ERROR_404 when doctor not found', async () => {
+  it('throws user-friendly message when doctor not found', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse(404, {}));
 
     await expect(adapter.update('non-existent', { name: 'Test' })).rejects.toThrow(
-      'HTTP_ERROR_404',
+      'Médico no encontrado.',
     );
   });
 
-  it('throws HTTP_ERROR_500 on server error', async () => {
+  it('throws user-friendly message on server error', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse(500, {}));
 
-    await expect(adapter.update('doc-1', { name: 'Test' })).rejects.toThrow('HTTP_ERROR_500');
+    await expect(adapter.update('doc-1', { name: 'Test' })).rejects.toThrow('Error del servidor. Intente más tarde.');
   });
 });

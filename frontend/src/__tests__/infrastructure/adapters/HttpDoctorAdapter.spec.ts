@@ -51,16 +51,16 @@ describe('HttpDoctorAdapter', () => {
       });
     });
 
-    it('throws HTTP_ERROR_401 on unauthorized response', async () => {
+    it('throws user-friendly message on unauthorized response', async () => {
       mockFetch.mockResolvedValueOnce(mockResponse(401, {}));
 
-      await expect(adapter.getAll()).rejects.toThrow('HTTP_ERROR_401');
+      await expect(adapter.getAll()).rejects.toThrow('No autorizado. Inicie sesión nuevamente.');
     });
 
-    it('throws HTTP_ERROR_500 on server error', async () => {
+    it('throws user-friendly message on server error', async () => {
       mockFetch.mockResolvedValueOnce(mockResponse(500, {}));
 
-      await expect(adapter.getAll()).rejects.toThrow('HTTP_ERROR_500');
+      await expect(adapter.getAll()).rejects.toThrow('Error del servidor. Intente más tarde.');
     });
 
     it('appends page and limit as query params when provided', async () => {
@@ -123,10 +123,10 @@ describe('HttpDoctorAdapter', () => {
       await expect(adapter.create(data)).rejects.toThrow('CONFLICT');
     });
 
-    it('throws HTTP_ERROR_500 on non-409 error', async () => {
+    it('throws user-friendly message on non-409 error', async () => {
       mockFetch.mockResolvedValueOnce(mockResponse(500, {}));
 
-      await expect(adapter.create(data)).rejects.toThrow('HTTP_ERROR_500');
+      await expect(adapter.create(data)).rejects.toThrow('Error del servidor. Intente más tarde.');
     });
 
     it('omits Authorization header when no token', async () => {
@@ -175,10 +175,10 @@ describe('HttpDoctorAdapter', () => {
       );
     });
 
-    it('throws HTTP_ERROR_500 on server error', async () => {
+    it('throws user-friendly message on server error', async () => {
       mockFetch.mockResolvedValueOnce(mockResponse(500, {}));
 
-      await expect(adapter.getAvailableShifts('1')).rejects.toThrow('HTTP_ERROR_500');
+      await expect(adapter.getAvailableShifts('1')).rejects.toThrow('Error del servidor. Intente más tarde.');
     });
 
     it('fetches without auth header when no token', async () => {
