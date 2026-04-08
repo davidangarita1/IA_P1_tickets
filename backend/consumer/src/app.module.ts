@@ -2,15 +2,23 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConsumerController } from './presentation/consumer.controller';
-import { TurnosModule } from './turnos/turnos.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { SchedulerModule } from './scheduler/scheduler.module';
+import { Turno, TurnoSchema } from './infrastructure/schemas/turno.schema';
+import { TurnoMongooseAdapter } from './infrastructure/adapters/turno-mongoose.adapter';
+import { StandardPrioritySortingStrategy } from './infrastructure/adapters/standard-priority-sorting.strategy';
 import { RabbitMQEventPublisher } from './infrastructure/adapters/rabbitmq-event-publisher.adapter';
-import { NotificationsService } from './notifications/notifications.service';
-import { EVENT_PUBLISHER_TOKEN, NOTIFICATION_GATEWAY_TOKEN } from './domain/ports/tokens';
+import { NotificationsService } from './infrastructure/adapters/notifications.service';
+import { SchedulerService } from './infrastructure/adapters/scheduler.service';
+import {
+    TURNO_REPOSITORY_TOKEN,
+    PRIORITY_SORTING_STRATEGY_TOKEN,
+    EVENT_PUBLISHER_TOKEN,
+    NOTIFICATION_GATEWAY_TOKEN,
+} from './domain/ports/tokens';
 import { CreateTurnoUseCase } from './application/use-cases/create-turno.use-case';
 import { AssignRoomUseCase } from './application/use-cases/assign-room.use-case';
+import { FinalizeTurnosUseCase } from './application/use-cases/finalize-turnos.use-case';
 
 @Module({
     imports: [
@@ -30,23 +38,53 @@ import { AssignRoomUseCase } from './application/use-cases/assign-room.use-case'
             },
             inject: [ConfigService],
         }),
-        NotificationsModule,
-        SchedulerModule,
-        TurnosModule,
+        MongooseModule.forFeature([{ name: Turno.name, schema: TurnoSchema }]),
+        ClientsModule.registerAsync([
+            {
+                name: 'TURNOS_NOTIFICATIONS',
+                imports: [ConfigModule],
+                useFactory: async (configService: ConfigService) => {
+                    const rabbitUrl = configService.get<string>('RABBITMQ_URL');
+                    if (!rabbitUrl) throw new Error('RABBITMQ_URL environment variable is required');
+                    return {
+                        transport: Transport.RMQ,
+                        options: {
+                            urls: [rabbitUrl],
+                            queue: configService.get<string>('RABBITMQ_NOTIFICATIONS_QUEUE', 'turnos_notifications'),
+                            queueOptions: {
+                                durable: true,
+                            },
+                        },
+                    };
+                },
+                inject: [ConfigService],
+            },
+        ]),
     ],
     controllers: [ConsumerController],
 
     providers: [
-        CreateTurnoUseCase,
-        AssignRoomUseCase,
+        {
+            provide: TURNO_REPOSITORY_TOKEN,
+            useClass: TurnoMongooseAdapter,
+        },
+        {
+            provide: PRIORITY_SORTING_STRATEGY_TOKEN,
+            useClass: StandardPrioritySortingStrategy,
+        },
         {
             provide: EVENT_PUBLISHER_TOKEN,
             useClass: RabbitMQEventPublisher,
         },
+        NotificationsService,
         {
             provide: NOTIFICATION_GATEWAY_TOKEN,
             useExisting: NotificationsService,
         },
+        CreateTurnoUseCase,
+        AssignRoomUseCase,
+        FinalizeTurnosUseCase,
+        SchedulerService,
     ],
 })
 export class AppModule { }

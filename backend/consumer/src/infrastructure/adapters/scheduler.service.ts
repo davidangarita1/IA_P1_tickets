@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
-import { FinalizeTurnosUseCase } from '../application/use-cases/finalize-turnos.use-case';
-import { AssignRoomUseCase } from '../application/use-cases/assign-room.use-case';
+import { FinalizeTurnosUseCase } from '../../application/use-cases/finalize-turnos.use-case';
+import { AssignRoomUseCase } from '../../application/use-cases/assign-room.use-case';
 
 const DEFAULT_CONSULTORIOS = 5;
 const SCHEDULER_INTERVAL_NAME = 'scheduler-asignacion-turnos';

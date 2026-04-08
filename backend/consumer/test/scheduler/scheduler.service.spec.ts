@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { SchedulerService } from '../../src/scheduler/scheduler.service';
+import { SchedulerService } from '../../src/infrastructure/adapters/scheduler.service';
 import { FinalizeTurnosUseCase } from '../../src/application/use-cases/finalize-turnos.use-case';
 import { AssignRoomUseCase } from '../../src/application/use-cases/assign-room.use-case';
 

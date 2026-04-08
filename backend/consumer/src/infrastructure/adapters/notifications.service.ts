@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { INotificationGateway } from '../domain/ports/INotificationGateway';
+import { INotificationGateway } from '../../domain/ports/INotificationGateway';
 
 @Injectable()
 export class NotificationsService implements INotificationGateway {
