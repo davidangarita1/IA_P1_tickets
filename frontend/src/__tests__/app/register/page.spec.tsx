@@ -12,7 +12,7 @@ describe('RegisterPage redirect', () => {
     jest.clearAllMocks();
   });
 
-  it('[HU-01] redirects /register to /solicitar-turno permanently', async () => {
+  it('redirects /register to /solicitar-turno permanently', async () => {
     const { default: RegisterPage } = await import('@/app/register/page');
     try {
       RegisterPage();
@@ -21,7 +21,7 @@ describe('RegisterPage redirect', () => {
     expect(mockRedirect).toHaveBeenCalledWith('/solicitar-turno');
   });
 
-  it('[HU-01][Validate] /register route does not render form content directly', async () => {
+  it('[Validate] /register route does not render form content directly', async () => {
     const { default: RegisterPage } = await import('@/app/register/page');
     try {
       RegisterPage();

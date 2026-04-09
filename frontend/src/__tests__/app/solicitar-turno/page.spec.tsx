@@ -58,21 +58,21 @@ beforeEach(() => {
 });
 
 describe('SolicitarTurnoPage', () => {
-  it('[HU-01][Validate] is publicly accessible — renders without requiring authentication', () => {
+  it('[Validate] is publicly accessible — renders without requiring authentication', () => {
     render(<SolicitarTurnoPage />);
 
     expect(screen.getByText('Registro de Paciente')).toBeInTheDocument();
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('[HU-01] renders CreateTicketForm at /solicitar-turno route', () => {
+  it('renders CreateTicketForm at /solicitar-turno route', () => {
     render(<SolicitarTurnoPage />);
 
     expect(screen.getByPlaceholderText('Nombre completo')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Cédula')).toBeInTheDocument();
   });
 
-  it('[HU-01] renders the same form content as the previous /register page', () => {
+  it('renders the same form content as the previous /register page', () => {
     render(<SolicitarTurnoPage />);
 
     expect(screen.getByText('Registro de Paciente')).toBeInTheDocument();

@@ -209,7 +209,7 @@ describe('Navbar', () => {
     expect(link.className).toBe('linkActive');
   });
 
-  it('[HU-01] shows Solicitar Turno button in public navbar for unauthenticated users', () => {
+  it('shows Solicitar Turno button in public navbar for unauthenticated users', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/');
 
@@ -220,7 +220,7 @@ describe('Navbar', () => {
     expect(link).toHaveAttribute('href', '/solicitar-turno');
   });
 
-  it('[HU-01] Solicitar Turno is active when unauthenticated user is on /solicitar-turno', () => {
+  it('Solicitar Turno is active when unauthenticated user is on /solicitar-turno', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/solicitar-turno');
 
@@ -230,7 +230,7 @@ describe('Navbar', () => {
     expect(link.className).toBe('linkActive');
   });
 
-  it('[HU-01][Validate] unauthenticated user can see Solicitar Turno without needing to know the URL', () => {
+  it('[Validate] unauthenticated user can see Solicitar Turno without needing to know the URL', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/');
 
@@ -241,7 +241,7 @@ describe('Navbar', () => {
     expect(link).toHaveAttribute('href', '/solicitar-turno');
   });
 
-  it('[HU-01] public navbar does not show authenticated-only links', () => {
+  it('public navbar does not show authenticated-only links', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/');
 
@@ -251,7 +251,7 @@ describe('Navbar', () => {
     expect(screen.queryByRole('link', { name: /gestión médicos/i })).not.toBeInTheDocument();
   });
 
-  it('[HU-01][Validate] authenticated user does not see public-only navbar', () => {
+  it('[Validate] authenticated user does not see public-only navbar', () => {
     setupAuth(true);
     mockUsePathname.mockReturnValue('/');
 
