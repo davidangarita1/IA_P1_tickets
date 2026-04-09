@@ -368,4 +368,86 @@ describe('Navbar', () => {
     expect(navTurnosLink).toBeVisible();
     expect(logoLink).not.toBe(navTurnosLink);
   });
+
+  it('renders Historial Turnos button instead of Dashboard for authenticated users', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.getByRole('link', { name: 'Historial Turnos' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
+  });
+
+  it('Historial Turnos button has href /dashboard', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Historial Turnos' });
+    expect(link).toHaveAttribute('href', '/dashboard');
+  });
+
+  it('applies active class to Historial Turnos when on /dashboard', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/dashboard');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Historial Turnos' });
+    expect(link.className).toBe('linkActive');
+  });
+
+  it('Historial Turnos is inactive when on a different route', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Historial Turnos' });
+    expect(link.className).toBe('link');
+  });
+
+  it('the word Dashboard does not appear anywhere in the authenticated navbar', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const allLinks = screen.getAllByRole('link');
+    const labels = allLinks.map((l) => l.textContent);
+    expect(labels.every((label) => !/dashboard/i.test(label ?? ''))).toBe(true);
+  });
+
+  it('Historial Turnos is not visible in the public navbar for unauthenticated users', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole('link', { name: 'Historial Turnos' })).not.toBeInTheDocument();
+  });
+
+  it('[Validate] authenticated user sees Historial Turnos and not Dashboard in navbar', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/dashboard');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Historial Turnos' });
+    expect(link).toBeVisible();
+    expect(link).toHaveAttribute('href', '/dashboard');
+    expect(link.className).toBe('linkActive');
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
+  });
+
+  it('[Validate] Dashboard text is absent from navbar in all authenticated states', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.queryByText(/^dashboard$/i)).not.toBeInTheDocument();
+  });
 });
