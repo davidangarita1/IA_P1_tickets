@@ -1,4 +1,4 @@
-import SolicitarTurnoPage from '@/app/solicitar-turno/page';
+import RequestTurnPage from '@/app/request-turn/page';
 import { render, screen } from '@testing-library/react';
 
 const mockPush = jest.fn();
@@ -57,23 +57,23 @@ beforeEach(() => {
   });
 });
 
-describe('SolicitarTurnoPage', () => {
+describe('RequestTurnPage', () => {
   it('[Validate] is publicly accessible — renders without requiring authentication', () => {
-    render(<SolicitarTurnoPage />);
+    render(<RequestTurnPage />);
 
     expect(screen.getByText('Registro de Paciente')).toBeInTheDocument();
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('renders CreateTicketForm at /solicitar-turno route', () => {
-    render(<SolicitarTurnoPage />);
+  it('renders CreateTicketForm at /request-turn route', () => {
+    render(<RequestTurnPage />);
 
     expect(screen.getByPlaceholderText('Nombre completo')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Cédula')).toBeInTheDocument();
   });
 
   it('renders the same form content as the previous /register page', () => {
-    render(<SolicitarTurnoPage />);
+    render(<RequestTurnPage />);
 
     expect(screen.getByText('Registro de Paciente')).toBeInTheDocument();
   });

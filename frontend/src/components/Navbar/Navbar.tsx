@@ -10,11 +10,11 @@ const AUTH_NAV_ITEMS = [
   { href: '/', label: 'Turnos' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/doctors', label: 'Gestión Médicos' },
-  { href: '/solicitar-turno', label: 'Solicitar Turno' },
+  { href: '/request-turn', label: 'Request Turn' },
 ];
 
 const PUBLIC_NAV_ITEMS = [
-  { href: '/solicitar-turno', label: 'Solicitar Turno' },
+  { href: '/request-turn', label: 'Request Turn' },
 ];
 
 export default function Navbar() {
