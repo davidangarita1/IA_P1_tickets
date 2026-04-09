@@ -263,4 +263,109 @@ describe('Navbar', () => {
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
+
+  it('renders Turnos button in public navbar for unauthenticated users', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    expect(turnosLinks.some((l) => l.getAttribute('href') === '/')).toBe(true);
+  });
+
+  it('Turnos button in public navbar has href /', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/request-ticket');
+
+    render(<Navbar />);
+
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    expect(turnosLinks.some((l) => l.getAttribute('href') === '/')).toBe(true);
+  });
+
+  it('public navbar shows Turnos, Solicitar Turno and Iniciar Sesion for unauthenticated users', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.getAllByRole('link', { name: 'Turnos' }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /iniciar sesión/i })).toBeInTheDocument();
+  });
+
+  it('applies active class to Turnos in public navbar when pathname is /', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    const navTurnosLink = turnosLinks.find((l) => l.getAttribute('href') === '/');
+    expect(navTurnosLink?.className).toBe('linkActive');
+  });
+
+  it('Turnos in public navbar is inactive when on /request-ticket', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/request-ticket');
+
+    render(<Navbar />);
+
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    const navTurnosLink = turnosLinks.find((l) => l.getAttribute('href') === '/');
+    expect(navTurnosLink?.className).toBe('link');
+  });
+
+  it('logo and Turnos button in public navbar are independent links to /', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const logoLink = screen.getByRole('link', { name: /sistema de turnos/i });
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+
+    expect(logoLink).toHaveAttribute('href', '/');
+    expect(turnosLinks.some((l) => l.getAttribute('href') === '/')).toBe(true);
+    expect(logoLink).not.toBe(turnosLinks[0]);
+  });
+
+  it('Turnos button remains visible for authenticated users', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/dashboard');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Turnos' });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/');
+  });
+
+  it('[Validate] unauthenticated user can navigate to turnos screen via navbar', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    const navTurnosLink = turnosLinks.find((l) => l.getAttribute('href') === '/');
+    expect(navTurnosLink).toBeVisible();
+    expect(navTurnosLink).toHaveAttribute('href', '/');
+  });
+
+  it('[Validate] Turnos button coexists with logo as independent navigation elements in public navbar', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const logoLink = screen.getByRole('link', { name: /sistema de turnos/i });
+    const turnosLinks = screen.getAllByRole('link', { name: 'Turnos' });
+    const navTurnosLink = turnosLinks.find((l) => l.getAttribute('href') === '/');
+
+    expect(logoLink).toBeVisible();
+    expect(navTurnosLink).toBeVisible();
+    expect(logoLink).not.toBe(navTurnosLink);
+  });
 });

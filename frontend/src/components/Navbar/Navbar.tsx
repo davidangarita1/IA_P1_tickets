@@ -14,6 +14,7 @@ const AUTH_NAV_ITEMS = [
 ];
 
 const PUBLIC_NAV_ITEMS = [
+  { href: '/', label: 'Turnos' },
   { href: '/request-ticket', label: 'Solicitar Turno' },
 ];
 
