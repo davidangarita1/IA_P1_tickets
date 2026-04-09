@@ -1,5 +1,9 @@
 # Sistema de Turnos Médicos en Tiempo Real
 
+<p align="center">
+  <img src="docs/images/cover.png" alt="Cover" />
+</p>
+
 Sistema para gestionar turnos médicos en tiempo real usando microservicios, mensajería asíncrona y WebSockets.
 
 ## Objetivo del proyecto
