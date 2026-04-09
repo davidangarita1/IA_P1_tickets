@@ -51,7 +51,7 @@ describe('Navbar', () => {
 
     expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Request Turn' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 
   it('renders logo text', () => {
@@ -119,13 +119,13 @@ describe('Navbar', () => {
     expect(turnosLink.className).toBe('link');
   });
 
-  it('applies active class to Request Turn link when on /request-turn', () => {
+  it('applies active class to Solicitar Turno link when on /request-turn', () => {
     setupAuth(true);
     mockUsePathname.mockReturnValue('/request-turn');
 
     render(<Navbar />);
 
-    const solicitarLink = screen.getByRole('link', { name: 'Request Turn' });
+    const solicitarLink = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(solicitarLink.className).toBe('linkActive');
   });
 
@@ -201,34 +201,34 @@ describe('Navbar', () => {
     expect(link.className).toBe('linkActive');
   });
 
-  it('shows Request Turn button in public navbar for unauthenticated users', () => {
+  it('shows Solicitar Turno button in public navbar for unauthenticated users', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    const link = screen.getByRole('link', { name: 'Request Turn' });
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', '/request-turn');
   });
 
-  it('Request Turn is active when unauthenticated user is on /request-turn', () => {
+  it('Solicitar Turno is active when unauthenticated user is on /request-turn', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/request-turn');
 
     render(<Navbar />);
 
-    const link = screen.getByRole('link', { name: 'Request Turn' });
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(link.className).toBe('linkActive');
   });
 
-  it('[Validate] unauthenticated user can see Request Turn without needing to know the URL', () => {
+  it('[Validate] unauthenticated user can see Solicitar Turno without needing to know the URL', () => {
     setupAuth(false);
     mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
-    const link = screen.getByRole('link', { name: 'Request Turn' });
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(link).toBeVisible();
     expect(link).toHaveAttribute('href', '/request-turn');
   });
@@ -261,6 +261,6 @@ describe('Navbar', () => {
 
     expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Request Turn' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 });
