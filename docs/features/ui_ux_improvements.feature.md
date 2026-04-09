@@ -20,7 +20,7 @@ Cambios en la lógica de negocio de turnos, modificaciones en la autenticación 
 
 ## Historias de Usuario
 
-### HU-04: Mejora de la experiencia visual de la pantalla de turnos habilitados
+### HU-01: Mejora de la experiencia visual de la pantalla de turnos habilitados
 
 **Estimación:** M (Medium)
 **Como** usuario (paciente o visitante) que consulta la pantalla pública de turnos habilitados
