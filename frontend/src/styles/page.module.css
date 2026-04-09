@@ -13,16 +13,40 @@
 }
 
 .connected {
-  color: #22c55e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
   font-size: 14px;
   margin-bottom: 20px;
 }
 
 .disconnected {
-  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ef4444;
   font-size: 14px;
   margin-bottom: 20px;
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+.dotConnected {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  flex-shrink: 0;
+}
+
+.dotDisconnected {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -36,16 +60,40 @@
 }
 
 .sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 22px;
+  font-weight: 700;
   margin-top: 24px;
-  margin-bottom: 8px;
-  color: #94a3b8;
+  margin-bottom: 12px;
+  color: #334155;
+}
+
+.sectionIcon {
+  flex-shrink: 0;
 }
 
 .list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 22px;
+}
+
+@media (max-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 40px 20px;
+  }
+
+  .list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .item {
@@ -53,15 +101,14 @@
   border-radius: 12px;
   background: white;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
   font-size: 24px;
-  gap: 16px;
   box-shadow:
     0 4px 12px rgba(15, 23, 42, 0.04),
     0 1px 2px rgba(15, 23, 42, 0.04);
   border-left: 6px solid transparent;
-  transform: translateY(0);
+  animation: fadeInLift 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
   transition:
     transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
     box-shadow 0.3s ease;
@@ -77,7 +124,39 @@
 .highlight {
   border-left: 6px solid #22c55e;
   background: #f0fdf4;
-  animation: fadeInLift 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.waitingItem {
+  background: #f8fafc;
+  border-left: 6px solid #e2e8f0;
+}
+
+.calledName {
+  font-weight: 700;
+  font-size: 1.5rem;
+  flex: 1;
+}
+
+.name {
+  font-weight: 600;
+  flex: 1;
+}
+
+.office {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  color: #334155;
+}
+
+.officeIcon {
+  flex-shrink: 0;
+}
+
+.muted {
+  font-size: 14px;
+  color: #94a3b8;
 }
 
 .served {
@@ -95,11 +174,6 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-.name {
-  font-weight: 600;
-  flex: 1;
 }
 
 .time {
@@ -120,6 +194,25 @@
   color: #64748b;
   font-size: 14px;
   margin-bottom: 10px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80px;
+  gap: 16px;
+}
+
+.emptyIcon {
+  color: #94a3b8;
+}
+
+.emptyText {
+  color: #64748b;
+  font-size: 18px;
+  text-align: center;
 }
 
 .empty {
@@ -154,5 +247,84 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+    color: #f1f5f9;
+  }
+
+  .title {
+    color: #f1f5f9;
+  }
+
+  .sectionTitle {
+    color: #cbd5e1;
+  }
+
+  .item {
+    background: #1e293b;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .item:hover {
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .highlight {
+    background: #14532d;
+    border-left-color: #4ade80;
+  }
+
+  .waitingItem {
+    background: #1e293b;
+    border-left-color: #475569;
+  }
+
+  .calledName {
+    color: #f0fdf4;
+  }
+
+  .name {
+    color: #e2e8f0;
+  }
+
+  .office {
+    color: #cbd5e1;
+  }
+
+  .muted {
+    color: #64748b;
+  }
+
+  .served {
+    background: #1e293b;
+    border-left-color: #475569;
+  }
+
+  .emptyIcon {
+    color: #64748b;
+  }
+
+  .emptyText {
+    color: #94a3b8;
+  }
+
+  .error {
+    color: #fca5a5;
+  }
+
+  .toast {
+    background: #1e293b;
+    color: #f1f5f9;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.15);
   }
 }
