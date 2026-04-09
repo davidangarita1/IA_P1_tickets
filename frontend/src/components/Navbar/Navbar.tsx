@@ -8,13 +8,12 @@ import styles from '@/styles/Navbar.module.css';
 
 const AUTH_NAV_ITEMS = [
   { href: '/', label: 'Turnos' },
-  { href: '/dashboard', label: 'Historial Turnos' },
+  { href: '/dashboard', label: 'Dashboard' },
   { href: '/doctors', label: 'Gestión Médicos' },
   { href: '/solicitar-turno', label: 'Solicitar Turno' },
 ];
 
 const PUBLIC_NAV_ITEMS = [
-  { href: '/', label: 'Turnos' },
   { href: '/solicitar-turno', label: 'Solicitar Turno' },
 ];
 

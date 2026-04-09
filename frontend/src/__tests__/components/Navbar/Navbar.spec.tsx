@@ -50,7 +50,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Historial Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 
@@ -101,21 +101,13 @@ describe('Navbar', () => {
     expect(screen.queryByRole('link', { name: 'Registro' })).not.toBeInTheDocument();
   });
 
-  it('does not render the label "Dashboard" anywhere in the navbar', () => {
-    mockUsePathname.mockReturnValue('/');
-
-    render(<Navbar />);
-
-    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
-  });
-
   it('applies active class to the link matching current pathname', () => {
     mockUsePathname.mockReturnValue('/dashboard');
 
     render(<Navbar />);
 
-    const historialLink = screen.getByRole('link', { name: 'Historial Turnos' });
-    expect(historialLink.className).toBe('linkActive');
+    const dashboardLink = screen.getByRole('link', { name: 'Dashboard' });
+    expect(dashboardLink.className).toBe('linkActive');
   });
 
   it('applies inactive class to links not matching current pathname', () => {
@@ -247,7 +239,7 @@ describe('Navbar', () => {
 
     render(<Navbar />);
 
-    expect(screen.queryByRole('link', { name: 'Historial Turnos' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /gestión médicos/i })).not.toBeInTheDocument();
   });
 
@@ -258,7 +250,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     expect(screen.queryByRole('link', { name: /iniciar sesión/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Historial Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
   });
 
   it('renders navigation links when user is authenticated', () => {
@@ -268,7 +260,7 @@ describe('Navbar', () => {
     render(<Navbar />);
 
     expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Historial Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 });
