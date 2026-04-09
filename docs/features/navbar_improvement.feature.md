@@ -7,11 +7,11 @@
 
 ### Alcance de la funcionalidad
 
-Las mejoras cubren tres áreas: (1) renombrar el botón existente "Registrar" a "Solicitar Turno", actualizar su ruta de `/register` a `/request-turn` y habilitarlo en la barra de navegación pública para usuarios no autenticados, eliminando la necesidad de escribir la URL manualmente; (2) agregar el botón "Turnos" a la vista sin autenticación para que los usuarios puedan navegar a la pantalla pública de turnos sin depender exclusivamente del logo; y (3) renombrar el botón "Dashboard" a "Historial Turnos" para reflejar con mayor claridad el contenido de la pantalla.
+Las mejoras cubren tres áreas: (1) renombrar el botón existente "Registrar" a "Solicitar Turno", actualizar su ruta de `/register` a `/request-ticket` y habilitarlo en la barra de navegación pública para usuarios no autenticados, eliminando la necesidad de escribir la URL manualmente; (2) agregar el botón "Turnos" a la vista sin autenticación para que los usuarios puedan navegar a la pantalla pública de turnos sin depender exclusivamente del logo; y (3) renombrar el botón "Dashboard" a "Historial Turnos" para reflejar con mayor claridad el contenido de la pantalla.
 
 ### Fuera de alcance
 
-Cambios en la lógica de negocio de turnos, modificaciones en la autenticación o autorización, creación de nuevas pantallas o funcionalidades, cambios en el backend o en los servicios de WebSocket, rediseño visual de pantallas, rediseño completo del sistema de diseño (design system) del proyecto. El renombramiento de la ruta `/register` a `/request-turn` no constituye una ruta nueva: es la misma pantalla con una URL actualizada.
+Cambios en la lógica de negocio de turnos, modificaciones en la autenticación o autorización, creación de nuevas pantallas o funcionalidades, cambios en el backend o en los servicios de WebSocket, rediseño visual de pantallas, rediseño completo del sistema de diseño (design system) del proyecto. El renombramiento de la ruta `/register` a `/request-ticket` no constituye una ruta nueva: es la misma pantalla con una URL actualizada.
 
 ## Épica
 
@@ -24,7 +24,7 @@ Cambios en la lógica de negocio de turnos, modificaciones en la autenticación 
 
 **Estimación:** XS (Extra Small)
 **Como** usuario no autenticado que accede al sistema de turnos
-**Quiero** que el botón "Registrar" se llame "Solicitar Turno", que la ruta `/register` cambie a `/request-turn`, y que este botón sea visible en la barra de navegación sin necesidad de iniciar sesión
+**Quiero** que el botón "Registrar" se llame "Solicitar Turno", que la ruta `/register` cambie a `/request-ticket`, y que este botón sea visible en la barra de navegación sin necesidad de iniciar sesión
 **Para** poder acceder directamente al formulario de solicitud de turno desde la barra de navegación, con una etiqueta que refleje con claridad la acción que voy a realizar.
 
 > **Nota de contexto:** El botón "Registrar" ya existe en el sistema pero actualmente **no es visible** en la barra de navegación para usuarios no autenticados — requiere conocer la URL directamente. Esta historia **no crea un nuevo botón ni una nueva pantalla**: únicamente renombra el botón existente, actualiza la ruta asociada y lo expone en la barra de navegación pública.
@@ -35,7 +35,7 @@ Cambios en la lógica de negocio de turnos, modificaciones en la autenticación 
   Dado que el sistema tiene un botón llamado "Registrar" que apuntaba a la ruta `/register`
   Cuando se implementa el cambio
   Entonces el botón pasa a llamarse "Solicitar Turno" en todos los puntos donde aparece
-  Y la ruta asociada cambia de `/register` a `/request-turn`
+  Y la ruta asociada cambia de `/register` a `/request-ticket`
   Y la pantalla de destino y su funcionalidad permanecen sin cambios.
 
 - **Escenario:** La barra de navegación pública es visible para usuarios no autenticados con el botón renombrado
@@ -47,17 +47,17 @@ Cambios en la lógica de negocio de turnos, modificaciones en la autenticación 
   Dado que el usuario no autenticado está en una página pública
   Y la barra de navegación pública es visible
   Cuando hace clic en el botón "Solicitar Turno"
-  Entonces el sistema lo redirige a la ruta `/request-turn`
+  Entonces el sistema lo redirige a la ruta `/request-ticket`
   Y se muestra la pantalla para registrar una nueva solicitud de turno (misma pantalla que antes existía en `/register`).
 
-- **Escenario:** La ruta anterior `/register` redirige correctamente a `/request-turn`
-  Dado que la ruta `/register` ha sido renombrada a `/request-turn`
+- **Escenario:** La ruta anterior `/register` redirige correctamente a `/request-ticket`
+  Dado que la ruta `/register` ha sido renombrada a `/request-ticket`
   Cuando un usuario accede directamente a la ruta `/register` (por ejemplo, mediante un enlace guardado)
-  Entonces el sistema lo redirige automáticamente a `/request-turn`
+  Entonces el sistema lo redirige automáticamente a `/request-ticket`
   Y se muestra la pantalla de solicitud de turno sin pérdida de funcionalidad.
 
 - **Escenario:** El botón "Solicitar Turno" se resalta cuando el usuario está en la página de solicitud de turnos
-  Dado que el usuario se encuentra en la ruta `/request-turn`
+  Dado que el usuario se encuentra en la ruta `/request-ticket`
   Cuando visualiza la barra de navegación pública
   Entonces el botón "Solicitar Turno" debe mostrar un estilo visual "activo" para indicar la ubicación actual.
 

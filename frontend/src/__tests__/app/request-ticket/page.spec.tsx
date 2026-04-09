@@ -1,4 +1,4 @@
-import RequestTurnPage from '@/app/request-turn/page';
+import RequestTurnPage from '@/app/request-ticket/page';
 import { render, screen } from '@testing-library/react';
 
 const mockPush = jest.fn();
@@ -65,7 +65,7 @@ describe('RequestTurnPage', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('renders CreateTicketForm at /request-turn route', () => {
+  it('renders CreateTicketForm at /request-ticket route', () => {
     render(<RequestTurnPage />);
 
     expect(screen.getByPlaceholderText('Nombre completo')).toBeInTheDocument();

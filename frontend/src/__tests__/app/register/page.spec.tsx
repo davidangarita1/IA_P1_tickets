@@ -12,13 +12,13 @@ describe('RegisterPage redirect', () => {
     jest.clearAllMocks();
   });
 
-  it('redirects /register to /request-turn permanently', async () => {
+  it('redirects /register to /request-ticket permanently', async () => {
     const { default: RegisterPage } = await import('@/app/register/page');
     try {
       RegisterPage();
     } catch {
     }
-    expect(mockRedirect).toHaveBeenCalledWith('/request-turn');
+    expect(mockRedirect).toHaveBeenCalledWith('/request-ticket');
   });
 
   it('[Validate] /register route does not render form content directly', async () => {

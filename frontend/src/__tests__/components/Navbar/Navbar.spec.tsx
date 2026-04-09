@@ -80,7 +80,7 @@ describe('Navbar', () => {
     const hrefs = links.map((l) => l.getAttribute('href'));
     expect(hrefs).toContain('/');
     expect(hrefs).toContain('/dashboard');
-    expect(hrefs).toContain('/request-turn');
+    expect(hrefs).toContain('/request-ticket');
   });
 
   it('does not render /register href anywhere in the navbar', () => {
@@ -119,9 +119,9 @@ describe('Navbar', () => {
     expect(turnosLink.className).toBe('link');
   });
 
-  it('applies active class to Solicitar Turno link when on /request-turn', () => {
+  it('applies active class to Solicitar Turno link when on /request-ticket', () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue('/request-turn');
+    mockUsePathname.mockReturnValue('/request-ticket');
 
     render(<Navbar />);
 
@@ -209,12 +209,12 @@ describe('Navbar', () => {
 
     const link = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/request-turn');
+    expect(link).toHaveAttribute('href', '/request-ticket');
   });
 
-  it('Solicitar Turno is active when unauthenticated user is on /request-turn', () => {
+  it('Solicitar Turno is active when unauthenticated user is on /request-ticket', () => {
     setupAuth(false);
-    mockUsePathname.mockReturnValue('/request-turn');
+    mockUsePathname.mockReturnValue('/request-ticket');
 
     render(<Navbar />);
 
@@ -230,7 +230,7 @@ describe('Navbar', () => {
 
     const link = screen.getByRole('link', { name: 'Solicitar Turno' });
     expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', '/request-turn');
+    expect(link).toHaveAttribute('href', '/request-ticket');
   });
 
   it('public navbar does not show authenticated-only links', () => {
