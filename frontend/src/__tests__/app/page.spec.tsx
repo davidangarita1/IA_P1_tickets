@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import TicketsScreen from '@/app/page';
 import {
   buildTicket,
@@ -80,18 +80,25 @@ describe('TicketsScreen', () => {
     expect(screen.getByText('Turnos Habilitados')).toBeInTheDocument();
   });
 
-  it('shows disconnected indicator when not connected', () => {
-    render(<TicketsScreen />);
+  describe('connection indicator', () => {
+    it('shows disconnected dot and text when not connected', () => {
+      render(<TicketsScreen />);
 
-    expect(screen.getByText(/Desconectado — reconectando\.\.\./i)).toBeInTheDocument();
-  });
+      const indicator = screen.getByTestId('connection-indicator');
+      expect(indicator).toBeInTheDocument();
+      expect(within(indicator).getByTestId('connection-dot')).toBeInTheDocument();
+      expect(within(indicator).getByText('Desconectado — reconectando...')).toBeInTheDocument();
+    });
 
-  it('shows connected indicator when connected', () => {
-    setupMocks({ connected: true });
+    it('shows connected dot and text when connected', () => {
+      setupMocks({ connected: true });
 
-    render(<TicketsScreen />);
+      render(<TicketsScreen />);
 
-    expect(screen.getByText(/Conectado en tiempo real/i)).toBeInTheDocument();
+      const indicator = screen.getByTestId('connection-indicator');
+      expect(within(indicator).getByTestId('connection-dot')).toBeInTheDocument();
+      expect(within(indicator).getByText('Conectado en tiempo real')).toBeInTheDocument();
+    });
   });
 
   it('shows audio hint when audio is disabled', () => {
@@ -112,12 +119,25 @@ describe('TicketsScreen', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows empty state when there are no tickets', () => {
-    setupMocks({ tickets: [] });
+  describe('empty state', () => {
+    it('shows empty state icon and message when there are no tickets', () => {
+      setupMocks({ tickets: [] });
 
-    render(<TicketsScreen />);
+      render(<TicketsScreen />);
 
-    expect(screen.getByText('No hay turnos registrados')).toBeInTheDocument();
+      const emptyState = screen.getByTestId('empty-state');
+      expect(emptyState).toBeInTheDocument();
+      expect(within(emptyState).getByTestId('empty-icon')).toBeInTheDocument();
+      expect(within(emptyState).getByText('No hay turnos registrados')).toBeInTheDocument();
+    });
+
+    it('does not show empty state when tickets exist', () => {
+      setupMocks({ tickets: [buildTicket({ status: 'waiting' })] });
+
+      render(<TicketsScreen />);
+
+      expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+    });
   });
 
   it('renders error message when error is present', () => {
@@ -128,25 +148,86 @@ describe('TicketsScreen', () => {
     expect(screen.getByText('Connection lost')).toBeInTheDocument();
   });
 
-  it('renders called tickets section', () => {
-    const ticket = buildTicket({ status: 'called', office: 'A1' });
-    setupMocks({ tickets: [ticket] });
+  describe('called tickets section', () => {
+    it('renders section header with megaphone icon and Spanish label', () => {
+      const ticket = buildTicket({ status: 'called', office: 'A1' });
+      setupMocks({ tickets: [ticket] });
 
-    render(<TicketsScreen />);
+      render(<TicketsScreen />);
 
-    expect(screen.getByText('📢 Called')).toBeInTheDocument();
-    expect(screen.getByText(ticket.name)).toBeInTheDocument();
-    expect(screen.getByText('Consultorio A1')).toBeInTheDocument();
+      const header = screen.getByTestId('called-section-header');
+      expect(header).toBeInTheDocument();
+      expect(within(header).getByTestId('icon-megaphone')).toBeInTheDocument();
+      expect(within(header).getByText('Turnos Llamados')).toBeInTheDocument();
+    });
+
+    it('renders called ticket card with prominent name and office icon', () => {
+      const ticket = buildTicket({ status: 'called', office: 'A1' });
+      setupMocks({ tickets: [ticket] });
+
+      render(<TicketsScreen />);
+
+      const card = screen.getByTestId(`ticket-card-${ticket.id}`);
+      expect(card).toBeInTheDocument();
+      expect(within(card).getByText(ticket.name)).toBeInTheDocument();
+      expect(within(card).getByTestId('icon-office')).toBeInTheDocument();
+      expect(within(card).getByText('Consultorio A1')).toBeInTheDocument();
+    });
+
+    it('does not render called section when no called tickets exist', () => {
+      setupMocks({ tickets: [buildTicket({ status: 'waiting' })] });
+
+      render(<TicketsScreen />);
+
+      expect(screen.queryByTestId('called-section-header')).not.toBeInTheDocument();
+    });
   });
 
-  it('renders waiting tickets section', () => {
-    const ticket = buildTicket({ status: 'waiting' });
-    setupMocks({ tickets: [ticket] });
+  describe('waiting tickets section', () => {
+    it('renders section header with clock icon and Spanish label', () => {
+      const ticket = buildTicket({ status: 'waiting' });
+      setupMocks({ tickets: [ticket] });
 
-    render(<TicketsScreen />);
+      render(<TicketsScreen />);
 
-    expect(screen.getByText('⏳ Waiting')).toBeInTheDocument();
-    expect(screen.getByText(ticket.name)).toBeInTheDocument();
+      const header = screen.getByTestId('waiting-section-header');
+      expect(header).toBeInTheDocument();
+      expect(within(header).getByTestId('icon-clock')).toBeInTheDocument();
+      expect(within(header).getByText('En Espera')).toBeInTheDocument();
+    });
+
+    it('renders waiting ticket card with muted "Sin consultorio" text', () => {
+      const ticket = buildTicket({ status: 'waiting' });
+      setupMocks({ tickets: [ticket] });
+
+      render(<TicketsScreen />);
+
+      const card = screen.getByTestId(`ticket-card-${ticket.id}`);
+      expect(card).toBeInTheDocument();
+      expect(within(card).getByText(ticket.name)).toBeInTheDocument();
+      expect(within(card).getByText('Sin consultorio')).toBeInTheDocument();
+    });
+
+    it('does not render waiting section when no waiting tickets exist', () => {
+      setupMocks({ tickets: [buildTicket({ status: 'called', office: 'B2' })] });
+
+      render(<TicketsScreen />);
+
+      expect(screen.queryByTestId('waiting-section-header')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('ticket card accessibility', () => {
+    it('renders called and waiting tickets in separate list structures', () => {
+      const called = buildTicket({ status: 'called', office: 'A1' });
+      const waiting = buildTicket({ status: 'waiting' });
+      setupMocks({ tickets: [called, waiting] });
+
+      render(<TicketsScreen />);
+
+      const lists = screen.getAllByRole('list');
+      expect(lists.length).toBeGreaterThanOrEqual(2);
+    });
   });
 
   it('renders toast when showToast is true', () => {
