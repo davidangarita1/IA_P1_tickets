@@ -20,6 +20,7 @@ Permitir que un paciente registre su turno y reciba actualizaciones en tiempo re
 - Gestionar usuarios: registro, inicio y cierre de sesión con autenticación HMAC.
 - Gestión de médicos: crear y editar médicos con nombre, cédula, consultorio y franja horaria; visualizar el catálogo de médicos activos. La franja horaria disponible se consulta en tiempo real antes de guardar, garantizando que no dos médicos activos compartan consultorio y franja. Módulo accesible solo para usuarios autenticados.
 - Barra de navegación pública: usuarios no autenticados ven los botones "Turnos" (`/`) y "Solicitar Turno" (`/request-ticket`) directamente desde la barra de navegación, sin necesidad de conocer las URLs. El botón "Turnos" también está disponible para usuarios autenticados. La ruta anterior `/register` redirige automáticamente a `/request-ticket`.
+- Pantalla de turnos con rediseño visual: tarjetas diferenciadas por estado (turnos llamados con acento verde y tipografía prominente, turnos en espera con estilo neutro), encabezados de sección en español con íconos (megáfono para "Turnos Llamados", reloj para "En Espera"), indicador de conexión WebSocket con dot circular (verde/rojo) y texto descriptivo, estado vacío con ícono ilustrativo centrado, animación fade-in para nuevas tarjetas, grid responsivo (3/2/1 columnas según ancho de pantalla) y soporte de modo oscuro con contraste WCAG 2.1.
 
 ## Próxima feature en ideación: Login + Dashboard privado
 
@@ -201,7 +202,7 @@ bun run test:coverage
 |--------|-------|--------|-----------|
 | Backend producer | 150 | 33 | 100% Stmts, 100% Branch |
 | Backend consumer | 43 | 10 | 100% Stmts, 100% Branch |
-| Frontend | 448 | 46 | 99.76% Stmts, 98.38% Branch |
+| Frontend | 480 | 47 | 99.76% Stmts, 98.38% Branch |
 
 ## Documentacion de Calidad y Auditoria
 
