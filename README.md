@@ -160,7 +160,7 @@ curl -X POST http://localhost:3000/turnos \
 | `/signin` | Inicio de sesión | Público |
 | `/signup` | Registro de usuario | Público |
 | `/register` | Registro de turno alternativo | Público |
-| `/dashboard` | Dashboard operativo: turnos en tiempo real | Autenticado |
+| `/dashboard` | Historial Turnos: historial de turnos atendidos | Autenticado |
 | `/doctors` | Gestión de médicos: listado y creación | Autenticado |
 
 ## Testing

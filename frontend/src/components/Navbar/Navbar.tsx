@@ -8,7 +8,7 @@ import styles from '@/styles/Navbar.module.css';
 
 const AUTH_NAV_ITEMS = [
   { href: '/', label: 'Turnos' },
-  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard', label: 'Historial Turnos' },
   { href: '/doctors', label: 'Gestión Médicos' },
   { href: '/request-ticket', label: 'Solicitar Turno' },
 ];
