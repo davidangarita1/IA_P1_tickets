@@ -44,14 +44,14 @@ describe('Navbar', () => {
     setupAuth(true);
   });
 
-  it('renders all navigation items', () => {
+  it('renders all navigation items for authenticated user', () => {
     mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
 
     expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Registro' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 
   it('renders logo text', () => {
@@ -71,7 +71,7 @@ describe('Navbar', () => {
     expect(logoLink).toHaveAttribute('href', '/');
   });
 
-  it('renders correct href for each nav item', () => {
+  it('renders correct href for each nav item for authenticated user', () => {
     mockUsePathname.mockReturnValue('/');
 
     render(<Navbar />);
@@ -80,7 +80,25 @@ describe('Navbar', () => {
     const hrefs = links.map((l) => l.getAttribute('href'));
     expect(hrefs).toContain('/');
     expect(hrefs).toContain('/dashboard');
-    expect(hrefs).toContain('/register');
+    expect(hrefs).toContain('/request-ticket');
+  });
+
+  it('does not render /register href anywhere in the navbar', () => {
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const links = screen.getAllByRole('link');
+    const hrefs = links.map((l) => l.getAttribute('href'));
+    expect(hrefs).not.toContain('/register');
+  });
+
+  it('does not render the label "Registro" anywhere in the navbar', () => {
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole('link', { name: 'Registro' })).not.toBeInTheDocument();
   });
 
   it('applies active class to the link matching current pathname', () => {
@@ -101,37 +119,14 @@ describe('Navbar', () => {
     expect(turnosLink.className).toBe('link');
   });
 
-  it('does not render navigation links when user is not authenticated', () => {
-    setupAuth(false);
-    mockUsePathname.mockReturnValue('/');
-
-    render(<Navbar />);
-
-    expect(screen.queryByRole('link', { name: 'Turnos' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Registro' })).not.toBeInTheDocument();
-  });
-
-  it('renders navigation links when user is authenticated', () => {
+  it('applies active class to Solicitar Turno link when on /request-ticket', () => {
     setupAuth(true);
-    mockUsePathname.mockReturnValue('/');
+    mockUsePathname.mockReturnValue('/request-ticket');
 
     render(<Navbar />);
 
-    expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Registro' })).toBeInTheDocument();
-  });
-
-  it('renders SignOutButton when user is authenticated', () => {
-    setupAuth(true);
-    mockUsePathname.mockReturnValue('/');
-
-    render(<Navbar />);
-
-    expect(
-      screen.getByRole('button', { name: /cerrar sesión|sign out|logout/i }),
-    ).toBeInTheDocument();
+    const solicitarLink = screen.getByRole('link', { name: 'Solicitar Turno' });
+    expect(solicitarLink.className).toBe('linkActive');
   });
 
   it('does not render SignOutButton when user is not authenticated', () => {
@@ -143,6 +138,17 @@ describe('Navbar', () => {
     expect(
       screen.queryByRole('button', { name: /cerrar sesión|sign out|logout/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it('renders SignOutButton when user is authenticated', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(
+      screen.getByRole('button', { name: /cerrar sesión|sign out|logout/i }),
+    ).toBeInTheDocument();
   });
 
   it('renders Iniciar sesión link when user is not authenticated', () => {
@@ -193,5 +199,68 @@ describe('Navbar', () => {
 
     const link = screen.getByRole('link', { name: /gestión médicos/i });
     expect(link.className).toBe('linkActive');
+  });
+
+  it('shows Solicitar Turno button in public navbar for unauthenticated users', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/request-ticket');
+  });
+
+  it('Solicitar Turno is active when unauthenticated user is on /request-ticket', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/request-ticket');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
+    expect(link.className).toBe('linkActive');
+  });
+
+  it('[Validate] unauthenticated user can see Solicitar Turno without needing to know the URL', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    const link = screen.getByRole('link', { name: 'Solicitar Turno' });
+    expect(link).toBeVisible();
+    expect(link).toHaveAttribute('href', '/request-ticket');
+  });
+
+  it('public navbar does not show authenticated-only links', () => {
+    setupAuth(false);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /gestión médicos/i })).not.toBeInTheDocument();
+  });
+
+  it('[Validate] authenticated user does not see public-only navbar', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.queryByRole('link', { name: /iniciar sesión/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+  });
+
+  it('renders navigation links when user is authenticated', () => {
+    setupAuth(true);
+    mockUsePathname.mockReturnValue('/');
+
+    render(<Navbar />);
+
+    expect(screen.getByRole('link', { name: 'Turnos' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Solicitar Turno' })).toBeInTheDocument();
   });
 });

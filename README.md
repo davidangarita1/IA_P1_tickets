@@ -15,6 +15,7 @@ Permitir que un paciente registre su turno y reciba actualizaciones en tiempo re
 - Consultar turnos por lista general o por cédula.
 - Gestionar usuarios: registro, inicio y cierre de sesión con autenticación HMAC.
 - Gestión de médicos: crear y editar médicos con nombre, cédula, consultorio y franja horaria; visualizar el catálogo de médicos activos. La franja horaria disponible se consulta en tiempo real antes de guardar, garantizando que no dos médicos activos compartan consultorio y franja. Módulo accesible solo para usuarios autenticados.
+- Barra de navegación pública: usuarios no autenticados acceden a "Solicitar Turno" (`/request-ticket`) directamente desde la barra de navegación, sin necesidad de conocer la URL. La ruta anterior `/register` redirige automáticamente a `/request-ticket`.
 
 ## Próxima feature en ideación: Login + Dashboard privado
 

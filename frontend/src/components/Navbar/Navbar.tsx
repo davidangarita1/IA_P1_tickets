@@ -6,11 +6,15 @@ import { useAuth } from '@/providers/AuthProvider';
 import SignOutButton from '@/components/SignOutButton/SignOutButton';
 import styles from '@/styles/Navbar.module.css';
 
-const NAV_ITEMS = [
+const AUTH_NAV_ITEMS = [
   { href: '/', label: 'Turnos' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/doctors', label: 'Gestión Médicos' },
-  { href: '/register', label: 'Registro' },
+  { href: '/request-ticket', label: 'Solicitar Turno' },
+];
+
+const PUBLIC_NAV_ITEMS = [
+  { href: '/request-ticket', label: 'Solicitar Turno' },
 ];
 
 export default function Navbar() {
@@ -24,7 +28,7 @@ export default function Navbar() {
       </Link>
       {isAuthenticated ? (
         <div className={styles.links}>
-          {NAV_ITEMS.map(({ href, label }) => (
+          {AUTH_NAV_ITEMS.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -37,6 +41,15 @@ export default function Navbar() {
         </div>
       ) : (
         <div className={styles.links}>
+          {PUBLIC_NAV_ITEMS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={pathname === href ? styles.linkActive : styles.link}
+            >
+              {label}
+            </Link>
+          ))}
           <Link href="/signin" className={styles.link}>
             Iniciar sesión
           </Link>
