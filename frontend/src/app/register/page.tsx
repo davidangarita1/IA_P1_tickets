@@ -1,5 +1,5 @@
-import CreateTicketForm from '@/components/CreateTicketForm/CreateTicketForm';
+import { redirect } from 'next/navigation';
 
-export default function RegisterPage() {
-  return <CreateTicketForm />;
+export default function RegisterPage(): never {
+  redirect('/solicitar-turno');
 }
